@@ -247,6 +247,24 @@
 .composer-toolbar button.active{ background: rgba(122,31,43,.14); }
 .rte-toolbar button.active{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,31,43,.08); }
 
+/* ---------------------------------------------------------
+   Urdu / RTL toggle button — flips a composer or staff editor
+   field to right-to-left Nastaliq typing on demand (see richtext.js).
+--------------------------------------------------------- */
+.btn-lang-toggle{
+  width:auto !important; padding:0 12px; border-radius: 16px !important;
+  font-family: var(--urdu) !important; font-size:14px !important; font-weight:600 !important;
+  border:1.5px solid var(--rule);
+}
+.composer-toolbar .btn-lang-toggle{ height:34px; }
+.btn-lang-toggle.active{
+  background: var(--maroon) !important; color:#fff !important; border-color: var(--maroon) !important;
+}
+.writer-editor.lang-ur, .rte-editor.lang-ur{
+  font-family: var(--urdu); font-size:1.18rem; line-height:2; text-align:right;
+}
+.writer-editor.lang-ur:empty:before, .rte-editor.lang-ur:empty:before{ text-align:right; }
+
 .format-bubble{
   position: absolute; top:-999px; left:-999px; z-index: 60;
   display:flex; align-items:center; gap:2px;
