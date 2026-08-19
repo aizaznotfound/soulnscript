@@ -8,17 +8,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap');
 
 :root{
-  --paper: #FEFCF7;
-  --paper-dim: #F5EFE4;
-  --ink: #201A14;
-  --ink-soft: #5C5248;
-  --maroon: #6E1F1F;
-  --maroon-dark: #4A1414;
-  --maroon-tint: #C98B7E;
-  --steel: #7A6F5F;
-  --rule: #E5DDCF;
-  --rule-strong: #201A14;
-  --gold: #C79A3C;
+  --paper: #FBF8F2;
+  --paper-dim: #F1E9DC;
+  --ink: #1E1A2E;
+  --ink-soft: #55506A;
+  --maroon: #7A2048;
+  --maroon-dark: #4A1030;
+  --maroon-tint: #C77FA0;
+  --steel: #756F8A;
+  --rule: #E6DFEA;
+  --rule-strong: #1E1A2E;
+  --gold: #C08A2E;
 
   --display: 'Playfair Display', 'Noto Nastaliq Urdu', Georgia, serif;
   --body: 'PT Serif', 'Noto Nastaliq Urdu', Georgia, serif;
@@ -32,7 +32,7 @@
   --shadow-sm: 0 2px 8px rgba(18,18,18,.08);
   --shadow-md: 0 8px 24px rgba(18,18,18,.12);
   --shadow-lg: 0 20px 48px rgba(18,18,18,.18);
-  --shadow-maroon: 0 10px 26px rgba(110,31,31,.22);
+  --shadow-maroon: 0 10px 26px rgba(122,32,72,.22);
   --ease: cubic-bezier(.22,.68,.31,1);
   --fast: .18s;
   --med: .32s;
@@ -268,7 +268,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 1.5px; text-unde
   display:inline-flex !important;
   align-items:center;
   gap:7px;
-  box-shadow: 0 1px 0 rgba(122,31,43,.05), 0 2px 6px rgba(122,31,43,.22);
+  box-shadow: 0 1px 0 rgba(122,32,72,.05), 0 2px 6px rgba(122,32,72,.22);
   transition: background var(--fast) var(--ease), transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
 }
 .nav-cta svg{ flex-shrink:0; transition: transform var(--fast) var(--ease); }
@@ -277,10 +277,10 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 1.5px; text-unde
   background: var(--maroon-dark);
   color: var(--paper) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(122,31,43,.32);
+  box-shadow: 0 4px 12px rgba(122,32,72,.32);
 }
 .nav-cta:hover svg{ transform: rotate(-8deg); }
-.nav-cta:active{ transform: translateY(0); box-shadow: 0 2px 6px rgba(122,31,43,.22); }
+.nav-cta:active{ transform: translateY(0); box-shadow: 0 2px 6px rgba(122,32,72,.22); }
 
 /* ---------- Mobile burger + mega-toggle ---------- */
 .nav-burger{
@@ -372,7 +372,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 1.5px; text-unde
   z-index: 2; /* always paints above the scrolling ticker text below */
   animation: pulse-dot 2.2s ease-in-out infinite;
 }
-@keyframes pulse-dot{ 0%,100%{ box-shadow: 0 0 0 0 rgba(122,31,43,0);} 50%{ box-shadow: 0 0 0 4px rgba(250,248,243,.18);} }
+@keyframes pulse-dot{ 0%,100%{ box-shadow: 0 0 0 0 rgba(122,32,72,0);} 50%{ box-shadow: 0 0 0 4px rgba(250,248,243,.18);} }
 /* Dedicated clipped lane for the scrolling text: this keeps the animated
    headlines strictly to the right of the tag at all times, so they can
    never visually cross under/over the "Latest" pill as they scroll by. */
