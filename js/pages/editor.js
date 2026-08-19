@@ -361,6 +361,7 @@
       italic: document.getElementById("pb-bubble-italic"),
       link: document.getElementById("pb-bubble-link")
     },
+    langToggle: document.getElementById("pb-lang"),
     onChange: () => { updatePbCounts(); renderPreview(); }
   });
 
