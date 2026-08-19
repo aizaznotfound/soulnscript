@@ -334,8 +334,18 @@
           <textarea id="tm-bio" placeholder="A sentence or two, if you want it."></textarea>
         </div>
         <div class="form-field">
-          <label for="tm-photo">Photo URL (optional — leave blank to show initials)</label>
-          <input type="text" id="tm-photo" placeholder="https://...">
+          <label>Profile Photo (optional — leave blank to show initials)</label>
+          <div class="image-input-toggle">
+            <button type="button" class="active" data-imgmode="upload" onclick="setTeamImageMode('upload')">Upload from computer</button>
+            <button type="button" data-imgmode="url" onclick="setTeamImageMode('url')">Paste image URL</button>
+          </div>
+          <div id="tm-image-upload-wrap">
+            <input type="file" id="tm-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="image-preview" id="tm-image-preview" style="display:none;"><img id="tm-image-preview-img" alt="Preview"></div>
+          </div>
+          <div id="tm-image-url-wrap" style="display:none;">
+            <input type="text" id="tm-photo" placeholder="https://...">
+          </div>
         </div>
         <div class="gh-actions">
           <button type="button" class="btn" id="tm-publish-btn" onclick="publishTeamMember()">🚀 Publish to Site</button>
