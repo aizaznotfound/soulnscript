@@ -24,8 +24,8 @@
    Photo posts (image-only content type)
 --------------------------------------------------------- */
 .photo-tile{
-  display:block; border:1px solid var(--rule); border-radius: var(--radius-md);
-  overflow:hidden; background: var(--paper);
+  display:block; border:none; border-radius: var(--radius-md);
+  overflow:hidden; background: var(--paper); box-shadow: var(--shadow-sm);
   transition: transform var(--med) var(--ease), box-shadow var(--med) var(--ease);
 }
 .photo-tile:hover{ transform: translateY(-3px); box-shadow: var(--shadow-md); text-decoration:none; }
