@@ -5,7 +5,7 @@
    Loaded on EVERY page, first, before components.css.
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap');
 
 :root{
   --paper: #FEFCF7;
@@ -20,9 +20,10 @@
   --rule-strong: #201A14;
   --gold: #C79A3C;
 
-  --display: 'Playfair Display', Georgia, serif;
-  --body: 'PT Serif', Georgia, serif;
-  --utility: 'Barlow Condensed', Arial, sans-serif;
+  --display: 'Playfair Display', 'Noto Nastaliq Urdu', Georgia, serif;
+  --body: 'PT Serif', 'Noto Nastaliq Urdu', Georgia, serif;
+  --utility: 'Barlow Condensed', 'Noto Nastaliq Urdu', Arial, sans-serif;
+  --urdu: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
 
   --max-w: 1180px;
 
@@ -50,6 +51,23 @@ html{
 @media (min-width: 1024px){ html{ font-size: 17.5px; } }
 @media (min-width: 1440px){ html{ font-size: 18.5px; } }
 @media (min-width: 1920px){ html{ font-size: 19.5px; } }
+
+/* ---------- Urdu / RTL-aware text ----------
+   unicode-bidi:plaintext makes every text block (heading, paragraph, form
+   field, or contenteditable line) resolve its own direction from its own
+   first strong character, instead of inheriting the page's ltr default.
+   That's what was making Urdu "buggy to edit": a single html[dir] or lack
+   of per-line direction meant the caret and punctuation kept jumping to
+   the wrong side as soon as Urdu/Arabic-script text was typed or mixed
+   with English. This fixes it site-wide with no markup changes needed —
+   Urdu glyphs also fall back automatically to Noto Nastaliq Urdu (added
+   to the font stacks above) since PT Serif/Playfair/Barlow don't cover
+   that script. */
+body, p, h1, h2, h3, h4, h5, h6, li, blockquote, figcaption, span, a,
+label, input, textarea, [contenteditable]{
+  unicode-bidi: plaintext;
+}
+[contenteditable]{ line-height: 1.7; }
 
 body{
   margin:0;
@@ -379,4 +397,3 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 1.5px; text-unde
   0%{ transform: translateX(0); }
   100%{ transform: translateX(-100%); }
 }
-
