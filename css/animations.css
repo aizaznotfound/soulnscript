@@ -102,6 +102,40 @@ footer li a:hover{ transform: translateX(3px); }
 .utility-bar a{ transition: opacity var(--fast) var(--ease); }
 .utility-bar a:hover{ opacity:.75; }
 
+/* ---------- Video play button: ripple pulse on hover ---------- */
+.video-card .play span{ position:relative; }
+.video-card .play span::after{
+  content:""; position:absolute; inset:-1px; border-radius:50%; border:2px solid rgba(255,255,255,.7);
+  opacity:0; transform:scale(.8);
+}
+.video-card:hover .play span::after{ animation: ripple-out 1.1s ease-out infinite; }
+
+/* ---------- Blockquote: flourish quote mark ---------- */
+.article-body blockquote{ position:relative; }
+.article-body blockquote::before{
+  content:"“"; position:absolute; left:-6px; top:-18px; font-family: var(--display);
+  font-size:3rem; color: var(--gold); opacity:.55; line-height:1; font-style:normal;
+}
+
+/* ---------- Card image: subtle depth gradient on hover ---------- */
+.card > a, .front-grid .big > a, .front-grid .medium > a{ position:relative; }
+.card > a::after, .front-grid .big > a::after, .front-grid .medium > a::after{
+  content:""; position:absolute; inset:0; background: linear-gradient(180deg, transparent 60%, rgba(32,26,20,.28));
+  opacity:0; transition: opacity var(--med) var(--ease); pointer-events:none;
+}
+.card:hover > a::after, .front-grid .big:hover > a::after, .front-grid .medium:hover > a::after{ opacity:1; }
+
+/* ---------- Search toggle: icon nudge ---------- */
+.nav .search-toggle{ transition: border-color var(--fast) var(--ease), color var(--fast) var(--ease), transform var(--fast) var(--ease); }
+.nav .search-toggle:hover{ transform: scale(1.05); }
+.nav .search-toggle:active{ transform: scale(.95); }
+
+/* ---------- Mega menu: slight scale-in instead of flat fade ---------- */
+.nav .mega{ transition: opacity var(--fast) var(--ease), transform var(--fast) var(--ease), visibility var(--fast); }
+
+/* ---------- Drop cap: gentle entrance ---------- */
+.drop-cap:first-letter{ animation: pop-in .5s var(--ease) both; }
+
 /* ---------- Scroll reveal ---------- */
 .reveal{ opacity:0; transform: translateY(18px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
 .reveal.is-visible{ opacity:1; transform: translateY(0); }
