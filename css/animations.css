@@ -71,14 +71,14 @@
 /* ---------- Chips / tag-pills: pop on hover ---------- */
 .chip{ transition: transform var(--fast) var(--ease), background var(--fast) var(--ease), border-color var(--fast) var(--ease); }
 .chip:hover{ transform: translateY(-2px) scale(1.03); }
-.tag-pill{ transition: transform var(--fast) var(--ease); }
-a:hover > .tag-pill, .tag-pill:hover{ transform: translateY(-1px) scale(1.05); }
+.tag-pill{ transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease); }
+a:hover > .tag-pill, .tag-pill:hover{ transform: rotate(0deg) translateY(-1px) scale(1.06); }
 
 /* ---------- Section headings: rule draws in on reveal ---------- */
 .team-group h3, .strip-head h3{ position:relative; overflow:hidden; }
 .team-group h3::after, .strip-head h3::after{
-  content:""; position:absolute; left:0; bottom:-2px; height:2px; width:0;
-  background: linear-gradient(90deg, var(--maroon), var(--gold));
+  content:""; position:absolute; left:0; bottom:-2px; height:3px; width:0; max-width:130px;
+  background: linear-gradient(90deg, var(--maroon), var(--gold)); border-radius:3px;
 }
 .team-group.reveal.is-visible h3::after, .strip-head.reveal.is-visible h3::after{ animation: draw-rule .9s var(--ease) .15s both; }
 
