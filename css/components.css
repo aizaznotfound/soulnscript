@@ -212,7 +212,7 @@
   margin: 10px 0 14px;
 }
 .article-head .deck{ font-size:1.2rem; font-style:italic; color:var(--ink-soft); margin-bottom:16px; }
-.article-body{ max-width: 720px; margin: 0 auto; padding: 30px 0 60px; font-size:1.12rem; }
+.article-body{ max-width: 720px; margin: 0 auto; padding: 30px 0 60px; font-size:1.12rem; line-height:1.75; }
 .article-body p{ margin: 0 0 20px; }
 .article-body figure{ margin: 28px 0; }
 .article-body figcaption{ font-family:var(--utility); font-size:13px; color:var(--steel); margin-top:8px; }
@@ -504,25 +504,39 @@ footer .masthead-mini{
 .share-bar a:hover, .share-bar button:hover{ background:var(--ink); color:var(--paper); text-decoration:none; transform: translateY(-2px); }
 
 /* ---------- Team page ---------- */
-.team-group{ margin: 8px 0 40px; }
+.team-group{ margin: 8px 0 44px; }
 .team-group h3{
   font-family: var(--display); font-style: italic; font-weight:700; font-size: 1.4rem;
-  color: var(--maroon-dark); margin: 0 0 18px; padding-bottom:8px; border-bottom: 2px solid var(--rule);
+  color: var(--maroon-dark); margin: 0 0 20px; padding-bottom:10px; border-bottom: 2px solid var(--rule);
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+}
+.team-group-count{
+  font-family: var(--utility); font-style:normal; font-weight:600; font-size:12px;
+  letter-spacing:.06em; text-transform:uppercase; color: var(--steel); white-space:nowrap;
 }
 .team-grid{
   display:grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 22px;
 }
 .team-card{
-  text-align:center; padding: 18px 12px 20px; border:1px solid var(--rule); border-radius: var(--radius-md);
-  background: var(--paper); transition: box-shadow var(--fast) var(--ease), transform var(--fast) var(--ease);
+  text-align:center; padding: 22px 14px 22px; border:1px solid var(--rule); border-radius: var(--radius-md);
+  background: var(--paper); position:relative; overflow:hidden;
+  transition: box-shadow var(--fast) var(--ease), transform var(--fast) var(--ease), border-color var(--fast) var(--ease);
 }
-.team-card:hover{ box-shadow: var(--shadow-maroon); transform: translateY(-2px); }
+.team-card::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--maroon), var(--gold));
+  transform: scaleX(0); transform-origin:left; transition: transform var(--med) var(--ease);
+}
+.team-card:hover{ box-shadow: var(--shadow-maroon); transform: translateY(-4px); border-color: var(--maroon-tint); }
+.team-card:hover::before{ transform: scaleX(1); }
 .team-avatar{
-  width:72px; height:72px; border-radius:50%; margin: 0 auto 12px; overflow:hidden;
+  width:78px; height:78px; border-radius:50%; margin: 0 auto 14px; overflow:hidden;
   background: linear-gradient(135deg, var(--maroon-tint), var(--gold)); display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 0 4px var(--paper-dim); transition: box-shadow var(--fast) var(--ease);
 }
+.team-card:hover .team-avatar{ box-shadow: 0 0 0 4px var(--paper-dim), 0 0 0 6px var(--maroon-tint); }
 .team-avatar img{ width:100%; height:100%; object-fit:cover; }
-.team-avatar-initials{ font-family: var(--display); font-weight:700; font-size:1.3rem; color: var(--paper); }
-.team-card h4{ font-family: var(--display); font-size:1.05rem; margin: 0 0 2px; color: var(--ink); }
-.team-role{ font-family: var(--utility); font-size:12px; letter-spacing:.05em; text-transform:uppercase; color: var(--maroon); margin-bottom:8px; }
-.team-bio{ font-family: var(--body); font-size:.85rem; color: var(--ink-soft); margin:0; }
+.team-avatar-initials{ font-family: var(--display); font-weight:700; font-size:1.35rem; color: var(--paper); }
+.team-card h4{ font-family: var(--display); font-size:1.08rem; font-weight:700; margin: 0 0 3px; color: var(--ink); }
+.team-role{ font-family: var(--utility); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color: var(--maroon); margin-bottom:9px; font-weight:600; }
+.team-bio{ font-family: var(--body); font-size:.85rem; line-height:1.6; color: var(--ink-soft); margin:0; }
