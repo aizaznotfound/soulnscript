@@ -228,6 +228,7 @@
       italic: document.getElementById("bubble-italic"),
       link: document.getElementById("bubble-link")
     },
+    langToggle: document.getElementById("btn-lang"),
     onChange: () => { updateCounts(); scheduleAutosave(); }
   });
   inlinePhotoInput.addEventListener("change", async (e) => {
