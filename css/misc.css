@@ -14,13 +14,13 @@
 .newsletter-box h4{ font-family:var(--display); font-size:1.05rem; font-weight:800; margin:0 0 8px; }
 .newsletter-box p{ font-size:.88rem; color:var(--ink-soft); margin:0 0 12px; }
 .newsletter-box form{ display:flex; gap:8px; }
-.newsletter-box input{ flex:1; padding:9px 10px; border:1px solid var(--rule-strong); font-family:var(--body); border-radius: var(--radius-sm); transition: box-shadow var(--fast) var(--ease); }
+.newsletter-box input{ flex:1; min-width:0; padding:9px 10px; border:1px solid var(--rule-strong); font-family:var(--body); border-radius: var(--radius-sm); transition: box-shadow var(--fast) var(--ease); }
 .newsletter-box input:focus{ outline:none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--maroon) 15%, transparent); }
 .newsletter-box button{ background:var(--maroon); color:#fff; border:none; padding:0 14px; font-family:var(--utility); font-weight:700; text-transform:uppercase; font-size:13px; cursor:pointer; border-radius: var(--radius-sm); transition: background var(--fast) var(--ease); }
 .newsletter-box button:hover{ background: var(--maroon-dark); }
 
 
-/* ---------- Photo posts (image-only content type) ---------- */
+/* ---------------------------------------------------------
    Photo posts (image-only content type)
 --------------------------------------------------------- */
 .photo-tile{
