@@ -107,6 +107,27 @@ function initRichText(editorEl, opts){
     notifyChange();
   });
 
+  // Urdu / RTL toggle — CSS (unicode-bidi:plaintext) already auto-detects
+  // direction per line, but a short line, a line that opens with a number,
+  // or an empty new paragraph has no strong character for the browser to
+  // guess from, which is exactly where typing Urdu used to feel "buggy"
+  // (caret jumping, new text landing on the wrong side). This button lets
+  // a writer lock the field to Urdu explicitly: proper dir/lang, the
+  // Nastaliq font, and right-aligned typing, no guessing required.
+  if(opts.langToggle){
+    const btn = opts.langToggle;
+    btn.addEventListener("mousedown", (e) => e.preventDefault());
+    btn.addEventListener("click", () => {
+      editorEl.focus();
+      const isUrdu = editorEl.classList.toggle("lang-ur");
+      editorEl.setAttribute("dir", isUrdu ? "rtl" : "auto");
+      editorEl.setAttribute("lang", isUrdu ? "ur" : "en");
+      btn.classList.toggle("active", isUrdu);
+      btn.setAttribute("aria-pressed", isUrdu ? "true" : "false");
+      notifyChange();
+    });
+  }
+
   // Floating bubble toolbar — appears above the current selection.
   if(opts.bubble && opts.bubble.root){
     const bubble = opts.bubble.root;
@@ -132,4 +153,3 @@ function initRichText(editorEl, opts){
     window.addEventListener("scroll", () => bubble.classList.remove("show"), { passive: true });
   }
 }
-
