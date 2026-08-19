@@ -7,15 +7,16 @@
 
 const TEAM_LABELS = {
   founders: "Founders & Co-Founders",
+  editorial: "Editorial Board",
   media: "Media Team",
-  promotion: "Promotion Team",
+  promotion: "Promotional Team",
   judges: "Judges",
   communication: "Communication Team",
   finance: "Finance Team"
 };
-const TEAM_ORDER = ["founders", "media", "promotion", "judges", "communication", "finance"];
+const TEAM_ORDER = ["founders", "editorial", "media", "promotion", "judges", "communication", "finance"];
 
-function teamMemberCardHTML(member){
+function teamMemberCardHTML(member, index){
   const name = escapeHtml(member.name || "");
   const role = escapeHtml(member.role || "");
   const bio = escapeHtml(member.bio || "");
@@ -23,8 +24,9 @@ function teamMemberCardHTML(member){
   const photo = member.photo
     ? `<img src="${member.photo}" alt="${name}" loading="lazy">`
     : `<span class="team-avatar-initials">${initials}</span>`;
+  const delay = Math.min(index, 8) * 45;
   return `
-  <div class="team-card">
+  <div class="team-card" style="transition-delay:${delay}ms;">
     <div class="team-avatar">${photo}</div>
     <h4>${name}</h4>
     ${role ? `<div class="team-role">${role}</div>` : ""}
@@ -45,12 +47,15 @@ function renderTeamPage(){
     const key = m.team && TEAM_LABELS[m.team] ? m.team : "founders";
     (groups[key] = groups[key] || []).push(m);
   });
+  Object.keys(groups).forEach(k => {
+    groups[k].sort((a, b) => (Number(a.order) || 99) - (Number(b.order) || 99));
+  });
   const keys = TEAM_ORDER.filter(k => groups[k] && groups[k].length);
   mount.innerHTML = keys.map(k => `
     <section class="team-group">
-      <h3>${TEAM_LABELS[k]}</h3>
+      <h3><span>${TEAM_LABELS[k]}</span><span class="team-group-count">${groups[k].length} ${groups[k].length === 1 ? "member" : "members"}</span></h3>
       <div class="team-grid">
-        ${groups[k].map(teamMemberCardHTML).join("")}
+        ${groups[k].map((m, i) => teamMemberCardHTML(m, i)).join("")}
       </div>
     </section>`).join("");
 }
