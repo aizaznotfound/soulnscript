@@ -67,13 +67,17 @@ export async function onRequestPost(context) {
       return json({ ok: false, exists: true, error: `A ${type} with the slug "${data.slug}" already exists.` }, 409);
     }
 
-    // ---- Upload image first (posts and photos) ----
-    if ((type === "post" || type === "photo") && image && image.base64 && image.filename) {
+    // ---- Upload image first (posts, photos, and team member avatars) ----
+    if ((type === "post" || type === "photo" || type === "team") && image && image.base64 && image.filename) {
       const ext = (image.filename.split(".").pop() || "jpg").toLowerCase();
       const imagePath = `images/${data.slug}.${ext}`;
       const imgSha = await ghGetSha(env, imagePath);
-      await ghPutFile(env, imagePath, image.base64, `Add image for ${data.title || data.slug}`, imgSha);
-      data.image = imagePath;
+      await ghPutFile(env, imagePath, image.base64, `Add image for ${data.title || data.name || data.slug}`, imgSha);
+      if (type === "team") {
+        data.photo = imagePath;
+      } else {
+        data.image = imagePath;
+      }
     }
 
     // ---- Write the JSON content file ----
