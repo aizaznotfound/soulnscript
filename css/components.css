@@ -186,7 +186,7 @@
 }
 .video-card .play span{
   width:52px; height:52px; border-radius:50%;
-  background: rgba(122,31,43,.92);
+  background: rgba(122,32,72,.92);
   display:flex; align-items:center; justify-content:center;
   color:#fff; font-size:0;
   transition: transform var(--fast) var(--ease), background var(--fast) var(--ease);
