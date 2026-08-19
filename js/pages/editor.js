@@ -151,6 +151,12 @@
     document.getElementById("ph-image-url-wrap").style.display = mode === "url" ? "block" : "none";
   }
 
+  function setTeamImageMode(mode){
+    document.querySelectorAll("#team-shell .image-input-toggle button").forEach(b => b.classList.toggle("active", b.dataset.imgmode === mode));
+    document.getElementById("tm-image-upload-wrap").style.display = mode === "upload" ? "block" : "none";
+    document.getElementById("tm-image-url-wrap").style.display = mode === "url" ? "block" : "none";
+  }
+
   document.getElementById("p-image-file").addEventListener("change", (e) => {
     const file = e.target.files[0];
     const wrap = document.getElementById("p-image-preview");
@@ -162,6 +168,19 @@
       wrap.style.display = "none";
     }
     renderPreview();
+  });
+
+  document.getElementById("tm-image-file").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    const wrap = document.getElementById("tm-image-preview");
+    const img = document.getElementById("tm-image-preview-img");
+    if(file){
+      img.src = URL.createObjectURL(file);
+      wrap.style.display = "block";
+    } else {
+      wrap.style.display = "none";
+    }
+    renderTeamPreview();
   });
 
   document.getElementById("ph-image-file").addEventListener("change", (e) => {
@@ -375,7 +394,10 @@
     const team = document.getElementById("tm-team").value || "founders";
     const order = parseInt(document.getElementById("tm-order").value, 10) || 10;
     const bio = document.getElementById("tm-bio").value || "";
-    const photo = document.getElementById("tm-photo").value || "";
+    const uploadFile = document.getElementById("tm-image-file").files[0];
+    const photo = uploadFile
+      ? (document.getElementById("tm-image-preview-img").src || "")
+      : (document.getElementById("tm-photo").value || "");
     return { slug, name, role, team, order, bio, photo };
   }
 
@@ -650,6 +672,7 @@
       showStatus("tm-status", "error", "Please add a name first.");
       return;
     }
+    const uploadFile = document.getElementById("tm-image-file").files[0];
     const m = readTeamForm();
 
     const btn = document.getElementById("tm-publish-btn");
@@ -657,9 +680,15 @@
     showStatus("tm-status", "working", "Publishing…");
 
     try{
+      let image = null;
+      if(uploadFile){
+        const base64 = await fileToBase64(uploadFile);
+        image = { filename: uploadFile.name, base64 };
+      }
+
       let { status, data } = await callPublishApi({
         username: auth.username, password: auth.password,
-        type: "team", data: m
+        type: "team", data: m, image
       });
 
       if(status === 409 && data.exists){
@@ -668,7 +697,7 @@
         showStatus("tm-status", "working", "Overwriting…");
         ({ status, data } = await callPublishApi({
           username: auth.username, password: auth.password,
-          type: "team", data: m, confirmOverwrite: true
+          type: "team", data: m, image, confirmOverwrite: true
         }));
       }
 
@@ -757,7 +786,10 @@
     document.getElementById("tm-team").value = m.team || "founders";
     document.getElementById("tm-order").value = m.order || 10;
     document.getElementById("tm-bio").value = m.bio || "";
+    setTeamImageMode("url");
     document.getElementById("tm-photo").value = m.photo || "";
+    document.getElementById("tm-image-file").value = "";
+    document.getElementById("tm-image-preview").style.display = "none";
     renderTeamPreview();
     showStatus("tm-status", "working", `Editing "${escapeHtml(m.name)}" — change what you like, then hit Publish to save.`);
     window.scrollTo({ top: document.getElementById("team-form").getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
