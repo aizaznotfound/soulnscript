@@ -1,5 +1,5 @@
 /* =========================================================
-   THE GKMC TIMES — BASE.CSS
+   SOUL & SCRIPT — BASE.CSS
    Design tokens (colors/fonts/spacing), reset, utility bar,
    masthead, main navigation + mobile burger, breaking ticker.
    Loaded on EVERY page, first, before components.css.
@@ -36,8 +36,9 @@
   --ease: cubic-bezier(.22,.68,.31,1);
   --fast: .18s;
   --med: .32s;
-  --radius-sm: 6px;
-  --radius-md: 14px;
+  --radius-sm: 9px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
 }
 
 *{ box-sizing: border-box; }
@@ -45,6 +46,7 @@
 html{
   scroll-behavior: smooth;
   font-size: 16px; /* base — everything below is rem-based, so this scales the whole site */
+  overflow-x: hidden;
 }
 
 /* Bump base text size on bigger screens so reading text isn't tiny on laptop/desktop monitors */
@@ -71,6 +73,7 @@ label, input, textarea, [contenteditable]{
 
 body{
   margin:0;
+  overflow-x: hidden;
   background: var(--paper);
   background-image:
     radial-gradient(circle at 1px 1px, rgba(30,26,46,.035) 1px, transparent 0);
@@ -196,8 +199,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 1.5px; text-unde
    Navigation
 --------------------------------------------------------- */
 .nav{
-  border-top: 3px solid var(--rule-strong);
-  border-bottom: 1px solid var(--rule-strong);
+  border-top: none;
+  border-bottom: 1px solid var(--rule);
+  box-shadow: 0 4px 18px rgba(30,26,46,.05);
   background: var(--paper);
   position: sticky;
   top:0;
