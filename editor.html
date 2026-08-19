@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editorial Access — Soul &amp; Script</title>
+<meta name="description" content="Publish writing, films, gallery pieces, events, and manage the Soul &amp; Script team — no code required.">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/misc.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/editor-tool.css">
+<link rel="stylesheet" href="css/contributor.css">
+<link rel="stylesheet" href="css/write-tool.css">
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="wrap">
+    <span id="utility-date"></span>
+    <span><span class="divider">|</span>Staff Tool · Not visible to readers</span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="kicker">Team Only</div>
+    <h1><a href="index.html">Soul <span class="amp">&amp;</span> Script</a></h1>
+    <div class="tagline">Editorial Access</div>
+  </div>
+  <div class="wrap"><div class="pulse-rule-mount"></div></div>
+</header>
+
+<nav class="nav">
+  <div class="wrap">
+    <ul>
+      <li><a href="index.html">← Back to Site</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="wrap" style="padding-top:26px;">
+
+  <div class="page-header" style="text-align:left; border-bottom:3px solid var(--rule-strong); padding-bottom:20px;">
+    <h1 style="font-size:2.2rem;">Publish New Content</h1>
+    <p style="max-width:none;">Log in, fill in the form, check the live preview, then hit <strong>Publish</strong>. It goes straight to the site — no file uploads, no GitHub tokens to manage.</p>
+  </div>
+
+  <!-- ============ Login panel ============ -->
+  <div class="gh-panel" id="login-panel">
+    <div class="gh-panel-head" id="login-panel-toggle">
+      <h3>🔐 Staff Login</h3>
+      <span class="gh-status-pill disconnected" id="login-status-pill">Not logged in</span>
+    </div>
+    <div class="gh-panel-body" id="login-panel-body">
+      <div class="gh-row">
+        <div class="form-field">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" autocomplete="username" placeholder="Username">
+        </div>
+        <div class="form-field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" autocomplete="current-password" placeholder="Password">
+        </div>
+      </div>
+      <div class="gh-actions">
+        <button type="button" class="btn" onclick="doLogin()">Log In</button>
+        <button type="button" class="btn-secondary" onclick="doLogout()">Log Out</button>
+      </div>
+      <div id="login-status" class="publish-status"></div>
+    </div>
+  </div>
+
+  <!-- ============ Contributor submissions awaiting review ============ -->
+  <div class="gh-panel" id="pending-panel">
+    <div class="gh-panel-head" id="pending-panel-toggle">
+      <h3>📝 Contributor Submissions</h3>
+      <span class="gh-status-pill disconnected" id="pending-count-pill">0 pending</span>
+    </div>
+    <div class="gh-panel-body" id="pending-panel-body">
+      <p class="helper-text" style="margin-top:-2px;">Articles submitted by readers through <code>write.html</code> land here. Review each one, then approve (publishes it live) or decline (the contributor sees your note).</p>
+      <div class="gh-actions">
+        <button type="button" class="btn-secondary" onclick="loadPending()">Refresh</button>
+      </div>
+      <div id="pending-list" style="margin-top:14px;"></div>
+      <div id="pending-status" class="publish-status"></div>
+    </div>
+  </div>
+
+  <div class="editor-tabs">
+    <button type="button" class="active" data-mode="post" onclick="setMode('post')">Writing</button>
+    <button type="button" data-mode="video" onclick="setMode('video')">Video</button>
+    <button type="button" data-mode="photo" onclick="setMode('photo')">Gallery Piece</button>
+    <button type="button" data-mode="team" onclick="setMode('team')">Team Member</button>
+  </div>
+
+  <div class="editor-shell" id="post-shell">
+    <div>
+      <!-- POST FORM -->
+      <form id="post-form">
+        <div class="form-field">
+          <label for="p-category">Category</label>
+          <select id="p-category">
+            <option value="news">Prose &amp; Picture Stories</option>
+            <option value="campus">Poetry</option>
+            <option value="academics">Philosophy &amp; Reflections</option>
+            <option value="events">Session Recap</option>
+            <option value="opinion">Reader Reflection</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="p-title">Headline</label>
+          <input type="text" id="p-title" required placeholder="e.g. The Silence Between Two Verses">
+        </div>
+        <div class="form-field">
+          <label for="p-slug">URL Slug (auto-filled, edit if you like)</label>
+          <input type="text" id="p-slug" placeholder="auto-generated-from-headline">
+        </div>
+        <div class="form-field">
+          <label for="p-deck">Subheading / Deck (one or two sentences)</label>
+          <textarea id="p-deck" style="min-height:70px;" required placeholder="A short summary shown under the headline."></textarea>
+        </div>
+        <div class="form-field">
+          <label for="p-author">Author Name</label>
+          <input type="text" id="p-author" required placeholder="e.g. Ayesha Farooq">
+        </div>
+        <div class="form-field">
+          <label for="p-date">Publish Date</label>
+          <input type="date" id="p-date">
+        </div>
+        <div class="form-field">
+          <label for="p-readtime">Read Time (optional)</label>
+          <input type="text" id="p-readtime" placeholder="e.g. 4 min read" value="3 min read">
+        </div>
+        <div class="form-field">
+          <label>Image</label>
+          <div class="image-input-toggle">
+            <button type="button" class="active" data-imgmode="upload" onclick="setImageMode('upload')">Upload from computer</button>
+            <button type="button" data-imgmode="url" onclick="setImageMode('url')">Paste image URL</button>
+          </div>
+          <div id="p-image-upload-wrap">
+            <input type="file" id="p-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="image-preview" id="p-image-preview" style="display:none;"><img id="p-image-preview-img" alt="Preview"></div>
+          </div>
+          <div id="p-image-url-wrap" style="display:none;">
+            <input type="text" id="p-image" placeholder="https://... (leave blank to use a placeholder photo)">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="p-caption">Image Caption (optional)</label>
+          <input type="text" id="p-caption" placeholder="Photo credit or short caption">
+        </div>
+        <div class="form-field">
+          <label for="p-tags">Tags (comma separated)</label>
+          <input type="text" id="p-tags" placeholder="e.g. Poetry, Open Mic, Sketch">
+        </div>
+        <div class="form-field">
+          <label><input type="checkbox" id="p-featured" style="width:auto; display:inline-block; margin-right:8px;"> Feature this on the homepage lead story rotation</label>
+        </div>
+        <div class="form-field">
+          <label for="p-body-editor">Story Body</label>
+          <div class="rte-field">
+            <div class="rte-toolbar">
+              <button type="button" id="pb-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+              <button type="button" id="pb-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+              <button type="button" id="pb-link" title="Add link (Ctrl+K)">🔗</button>
+              <span class="rte-sep"></span>
+              <button type="button" id="pb-heading" title="Turn this line into a heading">H</button>
+              <span class="rte-counts" id="pb-counts">0 words</span>
+            </div>
+            <div class="rte-editor" id="p-body-editor" contenteditable="true" data-placeholder="Write the story here — select any text to bold, italicize, or add a link. First paragraph gets the drop-cap automatically."></div>
+          </div>
+          <div class="format-bubble" id="format-bubble-staff">
+            <button type="button" id="pb-bubble-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button type="button" id="pb-bubble-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button type="button" id="pb-bubble-link" title="Add link (Ctrl+K)">🔗</button>
+          </div>
+          <p class="helper-text">Editing an existing article? Its old paragraphs load right into this box, formatting and all.</p>
+        </div>
+        <div class="gh-actions">
+          <button type="button" class="btn" id="p-publish-btn" onclick="publishPost()">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" onclick="downloadPost()">⬇ Download File Instead</button>
+        </div>
+        <div id="p-warning" class="editor-warning" style="display:none;"></div>
+        <div id="p-status" class="publish-status"></div>
+      </form>
+    </div>
+
+    <div>
+      <div class="preview-frame">
+        <div style="font-family:var(--utility); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--maroon); margin-bottom:12px; font-weight:700;">Live Preview</div>
+        <div id="preview-mount"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEO FORM (hidden by default) -->
+  <div class="editor-shell" id="video-shell" style="display:none;">
+    <div>
+      <form id="video-form">
+        <div class="form-field">
+          <label for="v-title">Video Title</label>
+          <input type="text" id="v-title" required placeholder="e.g. Convocation 2026 Highlights">
+        </div>
+        <div class="form-field">
+          <label for="v-slug">URL Slug (auto-filled, edit if you like)</label>
+          <input type="text" id="v-slug" placeholder="auto-generated-from-title">
+        </div>
+        <div class="form-field">
+          <label for="v-deck">Description</label>
+          <textarea id="v-deck" required placeholder="A short description of the video."></textarea>
+        </div>
+        <div class="form-field">
+          <label for="v-author">Credit</label>
+          <input type="text" id="v-author" value="Soul &amp; Script Media Team">
+        </div>
+        <div class="form-field">
+          <label for="v-date">Publish Date</label>
+          <input type="date" id="v-date">
+        </div>
+        <div class="form-field">
+          <label for="v-youtube">YouTube Video ID</label>
+          <input type="text" id="v-youtube" required placeholder="the part after watch?v= in the YouTube URL">
+        </div>
+        <p class="helper-text">Thumbnail is generated automatically from the YouTube video ID.</p>
+        <div class="gh-actions">
+          <button type="button" class="btn" id="v-publish-btn" onclick="publishVideo()">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" onclick="downloadVideo()">⬇ Download File Instead</button>
+        </div>
+        <div id="v-warning" class="editor-warning" style="display:none;"></div>
+        <div id="v-status" class="publish-status"></div>
+      </form>
+    </div>
+    <div>
+      <div class="preview-frame">
+        <div style="font-family:var(--utility); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--maroon); margin-bottom:12px; font-weight:700;">Live Preview</div>
+        <div id="video-preview-mount"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHOTO FORM (hidden by default) -->
+  <div class="editor-shell" id="photo-shell" style="display:none;">
+    <div>
+      <form id="photo-form">
+        <div class="form-field">
+          <label for="ph-title">Title / Caption</label>
+          <input type="text" id="ph-title" required placeholder="e.g. Charcoal sketch, self-portrait study">
+        </div>
+        <div class="form-field">
+          <label for="ph-slug">URL Slug (auto-filled, edit if you like)</label>
+          <input type="text" id="ph-slug" placeholder="auto-generated-from-title">
+        </div>
+        <div class="form-field">
+          <label for="ph-caption">Longer Caption (optional)</label>
+          <textarea id="ph-caption" placeholder="A sentence or two of context, if you want it."></textarea>
+        </div>
+        <div class="form-field">
+          <label for="ph-author">Credit</label>
+          <input type="text" id="ph-author" value="Soul &amp; Script Media Team">
+        </div>
+        <div class="form-field">
+          <label for="ph-date">Publish Date</label>
+          <input type="date" id="ph-date">
+        </div>
+        <div class="form-field">
+          <label>Photo</label>
+          <div class="image-input-toggle">
+            <button type="button" class="active" data-imgmode="upload" onclick="setPhotoImageMode('upload')">Upload from computer</button>
+            <button type="button" data-imgmode="url" onclick="setPhotoImageMode('url')">Paste image URL</button>
+          </div>
+          <div id="ph-image-upload-wrap">
+            <input type="file" id="ph-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="image-preview" id="ph-image-preview" style="display:none;"><img id="ph-image-preview-img" alt="Preview"></div>
+          </div>
+          <div id="ph-image-url-wrap" style="display:none;">
+            <input type="text" id="ph-image" placeholder="https://...">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="ph-tags">Tags (comma separated, optional)</label>
+          <input type="text" id="ph-tags" placeholder="e.g. Campus, Aerial, Convocation">
+        </div>
+        <p class="helper-text">Photo posts are image-only — no article body. Great for a standalone shot that doesn't need a full story around it.</p>
+        <div class="gh-actions">
+          <button type="button" class="btn" id="ph-publish-btn" onclick="publishPhoto()">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" onclick="downloadPhoto()">⬇ Download File Instead</button>
+        </div>
+        <div id="ph-warning" class="editor-warning" style="display:none;"></div>
+        <div id="ph-status" class="publish-status"></div>
+      </form>
+    </div>
+    <div>
+      <div class="preview-frame">
+        <div style="font-family:var(--utility); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--maroon); margin-bottom:12px; font-weight:700;">Live Preview</div>
+        <div id="photo-preview-mount"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM MEMBER FORM (hidden by default) -->
+  <div class="editor-shell" id="team-shell" style="display:none;">
+    <div>
+      <form id="team-form">
+        <div class="form-field">
+          <label for="tm-name">Full Name</label>
+          <input type="text" id="tm-name" required placeholder="e.g. Ayesha Farooq">
+        </div>
+        <div class="form-field">
+          <label for="tm-slug">URL Slug (auto-filled, edit if you like)</label>
+          <input type="text" id="tm-slug" placeholder="auto-generated-from-name">
+        </div>
+        <div class="form-field">
+          <label for="tm-role">Role / Title</label>
+          <input type="text" id="tm-role" placeholder="e.g. President, Head of Media Team">
+        </div>
+        <div class="form-field">
+          <label for="tm-team">Team</label>
+          <select id="tm-team">
+            <option value="founders">Founders &amp; Co-Founders</option>
+            <option value="media">Media Team</option>
+            <option value="promotion">Promotion Team</option>
+            <option value="judges">Judges</option>
+            <option value="communication">Communication Team</option>
+            <option value="finance">Finance Team</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="tm-order">Display Order (lower shows first, optional)</label>
+          <input type="number" id="tm-order" value="10">
+        </div>
+        <div class="form-field">
+          <label for="tm-bio">Short Bio (optional)</label>
+          <textarea id="tm-bio" placeholder="A sentence or two, if you want it."></textarea>
+        </div>
+        <div class="form-field">
+          <label for="tm-photo">Photo URL (optional — leave blank to show initials)</label>
+          <input type="text" id="tm-photo" placeholder="https://...">
+        </div>
+        <div class="gh-actions">
+          <button type="button" class="btn" id="tm-publish-btn" onclick="publishTeamMember()">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" onclick="downloadTeamMember()">⬇ Download File Instead</button>
+        </div>
+        <div id="tm-warning" class="editor-warning" style="display:none;"></div>
+        <div id="tm-status" class="publish-status"></div>
+      </form>
+    </div>
+    <div>
+      <div class="preview-frame">
+        <div style="font-family:var(--utility); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--maroon); margin-bottom:12px; font-weight:700;">Live Preview</div>
+        <div id="team-preview-mount"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Manage existing content ============ -->
+  <div class="manage-panel">
+    <div class="gh-panel-head" id="manage-panel-toggle" style="margin-bottom:0;">
+      <h3>📋 Manage Existing Content</h3>
+      <span class="gh-status-pill connected" id="manage-count-pill">0 items</span>
+    </div>
+    <div id="manage-panel-body" style="margin-top:16px;">
+      <div class="manage-search">
+        <input type="text" id="manage-search" placeholder="Search by title…" oninput="renderManageList()">
+      </div>
+      <div class="manage-list" id="manage-list"></div>
+      <div id="manage-status" class="publish-status"></div>
+    </div>
+  </div>
+
+  <div class="draft-list">
+    <h5>Recent Activity (this browser session)</h5>
+    <div id="draft-items"></div>
+  </div>
+
+  <div class="editor-note" style="margin-top:24px;">
+    <strong>Prefer to do it manually instead?</strong>
+    <ol style="margin:10px 0 0; padding-left:20px; font-family:var(--body);">
+      <li style="margin-bottom:6px;">Click <strong>"⬇ Download File Instead"</strong> — it saves one small file, e.g. <code>your-title.json</code>.</li>
+      <li style="margin-bottom:6px;">On <a href="https://github.com" target="_blank" rel="noopener">github.com</a>, open the matching content folder — <code>content/posts</code>, <code>content/videos</code>, <code>content/photos</code>, or <code>content/team</code> — → <strong>Add file → Upload files</strong> → drop in the file → <strong>Commit changes</strong>.</li>
+      <li>Cloudflare Pages redeploys automatically — check your live site in about a minute.</li>
+    </ol>
+  </div>
+
+  <p class="helper-text" style="text-align:center; margin:24px 0 60px;">Editing an already-published article? Just publish again with the same headline/slug — it will overwrite the existing one after a confirmation. You can also edit the file directly inside <code>content/posts</code> on GitHub if you prefer.</p>
+
+</main>
+
+<script src="js/content.js"></script>
+<script src="js/lib/format.js"></script>
+<script src="js/lib/sanitize.js"></script>
+<script src="js/lib/content-data.js"></script>
+<script src="js/render/cards.js"></script>
+<script src="js/render/sections.js"></script>
+<script src="js/render/article-page.js"></script>
+<script src="js/render/share-and-rails.js"></script>
+<script src="js/render/team.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/richtext.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/reveal.js"></script>
+<script src="js/pages/editor.js"></script>
+</body>
+</html>

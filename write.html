@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Your Work — Soul &amp; Script</title>
+<meta name="description" content="Share a poem, story, reflection, or piece of writing and submit it to Soul &amp; Script for review.">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/misc.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/contributor.css">
+<link rel="stylesheet" href="css/write-tool.css">
+</head>
+<body>
+
+<div class="composer-page">
+
+  <div class="composer-topbar">
+    <a href="index.html" class="composer-back" title="Back to site">←</a>
+    <span class="composer-draft-state" id="draft-indicator"></span>
+    <div class="composer-topbar-right">
+      <button type="button" class="composer-icon-btn" id="submissions-btn" title="My submissions">
+        📋<span class="badge" id="submissions-badge" style="display:none;">0</span>
+      </button>
+      <button type="button" class="composer-logout" id="logout-btn">Log out</button>
+      <button type="button" class="composer-submit" id="submit-btn">Submit for review</button>
+    </div>
+  </div>
+
+  <div class="composer-hint" id="composer-hint">Write it like you're telling a friend what happened — an editor will polish anything rough before it goes live.</div>
+
+  <textarea id="a-title" class="composer-title" placeholder="Title" rows="1"></textarea>
+
+  <button type="button" class="composer-details-toggle" id="details-toggle">+ Add a summary, category, topics or photo</button>
+
+  <div class="composer-details" id="details-panel" hidden>
+    <div class="cd-field">
+      <div class="cd-label">💬 Add a short summary</div>
+      <div class="cd-hint">One sentence about your story, shown under the title. Totally optional.</div>
+      <textarea id="a-deck" class="writer-deck" rows="1" placeholder="e.g. Students share what convocation day felt like this year"></textarea>
+    </div>
+    <div class="cd-field">
+      <div class="cd-label">🗂️ Choose a category</div>
+      <div class="cd-hint">Pick whichever fits best.</div>
+      <div class="chip-group" id="category-chips">
+        <button type="button" class="chip active" data-value="campus">Poetry</button>
+        <button type="button" class="chip" data-value="news">Prose &amp; Picture Stories</button>
+        <button type="button" class="chip" data-value="academics">Philosophy &amp; Reflections</button>
+        <button type="button" class="chip" data-value="events">Session Recap</button>
+        <button type="button" class="chip" data-value="opinion">Reader Reflection</button>
+      </div>
+    </div>
+    <div class="cd-field">
+      <div class="cd-label">🏷️ Add a few topic words</div>
+      <div class="cd-hint">Optional — helps readers find your story, e.g. Convocation, Sports.</div>
+      <div class="tag-input" id="tag-input-wrap">
+        <input type="text" id="tag-entry" placeholder="Type a word, press Enter">
+      </div>
+    </div>
+    <div class="cd-field">
+      <div class="cd-label">📷 Add a cover photo</div>
+      <div class="cd-hint">Optional — this shows at the top of your story.</div>
+      <label class="dropzone" id="lead-dropzone" for="a-lead-image">
+        <input type="file" id="a-lead-image" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+        <span id="dropzone-text">📷 Tap to add a photo from your device</span>
+        <img id="a-lead-preview-img" style="display:none;" alt="Cover preview">
+      </label>
+      <div id="dropzone-remove" style="display:none; text-align:center;">
+        <span class="dz-remove" id="dropzone-remove-btn">Remove photo</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="writer-editor composer-body" id="editor" contenteditable="true" data-placeholder="Start writing your story here…"></div>
+
+  <!-- Floating selection toolbar — select any text to bold, italicize, or link it. -->
+  <div class="format-bubble" id="format-bubble">
+    <button type="button" id="bubble-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button type="button" id="bubble-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button type="button" id="bubble-link" title="Add link (Ctrl+K)">🔗</button>
+  </div>
+
+  <div class="composer-toolbar">
+    <button type="button" id="btn-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button type="button" id="btn-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button type="button" id="btn-link" title="Add link (Ctrl+K)">🔗</button>
+    <button type="button" id="btn-photo" title="Add a photo">🖼</button>
+    <button type="button" id="btn-heading" title="Turn this line into a heading">H</button>
+    <span class="writer-counts" id="writer-counts">0 words · 1 min read</span>
+  </div>
+  <input type="file" id="inline-photo-input" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+
+  <div id="submit-status" class="publish-status"></div>
+
+</div>
+
+<!-- ============ My submissions (overlay) ============ -->
+<div class="composer-submissions-panel" id="submissions-panel" hidden>
+  <div class="composer-submissions-card">
+    <div class="composer-submissions-head">
+      <h3>📋 My Submissions</h3>
+      <button type="button" class="composer-close-btn" id="submissions-close">✕</button>
+    </div>
+    <div id="my-submissions-list"></div>
+  </div>
+</div>
+
+<script src="js/content.js"></script>
+<script src="js/lib/format.js"></script>
+<script src="js/lib/sanitize.js"></script>
+<script src="js/lib/content-data.js"></script>
+<script src="js/render/cards.js"></script>
+<script src="js/render/sections.js"></script>
+<script src="js/render/article-page.js"></script>
+<script src="js/render/share-and-rails.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/richtext.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/reveal.js"></script>
+<script src="js/pages/write.js"></script>
+</body>
+</html>

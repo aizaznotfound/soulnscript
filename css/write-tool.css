@@ -1,0 +1,298 @@
+/* =========================================================
+   THE GKMC TIMES — WRITE-TOOL.CSS
+   The simplified block-by-block writing tool UI (write.html) and
+   the shared rich-text formatting toolbar (also used inside the
+   staff editor's Story Body field in editor.html).
+   Loaded on: write.html, editor.html
+   ========================================================= */
+
+   Simplified Writing Tool (write.html v2)
+--------------------------------------------------------- */
+.draft-indicator{
+  font-family: var(--utility); font-size: 12.5px; color: var(--steel);
+  display:flex; align-items:center; gap:6px; margin: -6px 0 16px 2px; min-height: 18px;
+}
+.draft-indicator .dot{ width:6px; height:6px; border-radius:50%; background:#2E5E33; display:inline-block; }
+.draft-indicator.saving .dot{ background: var(--gold); }
+
+.writer-card{
+  border:1px solid var(--rule); background: var(--paper); box-shadow: var(--shadow-sm);
+  padding: 22px 24px 26px; margin-bottom: 20px;
+}
+.writer-headline{
+  width:100%; border:none; background:none; font-family: var(--display); font-weight:700;
+  font-size: clamp(1.5rem, 3vw, 2.1rem); line-height:1.25; padding: 6px 0; outline:none;
+  border-bottom: 2px solid var(--rule);
+}
+.writer-headline::placeholder{ color: #ADADAD; font-weight:600; }
+.writer-headline:focus{ border-bottom-color: var(--maroon); }
+
+.writer-deck{
+  width:100%; border:none; background:none; font-family: var(--body); font-style:italic;
+  font-size: 1.05rem; color: var(--ink-soft); resize:none; outline:none; padding: 10px 0 14px;
+  border-bottom: 1px solid var(--rule); overflow:hidden;
+}
+.writer-deck::placeholder{ color:#ADADAD; font-style:italic; }
+.writer-deck:focus{ border-bottom-color: var(--maroon); }
+
+.writer-meta-row{ display:grid; grid-template-columns: 1.3fr 1fr; gap:22px; margin: 18px 0; }
+@media (max-width: 700px){ .writer-meta-row{ grid-template-columns: 1fr; } }
+.writer-field label{
+  display:block; font-family: var(--utility); font-size: 12px; text-transform:uppercase;
+  letter-spacing:.06em; color: var(--steel); margin-bottom: 8px; font-weight:600;
+}
+
+.chip-group{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  font-family: var(--utility); font-size: 13.5px; font-weight:600; letter-spacing:.02em;
+  border:1.5px solid var(--rule); background: var(--paper); color: var(--ink-soft);
+  padding: 7px 14px; border-radius: 999px; cursor:pointer; transition: all var(--fast) var(--ease);
+}
+.chip:hover{ border-color: var(--maroon); color: var(--maroon); }
+.chip.active{ background: var(--maroon); border-color: var(--maroon); color: var(--paper); }
+
+.tag-input{
+  display:flex; flex-wrap:wrap; gap:6px; align-items:center; border:1.5px solid var(--rule);
+  background: var(--paper); padding:7px 9px; border-radius: var(--radius-sm); min-height: 42px;
+}
+.tag-input:focus-within{ border-color: var(--maroon); }
+.tag-chip{
+  display:inline-flex; align-items:center; gap:6px; background: var(--paper-dim);
+  border:1px solid var(--rule); border-radius: 999px; padding: 3px 6px 3px 12px;
+  font-family: var(--utility); font-size:13px; color: var(--ink-soft);
+}
+.tag-chip button{
+  border:none; background: rgba(122,31,43,.12); color: var(--maroon); width:18px; height:18px;
+  border-radius:50%; cursor:pointer; font-size:11px; line-height:1; display:flex; align-items:center; justify-content:center;
+}
+.tag-input input{
+  border:none; outline:none; background:none; font-family: var(--body); font-size:14px;
+  flex:1; min-width:90px; padding:4px;
+}
+
+.dropzone{
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px;
+  border: 2px dashed var(--rule); border-radius: var(--radius-sm); background: var(--paper-dim);
+  min-height:96px; cursor:pointer; text-align:center; padding:14px; transition: all var(--fast) var(--ease);
+  font-family: var(--utility); font-size: 13.5px; color: var(--steel);
+}
+.dropzone:hover, .dropzone.drag-over{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,31,43,.04); }
+.dropzone img{ max-height:160px; border-radius: var(--radius-sm); }
+.dropzone .dz-remove{
+  font-family: var(--utility); font-size:12px; color: var(--maroon); text-decoration:underline; margin-top:4px;
+}
+
+.writer-toolbar{
+  display:flex; align-items:center; gap:8px; padding: 10px 2px; border-bottom:1px solid var(--rule);
+  margin-top: 6px; flex-wrap:wrap;
+}
+.writer-toolbar button{
+  font-family: var(--utility); font-size:13px; font-weight:600; border:1.5px solid var(--rule);
+  background: var(--paper); padding:7px 13px; border-radius: var(--radius-sm); cursor:pointer;
+  transition: all var(--fast) var(--ease);
+}
+.writer-toolbar button:hover, .writer-toolbar button.active{ border-color: var(--maroon); color: var(--maroon); }
+.writer-counts{
+  margin-left:auto; font-family: var(--utility); font-size:12.5px; color: var(--steel);
+}
+
+.writer-editor{
+  font-family: var(--body); font-size: 1.08rem; line-height:1.7; min-height: 340px;
+  padding: 18px 4px; outline:none;
+}
+.writer-editor:empty:before{
+  content: attr(data-placeholder); color:#ADADAD; font-style:italic; pointer-events:none;
+}
+.writer-editor p{ margin: 0 0 1em; }
+.writer-editor h3{ font-family: var(--display); font-size:1.35rem; font-weight:700; margin: 1.1em 0 .5em; }
+.writer-figure{ position:relative; margin: 1.2em 0; }
+.writer-figure img{ width:100%; border-radius: var(--radius-sm); display:block; }
+.writer-figure figcaption{
+  font-family: var(--utility); font-size:12.5px; color: var(--steel); text-align:center;
+  padding-top:6px; outline:none;
+}
+.writer-figure figcaption:empty:before{ content: attr(data-placeholder); color:#B5B5B5; }
+.figure-remove{
+  position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%;
+  border:none; background: rgba(25,23,15,.65); color:#fff; font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.figure-remove:hover{ background: var(--maroon); }
+
+.status-badge.friendly{ font-weight:600; }
+
+/* ---------------------------------------------------------
+   Composer — minimal, tweet/article-style writing (write.html v3)
+--------------------------------------------------------- */
+.composer-page{ max-width: 700px; margin: 0 auto; padding: 0 20px 80px; }
+
+.composer-topbar{
+  position: sticky; top: 0; z-index: 20;
+  display:flex; align-items:center; gap:14px;
+  padding: 14px 0; background: rgba(250,248,243,.92); backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--rule);
+}
+.composer-back{
+  font-size: 1.3rem; color: var(--ink); width:36px; height:36px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition: background var(--fast) var(--ease);
+}
+.composer-back:hover{ background: var(--paper-dim); text-decoration:none; }
+.composer-draft-state{
+  font-family: var(--utility); font-size:12.5px; color: var(--steel); flex:1; min-width:0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.composer-topbar-right{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.composer-icon-btn{
+  width:36px; height:36px; border-radius:50%; border:1px solid var(--rule); background: var(--paper);
+  cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
+  transition: all var(--fast) var(--ease); position:relative;
+}
+.composer-icon-btn:hover{ border-color: var(--maroon); color: var(--maroon); }
+.composer-icon-btn .badge{
+  position:absolute; top:-3px; right:-3px; background: var(--maroon); color:#fff;
+  font-family: var(--utility); font-size:10px; font-weight:700; border-radius:50%;
+  width:16px; height:16px; display:flex; align-items:center; justify-content:center;
+}
+.composer-logout{
+  font-family: var(--utility); font-size:12.5px; color: var(--steel); background:none; border:none;
+  cursor:pointer; text-decoration:underline; padding:0;
+}
+.composer-submit{
+  font-family: var(--utility); font-weight:700; font-size:14px; letter-spacing:.02em;
+  background: var(--maroon); color:#fff; border:none; padding:9px 20px; border-radius:999px;
+  cursor:pointer; transition: all var(--fast) var(--ease); white-space:nowrap;
+}
+.composer-submit:hover{ background: var(--maroon-dark); box-shadow: var(--shadow-maroon); }
+.composer-submit:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+
+.composer-hint{
+  font-family: var(--body); font-style:italic; font-size: 13.5px; color: var(--steel);
+  padding: 14px 0 0;
+}
+
+.composer-title{
+  width:100%; border:none; background:none; outline:none; resize:none; overflow:hidden;
+  font-family: var(--display); font-weight:700; line-height:1.2;
+  font-size: clamp(1.8rem, 5vw, 2.6rem); padding: 22px 0 6px; color: var(--ink);
+}
+.composer-title::placeholder{ color:#B5B5B5; }
+
+.composer-body{
+  font-family: var(--body); font-size: 1.15rem; line-height:1.75; min-height: 300px;
+  padding: 8px 0 90px; outline:none; color: var(--ink);
+}
+.composer-body:empty:before{ content: attr(data-placeholder); color:#B5B5B5; }
+.composer-body p{ margin: 0 0 1em; }
+.composer-body h3{ font-family: var(--display); font-weight:700; font-size:1.4rem; margin:1.1em 0 .5em; }
+
+.composer-toolbar{
+  position: sticky; bottom: 0; z-index: 15;
+  display:flex; align-items:center; gap:4px;
+  background: rgba(250,248,243,.95); backdrop-filter: blur(6px);
+  border-top: 1px solid var(--rule); padding: 10px 0; margin-top:-70px;
+}
+.composer-toolbar button{
+  width:38px; height:38px; border-radius:50%; border:none; background:none; cursor:pointer;
+  font-size:17px; display:flex; align-items:center; justify-content:center; color: var(--maroon);
+  transition: background var(--fast) var(--ease);
+}
+.composer-toolbar button:hover{ background: rgba(122,31,43,.1); }
+.composer-toolbar .writer-counts{ margin-left:auto; }
+
+.composer-details-toggle{
+  font-family: var(--utility); font-size:13px; font-weight:600; color: var(--maroon);
+  background:none; border:none; cursor:pointer; padding:8px 0; text-decoration: underline;
+  text-underline-offset:2px;
+}
+.composer-details{
+  border:1px solid var(--rule); background: var(--paper-dim); padding:18px 18px 6px;
+  border-radius: var(--radius-md); margin: 6px 0 10px;
+}
+.composer-details .writer-field{ margin-bottom:16px; }
+.composer-details .writer-deck{ border-bottom:1px solid var(--rule); }
+
+.cd-field{ margin-bottom: 22px; }
+.cd-field:last-child{ margin-bottom: 4px; }
+.cd-label{
+  font-family: var(--body); font-weight:700; font-size: 1rem; color: var(--ink);
+  margin-bottom: 3px;
+}
+.cd-hint{
+  font-family: var(--body); font-size: 13px; color: var(--steel); margin-bottom: 10px; line-height:1.4;
+}
+.cd-field .writer-deck{ padding-top:2px; font-size:1rem; }
+.cd-field .dropzone{ min-height: 84px; }
+
+.composer-submissions-panel{
+  position: fixed; inset: 0; background: rgba(25,23,15,.35); z-index: 50;
+  display:flex; align-items:flex-start; justify-content:center; padding: 40px 16px;
+}
+.composer-submissions-panel[hidden]{ display:none; }
+.composer-submissions-card{
+  background: var(--paper); max-width: 560px; width:100%; max-height: 82vh; overflow:auto;
+  border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 22px 24px;
+}
+.composer-submissions-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.composer-submissions-head h3{ font-family: var(--display); font-size:1.25rem; margin:0; }
+.composer-close-btn{
+  width:32px; height:32px; border-radius:50%; border:none; background: var(--paper-dim);
+  cursor:pointer; font-size:14px;
+}
+.composer-close-btn:hover{ background: var(--rule); }
+
+/* ---------------------------------------------------------
+   Formatting — toolbar active states + floating selection bubble
+   (shared by write.html's composer and editor.html's staff editor)
+--------------------------------------------------------- */
+.composer-toolbar button.active{ background: rgba(122,31,43,.14); }
+.rte-toolbar button.active{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,31,43,.08); }
+
+.format-bubble{
+  position: absolute; top:-999px; left:-999px; z-index: 60;
+  display:flex; align-items:center; gap:2px;
+  background: var(--ink); border-radius: 999px; padding: 5px;
+  box-shadow: var(--shadow-lg);
+  opacity:0; pointer-events:none; transform: translateY(4px) scale(.96);
+  transition: opacity var(--fast) var(--ease), transform var(--fast) var(--ease);
+}
+.format-bubble.show{ opacity:1; pointer-events:auto; transform: translateY(0) scale(1); }
+.format-bubble::after{
+  content:""; position:absolute; left:50%; bottom:-5px; transform: translateX(-50%);
+  border-left:5px solid transparent; border-right:5px solid transparent; border-top:5px solid var(--ink);
+}
+.format-bubble button{
+  width:34px; height:34px; border-radius:999px; border:none; background:none; cursor:pointer;
+  color: var(--paper); font-size:15px; display:flex; align-items:center; justify-content:center;
+  transition: background var(--fast) var(--ease);
+}
+.format-bubble button:hover{ background: rgba(255,255,255,.14); }
+.format-bubble button.active{ background: var(--maroon); color:#fff; }
+.format-bubble button b, .format-bubble button i{ font-family: var(--body); }
+
+/* Staff editor's rich text body field — a bordered field with its own small
+   toolbar above it, matching the look of the rest of the form (unlike
+   write.html's distraction-free full-bleed composer). */
+.rte-field{ border:1.5px solid var(--rule); border-radius: var(--radius-sm); background: var(--paper); overflow:hidden; }
+.rte-field:focus-within{ border-color: var(--maroon); }
+.rte-toolbar{
+  display:flex; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid var(--rule);
+  background: var(--paper-dim); flex-wrap:wrap;
+}
+.rte-toolbar button{
+  font-family: var(--utility); font-size:13px; font-weight:700; border:1.5px solid var(--rule);
+  background: var(--paper); color: var(--ink-soft); width:30px; height:30px; border-radius: var(--radius-sm);
+  cursor:pointer; display:flex; align-items:center; justify-content:center; transition: all var(--fast) var(--ease);
+}
+.rte-toolbar button:hover{ border-color: var(--maroon); color: var(--maroon); }
+.rte-toolbar .rte-sep{ width:1px; height:20px; background: var(--rule); margin:0 2px; }
+.rte-toolbar .rte-counts{ margin-left:auto; font-family: var(--utility); font-size:12px; color: var(--steel); font-weight:400; border:none; width:auto; height:auto; }
+.rte-editor{
+  font-family: var(--body); font-size:1rem; line-height:1.6; min-height: 220px;
+  padding: 14px 16px; outline:none;
+}
+.rte-editor:empty:before{ content: attr(data-placeholder); color:#ADADAD; font-style:italic; pointer-events:none; }
+.rte-editor p{ margin:0 0 1em; }
+.rte-editor p:last-child{ margin-bottom:0; }
+.rte-editor h3{ font-family: var(--display); font-size:1.25rem; font-weight:700; margin: 1em 0 .5em; }
+
+/* ---------------------------------------------------------

@@ -1,0 +1,38 @@
+/* =========================================================
+   THE GKMC TIMES — MISC.CSS
+   Small leftover bits that don't belong in a bigger file:
+   related-stories strip, newsletter box, photo-post gallery tile.
+   Loaded on EVERY page, after components.css.
+   ========================================================= */
+
+/* ---------- Related stories ---------- */
+.related-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:10px; }
+@media (max-width:760px){ .related-grid{ grid-template-columns:1fr; } }
+
+/* ---------- Newsletter box ---------- */
+.newsletter-box{ border:2px solid var(--rule-strong); padding:20px; margin-top:24px; background:var(--paper); border-radius: var(--radius-md); }
+.newsletter-box h4{ font-family:var(--display); font-size:1.05rem; font-weight:800; margin:0 0 8px; }
+.newsletter-box p{ font-size:.88rem; color:var(--ink-soft); margin:0 0 12px; }
+.newsletter-box form{ display:flex; gap:8px; }
+.newsletter-box input{ flex:1; padding:9px 10px; border:1px solid var(--rule-strong); font-family:var(--body); border-radius: var(--radius-sm); transition: box-shadow var(--fast) var(--ease); }
+.newsletter-box input:focus{ outline:none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--maroon) 15%, transparent); }
+.newsletter-box button{ background:var(--maroon); color:#fff; border:none; padding:0 14px; font-family:var(--utility); font-weight:700; text-transform:uppercase; font-size:13px; cursor:pointer; border-radius: var(--radius-sm); transition: background var(--fast) var(--ease); }
+.newsletter-box button:hover{ background: var(--maroon-dark); }
+
+
+/* ---------- Photo posts (image-only content type) ---------- */
+   Photo posts (image-only content type)
+--------------------------------------------------------- */
+.photo-tile{
+  display:block; border:1px solid var(--rule); border-radius: var(--radius-md);
+  overflow:hidden; background: var(--paper);
+  transition: transform var(--med) var(--ease), box-shadow var(--med) var(--ease);
+}
+.photo-tile:hover{ transform: translateY(-3px); box-shadow: var(--shadow-md); text-decoration:none; }
+.photo-tile img{ width:100%; aspect-ratio: 4/3; object-fit:cover; display:block; transition: transform var(--med) var(--ease); }
+.photo-tile:hover img{ transform: scale(1.04); }
+.photo-tile .pt-body{ padding:10px 12px; }
+.photo-tile h4{ font-family: var(--display); font-size:.98rem; font-weight:700; margin:0 0 4px; line-height:1.25; }
+.photo-tile .meta{ font-family: var(--utility); font-size:11px; color:var(--steel); text-transform:uppercase; }
+
+.rail-card.photo-rail-card h4{ margin-top:6px; }

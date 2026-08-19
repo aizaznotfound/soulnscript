@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Your Work — Soul &amp; Script</title>
+<meta name="description" content="Create a free contributor account and share your writing, art, or ideas with Soul &amp; Script. No coding needed — just create, and submit for review.">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/misc.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/contributor.css">
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="wrap">
+    <span id="utility-date"></span>
+    <span><span class="divider">|</span><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">Instagram</a><span class="divider">|</span><a href="https://l.instagram.com/?u=https%3A%2F%2Fchat.whatsapp.com%2FCTA39UN7TfU97Ges3nD7Qv%3Fmode%3Dgi_t&amp;e=AUAepJVC_8tI0yx_r99SeFSSV0EsHG72k8zv1Iacd_0PrS_ssVRQuzxrH6Kgr0WTOoquH9e6f3poeLnNvfajVt3S9D4C0wSfT87WRcBZhtxiE5EDFoaEJ9etF3svOja-GPStzHY" target="_blank" rel="noopener">Join our WhatsApp</a></span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="kicker">Est. 2026 &middot; A Home For Every Art</div>
+    <h1><a href="index.html">Soul <span class="amp">&amp;</span> Script</a></h1>
+    <div class="tagline">For readers, writers, thinkers, painters &mdash; and artists of every kind</div>
+  </div>
+  <div class="wrap"><div class="pulse-rule-mount"></div></div>
+</header>
+
+<nav class="nav">
+  <div class="wrap">
+    <button class="nav-burger" id="nav-burger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <ul id="nav-menu">
+      <li><a href="index.html" data-page="index.html">Home</a></li>
+      <li class="has-mega">
+        <a href="news.html" data-page="news.html">Writing</a>
+        <button class="mega-toggle" aria-label="Show Writing submenu" aria-expanded="false">▾</button>
+        <div class="mega" id="mega-news"></div>
+      </li>
+      <li class="has-mega">
+        <a href="videos.html" data-page="videos.html">Films &amp; Talks</a>
+        <button class="mega-toggle" aria-label="Show Films &amp; Talks submenu" aria-expanded="false">▾</button>
+        <div class="mega" id="mega-videos"></div>
+      </li>
+      <li class="has-mega">
+        <a href="photos.html" data-page="photos.html">Gallery</a>
+        <button class="mega-toggle" aria-label="Show Gallery submenu" aria-expanded="false">▾</button>
+        <div class="mega" id="mega-photos"></div>
+      </li>
+      <li><a href="events.html" data-page="events.html">Events</a></li>
+      <li><a href="team.html" data-page="team.html">Team</a></li>
+      <li><a href="about.html" data-page="about.html">Manifesto</a></li>
+      <li><a href="contact.html" data-page="contact.html">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="wrap" style="padding-top:26px;">
+
+  <div class="page-hero hero-invite" style="text-align:left;">
+    <div class="hero-decor"><div class="blob b1"></div><div class="blob b2"></div></div>
+    <div class="hero-inner">
+      <div class="kicker-sm">Join Us</div>
+      <h1 style="font-size:2.2rem;">Become Part of Soul &amp; Script</h1>
+      <p style="max-width:640px; margin:0;">Anyone can create a free account and submit a piece — writing, a reflection, an event write-up, anything. Nothing you submit goes live automatically — every submission is reviewed by our team before it's published.</p>
+    </div>
+  </div>
+
+  <div class="auth-panel">
+    <div class="auth-tabs">
+      <button type="button" class="active" data-tab="register" onclick="setTab('register')">Create Account</button>
+      <button type="button" data-tab="login" onclick="setTab('login')">Log In</button>
+    </div>
+
+    <!-- ============ Register ============ -->
+    <form id="register-form" class="gh-panel">
+      <div class="form-field">
+        <label for="r-username">Choose a Username</label>
+        <input type="text" id="r-username" required placeholder="e.g. ayesha_writes" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label for="r-email">Email</label>
+        <input type="email" id="r-email" required placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-field">
+        <label for="r-whatsapp">WhatsApp Number (with country code)</label>
+        <input type="text" id="r-whatsapp" required placeholder="e.g. +92 300 1234567" autocomplete="tel">
+      </div>
+      <div class="form-field">
+        <label for="r-password">Create a Password</label>
+        <input type="password" id="r-password" required placeholder="At least 8 characters" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn">Create Account</button>
+      <div id="register-status" class="publish-status"></div>
+    </form>
+
+    <!-- ============ Login ============ -->
+    <form id="login-form" class="gh-panel" style="display:none;">
+      <div class="form-field">
+        <label for="l-username">Username</label>
+        <input type="text" id="l-username" required placeholder="Username" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label for="l-password">Password</label>
+        <input type="password" id="l-password" required placeholder="Password" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn">Log In</button>
+      <div id="login-status" class="publish-status"></div>
+    </form>
+
+    <p class="helper-text" style="text-align:center; margin-top:20px;">
+      Your email and WhatsApp number are only used by the editorial team to reach you about your submissions — they're never shown publicly.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="masthead-mini">Soul &amp; Script</div>
+        <p style="margin-top:10px;">A creative collective for readers, writers, thinkers, painters, and artists of every kind.</p>
+      </div>
+      <div>
+        <h5>Explore</h5>
+        <ul>
+          <li><a href="news.html">Writing</a></li>
+          <li><a href="videos.html">Films &amp; Talks</a></li>
+          <li><a href="photos.html">Gallery</a></li>
+          <li><a href="events.html">Events</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>About</h5>
+        <ul>
+          <li><a href="about.html">Manifesto</a></li>
+          <li><a href="team.html">Team</a></li>
+          <li><a href="contact.html">Contact &amp; Submissions</a></li>
+          <li><a href="contribute.html">Share Your Work</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Reach Us</h5>
+        <ul>
+          <li><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">@soulnscript_</a></li>
+          <li><a href="tel:+923185119794">+92 318 5119794</a></li>
+          <li><a href="mailto:soulnscript26@gmail.com">soulnscript26@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="footer-year"></span> Soul &amp; Script. A home for every art.</span>
+      <span>An independent creative collective. <a href="editor.html" style="color:inherit; opacity:.8;">Team: Editorial Access</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/content.js"></script>
+<script src="js/lib/format.js"></script>
+<script src="js/lib/sanitize.js"></script>
+<script src="js/lib/content-data.js"></script>
+<script src="js/render/cards.js"></script>
+<script src="js/render/sections.js"></script>
+<script src="js/render/article-page.js"></script>
+<script src="js/render/share-and-rails.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/richtext.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/reveal.js"></script>
+<script src="js/pages/contribute.js"></script>
+</body>
+</html>

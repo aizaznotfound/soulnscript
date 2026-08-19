@@ -1,0 +1,382 @@
+/* =========================================================
+   THE GKMC TIMES — BASE.CSS
+   Design tokens (colors/fonts/spacing), reset, utility bar,
+   masthead, main navigation + mobile burger, breaking ticker.
+   Loaded on EVERY page, first, before components.css.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+
+:root{
+  --paper: #FEFCF7;
+  --paper-dim: #F5EFE4;
+  --ink: #201A14;
+  --ink-soft: #5C5248;
+  --maroon: #6E1F1F;
+  --maroon-dark: #4A1414;
+  --maroon-tint: #C98B7E;
+  --steel: #7A6F5F;
+  --rule: #E5DDCF;
+  --rule-strong: #201A14;
+  --gold: #C79A3C;
+
+  --display: 'Playfair Display', Georgia, serif;
+  --body: 'PT Serif', Georgia, serif;
+  --utility: 'Barlow Condensed', Arial, sans-serif;
+
+  --max-w: 1180px;
+
+  /* Modern depth & motion tokens */
+  --shadow-xs: 0 1px 2px rgba(18,18,18,.06);
+  --shadow-sm: 0 2px 8px rgba(18,18,18,.08);
+  --shadow-md: 0 8px 24px rgba(18,18,18,.12);
+  --shadow-lg: 0 20px 48px rgba(18,18,18,.18);
+  --shadow-maroon: 0 10px 26px rgba(110,31,31,.22);
+  --ease: cubic-bezier(.22,.68,.31,1);
+  --fast: .18s;
+  --med: .32s;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+}
+
+*{ box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+  font-size: 16px; /* base — everything below is rem-based, so this scales the whole site */
+}
+
+/* Bump base text size on bigger screens so reading text isn't tiny on laptop/desktop monitors */
+@media (min-width: 1024px){ html{ font-size: 17.5px; } }
+@media (min-width: 1440px){ html{ font-size: 18.5px; } }
+@media (min-width: 1920px){ html{ font-size: 19.5px; } }
+
+body{
+  margin:0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(25,23,15,.035) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+img{ max-width:100%; display:block; }
+
+a{ color: inherit; text-decoration:none; transition: color var(--fast) var(--ease); }
+a:hover{ text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+
+::selection{ background: var(--maroon); color: var(--paper); }
+
+/* subtle scrollbar polish */
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background: var(--paper-dim); }
+::-webkit-scrollbar-thumb{ background: var(--rule-strong); border-radius: 10px; border: 2px solid var(--paper-dim); }
+
+.wrap{
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+:focus-visible{
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}
+
+/* ---------------------------------------------------------
+   Utility bar (date / edition line)
+--------------------------------------------------------- */
+.utility-bar{
+  background: var(--ink);
+  color: var(--paper-dim);
+  font-family: var(--utility);
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+.utility-bar .wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-top:6px;
+  padding-bottom:6px;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.utility-bar span.divider{ opacity:.45; margin:0 8px; }
+
+/* ---------------------------------------------------------
+   Masthead
+--------------------------------------------------------- */
+.masthead{
+  padding: 14px 0 10px;
+  text-align:center;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-dim) 180%);
+  position: relative;
+}
+.masthead .kicker{
+  font-family: var(--utility);
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  font-size:11px;
+  color: var(--maroon);
+  font-weight:600;
+}
+/* Compact wordmark logo — deliberately small on every screen size, phone or desktop. */
+.masthead h1{
+  font-family: var(--display);
+  font-weight:700;
+  font-style: italic;
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  letter-spacing: 0;
+  margin: 2px 0 4px;
+  color: var(--maroon-dark);
+}
+.masthead a{ text-decoration:none; }
+.masthead a:hover{ text-decoration:none; }
+.masthead h1 .amp{
+  font-style: italic;
+  font-weight:500;
+  color: var(--gold);
+  padding: 0 .05em;
+}
+.masthead .tagline{
+  font-family: var(--utility);
+  font-size:13px;
+  color: var(--steel);
+  letter-spacing:.03em;
+}
+
+/* Signature element: ECG pulse rule ------------------------ */
+.pulse-rule{
+  width:100%;
+  height:22px;
+  display:block;
+  margin: 10px 0 0;
+}
+.pulse-rule path{
+  fill:none;
+  stroke: var(--maroon);
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.pulse-rule.thin path{ stroke-width:1.4; opacity:.8; }
+
+/* ---------------------------------------------------------
+   Navigation
+--------------------------------------------------------- */
+.nav{
+  border-top: 3px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+  background: var(--paper);
+  position: sticky;
+  top:0;
+  z-index: 50;
+  box-shadow: var(--shadow-xs);
+}
+.nav .wrap{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-top:0;
+  padding-bottom:0;
+}
+.nav ul{
+  list-style:none;
+  display:flex;
+  gap: 2px;
+  margin:0; padding:0;
+  flex-wrap:wrap;
+}
+.nav a{
+  font-family: var(--utility);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-size: 14.5px;
+  padding: 13px 14px;
+  display:inline-block;
+  color: var(--ink);
+  position: relative;
+  transition: color var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+.nav a::after{
+  content:"";
+  position:absolute;
+  left:14px; right:14px; bottom:6px;
+  height:2px;
+  background: var(--maroon);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--fast) var(--ease);
+}
+.nav a:hover:not(.nav-cta), .nav a.active:not(.nav-cta){
+  color: var(--maroon);
+  text-decoration:none;
+  background: var(--paper-dim);
+}
+.nav a:hover::after, .nav a.active::after{ transform: scaleX(1); }
+.nav .search-toggle{
+  font-family: var(--utility);
+  font-size: 14px;
+  color: var(--steel);
+  padding: 8px 12px;
+  border:1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background:none;
+  cursor:pointer;
+  transition: border-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.nav .search-toggle:hover{ border-color: var(--maroon); color: var(--maroon); }
+
+.nav-cta-item{ display:flex; align-items:center; margin-left:4px; }
+.nav-cta{
+  font-family: var(--utility) !important;
+  font-weight:700 !important;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-size: 13.5px !important;
+  padding: 9px 18px 9px 15px !important;
+  background: var(--maroon);
+  color: var(--paper) !important;
+  border-radius: 20px;
+  display:inline-flex !important;
+  align-items:center;
+  gap:7px;
+  box-shadow: 0 1px 0 rgba(122,31,43,.05), 0 2px 6px rgba(122,31,43,.22);
+  transition: background var(--fast) var(--ease), transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+.nav-cta svg{ flex-shrink:0; transition: transform var(--fast) var(--ease); }
+.nav-cta::after{ display:none; }
+.nav-cta:hover{
+  background: var(--maroon-dark);
+  color: var(--paper) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(122,31,43,.32);
+}
+.nav-cta:hover svg{ transform: rotate(-8deg); }
+.nav-cta:active{ transform: translateY(0); box-shadow: 0 2px 6px rgba(122,31,43,.22); }
+
+/* ---------- Mobile burger + mega-toggle ---------- */
+.nav-burger{
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  width:38px; height:38px;
+  border:none;
+  background:none;
+  cursor:pointer;
+  padding:0;
+  margin: 8px 0;
+}
+.nav-burger span{
+  display:block; width:100%; height:2px; background: var(--ink);
+  transition: transform var(--fast) var(--ease), opacity var(--fast) var(--ease);
+}
+.nav-burger[aria-expanded="true"] span:nth-child(1){ transform: translateY(7px) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+.nav-burger[aria-expanded="true"] span:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
+
+.mega-toggle{ display:none; }
+
+.nav li{ position:relative; }
+
+@media (max-width: 780px){
+  .nav-burger{ display:flex; }
+  .nav .wrap{ flex-wrap:wrap; padding-top:0; padding-bottom:0; position:relative; }
+  .nav ul{
+    display:none;
+    flex-direction:column;
+    width:100%;
+    gap:0;
+    max-height: calc(100vh - 60px);
+    overflow-y:auto;
+    border-top: 1px solid var(--rule);
+    padding: 4px 0 10px;
+  }
+  .nav ul.open{ display:flex; }
+  .nav li{ width:100%; }
+  .nav-cta-item{ margin:10px 4px 4px; }
+  .nav-cta{ display:block; text-align:center; padding:12px 18px !important; }
+  .nav a{
+    padding: 13px 4px;
+    width:100%;
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav a::after{ display:none; }
+  .nav li.has-mega{ display:flex; flex-wrap:wrap; align-items:center; }
+  .nav li.has-mega a{ flex:1; border-bottom: 1px solid var(--rule); }
+  .mega-toggle{
+    display:flex; align-items:center; justify-content:center;
+    width:44px; height:44px; flex-shrink:0;
+    border:none; background:none; cursor:pointer;
+    font-family: var(--utility); font-size:18px; color: var(--steel);
+    border-bottom: 1px solid var(--rule);
+    transition: transform var(--fast) var(--ease);
+  }
+  .mega-toggle[aria-expanded="true"]{ transform: rotate(180deg); color: var(--maroon); }
+}
+
+/* ---------------------------------------------------------
+   Breaking / ticker strip
+--------------------------------------------------------- */
+.ticker{
+  background: linear-gradient(90deg, var(--maroon-dark), var(--maroon));
+  color: var(--paper);
+  overflow:hidden;
+  white-space:nowrap;
+  position: sticky;
+  top: var(--nav-h, 54px);
+  z-index: 40; /* stays below .nav (z-index:50) so it tucks in neatly, not behind it */
+}
+.ticker .wrap{ display:flex; align-items:center; padding-top:8px; padding-bottom:8px; }
+.ticker .tag{
+  font-family: var(--utility);
+  font-weight:700;
+  text-transform:uppercase;
+  font-size:12.5px;
+  letter-spacing:.08em;
+  background: var(--paper);
+  color: var(--maroon);
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  margin-right:14px;
+  flex-shrink:0;
+  position: relative;
+  z-index: 2; /* always paints above the scrolling ticker text below */
+  animation: pulse-dot 2.2s ease-in-out infinite;
+}
+@keyframes pulse-dot{ 0%,100%{ box-shadow: 0 0 0 0 rgba(122,31,43,0);} 50%{ box-shadow: 0 0 0 4px rgba(250,248,243,.18);} }
+/* Dedicated clipped lane for the scrolling text: this keeps the animated
+   headlines strictly to the right of the tag at all times, so they can
+   never visually cross under/over the "Latest" pill as they scroll by. */
+.ticker-viewport{
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+.ticker-track{
+  display:inline-block;
+  font-family: var(--utility);
+  font-size:14.5px;
+  animation: ticker 32s linear infinite;
+  padding-left:100%;
+}
+.ticker:hover .ticker-track{ animation-play-state: paused; }
+.ticker-track a{ color: var(--paper); margin-right: 46px; opacity:.92; transition: opacity var(--fast) var(--ease); }
+.ticker-track a:hover{ opacity:1; text-decoration:underline; }
+@keyframes ticker{
+  0%{ transform: translateX(0); }
+  100%{ transform: translateX(-100%); }
+}
+
