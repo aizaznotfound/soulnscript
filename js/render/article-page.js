@@ -24,7 +24,7 @@ function renderArticleDetail(){
       <p class="deck">${escapeHtml(v.deck)}</p>
       <div class="byline">${escapeHtml(v.author)} · ${formatDate(v.date)}</div>`;
     body.innerHTML = `
-      <div style="position:relative;padding-top:56.25%;margin-bottom:24px;border:1px solid var(--rule);">
+      <div style="position:relative;padding-top:56.25%;margin-bottom:24px;border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 14px 32px rgba(30,26,46,.14);">
         <iframe src="https://www.youtube.com/embed/${encodeURIComponent(v.youtubeId)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
       </div>
       <p>${escapeHtml(v.deck)}</p>
@@ -45,7 +45,7 @@ function renderArticleDetail(){
       <div class="byline">${escapeHtml(p.author)} · ${formatDate(p.date)}</div>`;
     body.innerHTML = `
       <figure style="margin:0 0 24px;">
-        <img src="${p.image}" alt="${escapeHtml(p.title)}" style="width:100%; border:1px solid var(--rule); border-radius: var(--radius-md); display:block;">
+        <img src="${p.image}" alt="${escapeHtml(p.title)}" style="width:100%; border-radius: var(--radius-lg); box-shadow: 0 14px 32px rgba(30,26,46,.14); display:block;">
       </figure>
       <div class="share-bar-mount"></div>
       <div class="article-tags">${articleTagsHTML(p.tags)}</div>`;
@@ -107,7 +107,7 @@ function renderArticleDetail(){
 function renderNotFound(head, body){
   document.title = "Story not found — Soul & Script";
   if(head) head.innerHTML = `<h1>Story Not Found</h1><p class="deck">This story may have been moved or unpublished.</p>`;
-  if(body) body.innerHTML = `<div class="empty-state">Try heading back to the <a href="index.html">homepage</a> or browsing <a href="news.html">News</a>.</div>`;
+  if(body) body.innerHTML = `<div class="empty-state">Try heading back to the <a href="index.html">homepage</a> or browsing <a href="news.html">Writing</a>.</div>`;
 }
 
 /* ---------- Tags ---------- */

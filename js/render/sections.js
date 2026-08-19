@@ -19,7 +19,7 @@ function renderMostRead(mountId, excludeSlug){
   const el = document.getElementById(mountId);
   if(!el) return;
   const items = allPostsSorted().filter(p => p.slug !== excludeSlug).slice(0,5);
-  el.innerHTML = `<h4>Most Read</h4><ol>${
+  el.innerHTML = `<h4>Community Favorites</h4><ol>${
     items.map(p => `<li><a href="article.html?slug=${p.slug}">${escapeHtml(p.title)}</a></li>`).join("")
   }</ol>`;
 }
