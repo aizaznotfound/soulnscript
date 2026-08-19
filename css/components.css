@@ -156,7 +156,7 @@
   gap: 46px;
   align-items:start;
 }
-@media (max-width: 900px){ .layout-2col{ grid-template-columns:1fr; } }
+@media (max-width: 960px){ .layout-2col{ grid-template-columns:1fr; gap:36px; } }
 
 .most-read{ border:1px solid var(--rule); padding: 18px 20px; background: var(--paper-dim); border-radius: var(--radius-md); }
 .most-read h4{
@@ -436,8 +436,7 @@ footer .masthead-mini{
 .front-grid .medium h3{ font-family:var(--display); font-size:1.15rem; font-weight:700; line-height:1.2; margin:0 0 6px; }
 .front-grid .medium h3 a:hover{ color: var(--maroon); }
 .front-grid p.deck-sm{ font-size:.9rem; color:var(--ink-soft); margin:0 0 6px; }
-@media (max-width: 980px) and (min-width: 861px){ .front-grid{ gap:18px; } }
-@media (max-width: 860px){ .front-grid{ grid-template-columns:1fr; } .front-grid .big{ grid-row:auto; } }
+@media (max-width: 960px){ .front-grid{ grid-template-columns:1fr; } .front-grid .big{ grid-row:auto; } }
 
 /* ---------- Editor's Picks rail ---------- */
 .rail{
