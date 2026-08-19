@@ -45,7 +45,7 @@
 }
 .status-badge.pending{ background:rgba(180,140,20,.14); color:#8A6A10; }
 .status-badge.approved{ background:rgba(60,110,60,.14); color:#2E5E33; }
-.status-badge.rejected{ background:rgba(122,31,43,.1); color:var(--maroon); }
+.status-badge.rejected{ background:rgba(122,32,72,.1); color:var(--maroon); }
 
 .submission-item{ border:1px solid var(--rule); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:12px; background:var(--paper); }
 .submission-item-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
