@@ -62,7 +62,7 @@
   font-family: var(--utility); font-size:13px; color: var(--ink-soft);
 }
 .tag-chip button{
-  border:none; background: rgba(122,31,43,.12); color: var(--maroon); width:18px; height:18px;
+  border:none; background: rgba(122,32,72,.12); color: var(--maroon); width:18px; height:18px;
   border-radius:50%; cursor:pointer; font-size:11px; line-height:1; display:flex; align-items:center; justify-content:center;
 }
 .tag-input input{
@@ -76,7 +76,7 @@
   min-height:96px; cursor:pointer; text-align:center; padding:14px; transition: all var(--fast) var(--ease);
   font-family: var(--utility); font-size: 13.5px; color: var(--steel);
 }
-.dropzone:hover, .dropzone.drag-over{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,31,43,.04); }
+.dropzone:hover, .dropzone.drag-over{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,32,72,.04); }
 .dropzone img{ max-height:160px; border-radius: var(--radius-sm); }
 .dropzone .dz-remove{
   font-family: var(--utility); font-size:12px; color: var(--maroon); text-decoration:underline; margin-top:4px;
@@ -196,7 +196,7 @@
   font-size:17px; display:flex; align-items:center; justify-content:center; color: var(--maroon);
   transition: background var(--fast) var(--ease);
 }
-.composer-toolbar button:hover{ background: rgba(122,31,43,.1); }
+.composer-toolbar button:hover{ background: rgba(122,32,72,.1); }
 .composer-toolbar .writer-counts{ margin-left:auto; }
 
 .composer-details-toggle{
@@ -244,8 +244,8 @@
    Formatting — toolbar active states + floating selection bubble
    (shared by write.html's composer and editor.html's staff editor)
 --------------------------------------------------------- */
-.composer-toolbar button.active{ background: rgba(122,31,43,.14); }
-.rte-toolbar button.active{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,31,43,.08); }
+.composer-toolbar button.active{ background: rgba(122,32,72,.14); }
+.rte-toolbar button.active{ border-color: var(--maroon); color: var(--maroon); background: rgba(122,32,72,.08); }
 
 /* ---------------------------------------------------------
    Urdu / RTL toggle button — flips a composer or staff editor
