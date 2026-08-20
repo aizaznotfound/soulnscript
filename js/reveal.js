@@ -8,6 +8,9 @@
    ========================================================= */
 
 (function(){
+  // The art-gallery motion controller owns reveals on the redesigned public pages.
+  // Keep this legacy observer only for contributor/editor utility pages.
+  if(document.body.classList.contains("art-page")) return;
   var SELECTORS = ".card, .side-card, .hero-card, .video-card, .photo-card, .team-card, .mega-story, .strip-row, .rail .hero-card, .team-group, .strip-head";
 
   var io = ("IntersectionObserver" in window)
