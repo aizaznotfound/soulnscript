@@ -15,6 +15,9 @@
   const showImageInput = document.getElementById("poster-show-image");
   const selectionMeta = document.getElementById("poster-selection-meta");
   const status = document.getElementById("poster-status");
+  const pageIndicator = document.getElementById("poster-page-indicator");
+  const previousPageButton = document.getElementById("poster-prev");
+  const nextPageButton = document.getElementById("poster-next");
   const imageCache = new Map();
   const categoryLabelsUr = {
     news: "نثری اور تصویری کہانیاں",
@@ -43,7 +46,9 @@
     showImage: true,
     post: null,
     image: null,
-    imageFailed: false
+    imageFailed: false,
+    pages: [],
+    currentPage: 0
   };
 
   function readLanguage() {
@@ -139,7 +144,8 @@
       return;
     }
     const details = [categoryFor(state.post), authorFor(state.post), formatPosterDate(state.post.date)].filter(Boolean);
-    selectionMeta.textContent = details.join(" · ");
+    const pageCount = state.pages.length || 1;
+    selectionMeta.textContent = `${details.join(" · ")} · ${pageCount} poster pages`;
   }
 
   function loadArtwork() {
@@ -279,7 +285,60 @@
     return y + lines.length * lineHeight;
   }
 
-  function drawPoster() {
+  function bodyParagraphs(post) {
+    const localizedBody = field(post, "body");
+    const source = Array.isArray(localizedBody) ? localizedBody : (Array.isArray(post && post.body) ? post.body : []);
+    return source.map(stripMarkup).map((paragraph) => paragraph.trim()).filter(Boolean);
+  }
+
+  function bodyFont() {
+    return state.language === "ur"
+      ? '400 25px "Noto Nastaliq Urdu", serif'
+      : '400 29px "DM Sans", sans-serif';
+  }
+
+  function bodyLineHeight() {
+    return state.language === "ur" ? 52 : 43;
+  }
+
+  function paginateBody(post) {
+    const paragraphs = bodyParagraphs(post);
+    if (!paragraphs.length) return [[]];
+    const margin = 92;
+    const maxWidth = WIDTH - margin * 2;
+    const font = bodyFont();
+    const allLines = [];
+    paragraphs.forEach((paragraph) => {
+      wrapLines(paragraph, maxWidth, font).forEach((line) => allLines.push(line));
+      allLines.push("");
+    });
+    while (allLines[allLines.length - 1] === "") allLines.pop();
+    const maxLines = state.language === "ur" ? 18 : 22;
+    const pages = [];
+    for (let index = 0; index < allLines.length; index += maxLines) {
+      pages.push(allLines.slice(index, index + maxLines));
+    }
+    return pages.length ? pages : [[]];
+  }
+
+  function buildPosterPages() {
+    if (!state.post) {
+      state.pages = [];
+      return;
+    }
+    state.pages = [{ type: "cover" }, ...paginateBody(state.post).map((lines) => ({ type: "body", lines }))];
+    state.currentPage = Math.max(0, Math.min(state.currentPage, state.pages.length - 1));
+  }
+
+  function updatePageControls() {
+    const total = Math.max(1, state.pages.length);
+    const current = Math.min(total, state.currentPage + 1);
+    pageIndicator.textContent = `Page ${current} / ${total}`;
+    previousPageButton.disabled = state.currentPage <= 0;
+    nextPageButton.disabled = state.currentPage >= total - 1;
+  }
+
+  function drawCoverPage() {
     if (!state.post) {
       ctx.fillStyle = "#211b25";
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -308,38 +367,31 @@
     ctx.direction = state.language === "ur" ? "rtl" : "ltr";
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = align;
-
     ctx.fillStyle = theme.accent;
     roundRect(ctx, margin, 76, 330, 42, 21);
     ctx.fill();
     ctx.fillStyle = theme.label;
     ctx.font = "700 16px DM Sans, Arial, sans-serif";
-    ctx.letterSpacing = "2px";
     ctx.textAlign = "center";
     ctx.fillText(category || "SOUL & SCRIPT", margin + 165, 103);
-
     ctx.fillStyle = textColor;
     ctx.font = "600 18px DM Sans, Arial, sans-serif";
     ctx.textAlign = align;
     ctx.fillText("SOUL & SCRIPT / STORY SIGNAL", textX, 175);
-
     const titleTop = state.language === "ur" ? 282 : 300;
     ctx.font = titleFit.font;
     drawLines(titleFit.lines, textX, titleTop, titleFit.lineHeight, textColor, align);
-
     const deckTop = titleTop + titleFit.lines.length * titleFit.lineHeight + (state.language === "ur" ? 54 : 38);
     const deckFont = `${state.language === "ur" ? 400 : 400} ${state.language === "ur" ? 27 : 30}px ${state.language === "ur" ? '"Noto Nastaliq Urdu"' : '"DM Sans"'}, sans-serif`;
     const deckLines = wrapLines(deck, WIDTH - margin * 2, deckFont).slice(0, 5);
     ctx.font = deckFont;
     drawLines(deckLines, textX, deckTop, state.language === "ur" ? 51 : 42, "rgba(247,241,233,.88)", align);
-
     ctx.strokeStyle = `${theme.light}66`;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(margin, 1030);
     ctx.lineTo(right, 1030);
     ctx.stroke();
-
     ctx.fillStyle = theme.accent;
     ctx.font = "700 18px DM Sans, Arial, sans-serif";
     ctx.textAlign = align;
@@ -347,7 +399,6 @@
     ctx.fillStyle = "rgba(247,241,233,.74)";
     ctx.font = "500 17px DM Sans, Arial, sans-serif";
     ctx.fillText(date, textX, 1122);
-
     ctx.textAlign = state.language === "ur" ? "left" : "right";
     ctx.fillStyle = theme.light;
     ctx.font = "600 20px DM Sans, Arial, sans-serif";
@@ -358,10 +409,77 @@
     ctx.restore();
   }
 
+  function drawBodyPage(page) {
+    const theme = themes[state.palette] || themes.plum;
+    const margin = 92;
+    const right = WIDTH - margin;
+    const align = state.language === "ur" ? "right" : "left";
+    const textX = state.language === "ur" ? right : margin;
+    const pageNumber = state.currentPage;
+    ctx.fillStyle = theme.light;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    const wash = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+    wash.addColorStop(0, `${theme.soft}38`);
+    wash.addColorStop(.48, "rgba(247,241,233,0)");
+    wash.addColorStop(1, `${theme.accent}20`);
+    ctx.fillStyle = wash;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.fillStyle = theme.accent;
+    ctx.globalAlpha = .2;
+    ctx.beginPath();
+    ctx.ellipse(state.language === "ur" ? 150 : 930, 120, 180, 90, -.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    ctx.save();
+    ctx.direction = state.language === "ur" ? "rtl" : "ltr";
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = align;
+    ctx.fillStyle = theme.accent;
+    ctx.font = "700 17px DM Sans, Arial, sans-serif";
+    ctx.fillText("SOUL & SCRIPT / CONTINUATION", textX, 88);
+    ctx.fillStyle = theme.ink;
+    ctx.font = `${state.language === "ur" ? 600 : 600} ${state.language === "ur" ? 29 : 32}px ${state.language === "ur" ? '"Noto Nastaliq Urdu"' : '"Bodoni Moda"'}, serif`;
+    ctx.fillText(titleFor(state.post), textX, 151);
+    ctx.fillStyle = theme.ink;
+    ctx.font = "500 16px DM Sans, Arial, sans-serif";
+    ctx.fillText(`${authorFor(state.post)} · ${formatPosterDate(state.post.date)}`, textX, 190);
+    ctx.strokeStyle = `${theme.ink}38`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(margin, 225);
+    ctx.lineTo(right, 225);
+    ctx.stroke();
+    ctx.fillStyle = theme.ink;
+    ctx.font = bodyFont();
+    drawLines(page.lines, textX, state.language === "ur" ? 294 : 282, bodyLineHeight(), theme.ink, align);
+    ctx.strokeStyle = `${theme.ink}38`;
+    ctx.beginPath();
+    ctx.moveTo(margin, 1230);
+    ctx.lineTo(right, 1230);
+    ctx.stroke();
+    ctx.font = "700 15px DM Sans, Arial, sans-serif";
+    ctx.fillStyle = theme.accent;
+    ctx.textAlign = state.language === "ur" ? "left" : "right";
+    ctx.fillText(`PAGE ${pageNumber} / ${state.pages.length - 1}`, state.language === "ur" ? margin : right, 1272);
+    ctx.fillStyle = theme.ink;
+    ctx.fillText("SOUL & SCRIPT", state.language === "ur" ? right : margin, 1272);
+    ctx.restore();
+  }
+
+  function drawCurrentPage() {
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    const page = state.pages[state.currentPage];
+    if (!page || page.type === "cover") drawCoverPage();
+    else drawBodyPage(page);
+    updatePageControls();
+  }
+
   function renderPoster() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    drawPoster();
+    buildPosterPages();
+    drawCurrentPage();
+    updateSelectionMeta();
   }
 
   function setLanguage(language) {
@@ -378,18 +496,39 @@
     renderPoster();
   }
 
-  function downloadPoster() {
-    if (!state.post) return;
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${slugify(titleFor(state.post))}-soul-and-script.png`;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      status.textContent = "PNG downloaded — ready to share.";
-    }, "image/png");
+  function canvasBlob() {
+    return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+  }
+
+  function downloadBlob(blob, filename) {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1200);
+  }
+
+  function wait(milliseconds) {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+
+  async function downloadPoster() {
+    if (!state.post || !state.pages.length) return;
+    const originalPage = state.currentPage;
+    const baseName = slugify(titleFor(state.post));
+    status.textContent = `Preparing ${state.pages.length} poster pages…`;
+    for (let index = 0; index < state.pages.length; index += 1) {
+      state.currentPage = index;
+      drawCurrentPage();
+      const blob = await canvasBlob();
+      downloadBlob(blob, `${baseName}-soul-and-script-page-${index + 1}-of-${state.pages.length}.png`);
+      await wait(120);
+    }
+    state.currentPage = originalPage;
+    drawCurrentPage();
+    status.textContent = `${state.pages.length} PNG pages downloaded — ready to share as a set.`;
   }
 
   async function copyPoster() {
@@ -421,6 +560,16 @@
   document.querySelectorAll("[data-poster-language]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.posterLanguage));
   });
+  previousPageButton.addEventListener("click", () => {
+    if (state.currentPage <= 0) return;
+    state.currentPage -= 1;
+    drawCurrentPage();
+  });
+  nextPageButton.addEventListener("click", () => {
+    if (state.currentPage >= state.pages.length - 1) return;
+    state.currentPage += 1;
+    drawCurrentPage();
+  });
   document.getElementById("poster-download").addEventListener("click", downloadPoster);
   document.getElementById("poster-copy").addEventListener("click", copyPoster);
 
@@ -428,3 +577,4 @@
   setLanguage(state.language);
   selectPost(postSelect.value);
 })();
+
