@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600;6..96,700;6..96,900&family=Caveat:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap');
 
 :root {
-  --art-paper: #f2eee7;
-  --art-paper-soft: #e8e0d6;
+  --art-paper: #e9e0d5;
+  --art-paper-soft: #d9c9ba;
   --art-ink: #211b25;
-  --art-muted: #726b76;
+  --art-muted: #5e5664;
   --art-plum: #5a2c49;
   --art-plum-deep: #281326;
   --art-coral: #dc7657;
@@ -12,7 +12,7 @@
   --art-sage: #b9d7cb;
   --art-yellow: #efd373;
   --art-night: #100d16;
-  --art-white: #faf8f4;
+  --art-white: #f7f1e9;
   --art-line: rgba(33, 27, 37, .14);
   --art-display: 'Bodoni Moda', 'Noto Nastaliq Urdu', Georgia, serif;
   --art-sans: 'DM Sans', 'Noto Nastaliq Urdu', Arial, sans-serif;
@@ -978,4 +978,38 @@ html[dir="rtl"] .art-page-article .article-head h1 {
 @media (max-width: 780px) {
   .art-page-article .section-head.art-reveal { transform: none !important; }
   .art-page-article > section.wrap { min-width: 0; max-width: 100%; box-sizing: border-box; }
+}
+
+/* ---------------------------------------------------------
+   Abstract editorial art-paper surface
+   --------------------------------------------------------- */
+html { background: var(--art-paper); }
+body.art-page {
+  background-color: var(--art-paper);
+  background-image:
+    radial-gradient(ellipse at 9% 6%, rgba(220,118,87,.16) 0 0, transparent 32%),
+    radial-gradient(ellipse at 92% 18%, rgba(191,174,234,.22) 0 0, transparent 34%),
+    radial-gradient(ellipse at 68% 96%, rgba(185,215,203,.17) 0 0, transparent 36%),
+    linear-gradient(132deg, #e9e0d5 0%, #eee5da 46%, #e4ddd8 100%);
+  background-attachment: fixed;
+  background-size: 130% 130%, 145% 145%, 140% 140%, 100% 100%;
+}
+body.art-page > main.wrap::before {
+  background: linear-gradient(180deg, rgba(247,241,233,.28), rgba(247,241,233,.42) 42%, rgba(247,241,233,.2));
+  box-shadow: 0 24px 80px rgba(90,44,73,.055);
+}
+body.art-page.art-page-gallery,
+body.art-page.art-page-video,
+body.art-page.art-page-writing.is-philosophy {
+  background-color: var(--art-night);
+  background-image: none;
+}
+body.art-page.art-page-gallery > main.wrap::before,
+body.art-page.art-page-video > main.wrap::before,
+body.art-page.art-page-writing.is-philosophy > main.wrap::before {
+  background: linear-gradient(180deg, rgba(16,13,22,.08), rgba(16,13,22,.22) 42%, rgba(16,13,22,.08));
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.art-page { background-attachment: scroll; }
 }
