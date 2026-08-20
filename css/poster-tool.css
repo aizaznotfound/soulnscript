@@ -98,3 +98,27 @@ html[dir="rtl"] .poster-segmented button { letter-spacing: 0; }
 @media (prefers-reduced-motion: reduce) {
   .poster-download, .poster-copy { transition: none; }
 }
+
+.poster-page-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 16px auto 0;
+  color: var(--art-muted);
+  font: 700 10px/1 var(--art-sans);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.poster-page-controls button {
+  width: 34px;
+  height: 30px;
+  border: 1px solid rgba(33,27,37,.28);
+  background: rgba(247,241,233,.76);
+  color: var(--art-plum);
+  font: 700 16px/1 var(--art-sans);
+  cursor: pointer;
+}
+.poster-page-controls button:hover:not(:disabled) { background: var(--art-plum); color: var(--art-white); }
+.poster-page-controls button:disabled { cursor: not-allowed; opacity: .35; }
+.poster-page-controls button:focus-visible { outline: 3px solid var(--art-coral); outline-offset: 3px; }
