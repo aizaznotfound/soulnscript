@@ -15,7 +15,8 @@ const CATEGORY_LABELS = {
 function formatDate(iso){
   const d = new Date(iso + "T00:00:00");
   if(isNaN(d.getTime())) return iso || "";
-  return d.toLocaleDateString("en-US", { day:"numeric", month:"long", year:"numeric" });
+  const locale = window.SS_LANG === "ur" ? "ur-PK" : "en-US";
+  return d.toLocaleDateString(locale, { day:"numeric", month:"long", year:"numeric" });
 }
 
 /* ---------- Escaping & sanitizing ----------
