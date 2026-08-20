@@ -1,35 +1,26 @@
 /* =========================================================
-   SOUL & SCRIPT — js/render/sections.js
-   Ticker, Most Read sidebar, generic list renderer, category
-   filter buttons, live search (news.html).
+   SOUL & SCRIPT — sections, filters, search
    ========================================================= */
 
-/* ---------- Ticker ---------- */
 function renderTicker(mountId){
   const el = document.getElementById(mountId);
   if(!el) return;
   const latest = allPostsSorted().slice(0,6);
-  el.innerHTML = latest.map(p =>
-    `<a href="article.html?slug=${p.slug}">${escapeHtml(p.title)}</a>`
-  ).join(" &nbsp;•&nbsp; ");
+  el.innerHTML = latest.map(p => `<a href="article.html?slug=${p.slug}">${escapeHtml(ssField(p, "title"))}</a>`).join(" &nbsp;•&nbsp; ");
 }
 
-/* ---------- Most Read sidebar ---------- */
 function renderMostRead(mountId, excludeSlug){
   const el = document.getElementById(mountId);
   if(!el) return;
   const items = allPostsSorted().filter(p => p.slug !== excludeSlug).slice(0,5);
-  el.innerHTML = `<h4>Community Favorites</h4><ol>${
-    items.map(p => `<li><a href="article.html?slug=${p.slug}">${escapeHtml(p.title)}</a></li>`).join("")
-  }</ol>`;
+  el.innerHTML = `<h4>${escapeHtml(ssUi("ui.communityFavorites"))}</h4><ol>${items.map(p => `<li><a href="article.html?slug=${p.slug}">${escapeHtml(ssField(p, "title"))}</a></li>`).join("")}</ol>`;
 }
 
-/* ---------- Generic list renderer with optional filter buttons ---------- */
 function renderList(mountId, posts, emptyMsg){
   const el = document.getElementById(mountId);
   if(!el) return;
   if(!posts.length){
-    el.innerHTML = `<div class="empty-state">${emptyMsg || "No stories in this category yet. Check back soon."}</div>`;
+    el.innerHTML = `<div class="empty-state">${escapeHtml(emptyMsg || ssUi("ui.noStories"))}</div>`;
     return;
   }
   el.innerHTML = posts.map(cardHTML).join("");
@@ -49,18 +40,17 @@ function initFilters(filterRowId, listMountId, baseline){
   });
 }
 
-/* ---------- Search (news page) ---------- */
 function initSearch(inputId, listMountId, baseline){
   const input = document.getElementById(inputId);
   if(!input) return;
   input.addEventListener("input", () => {
     const q = input.value.trim().toLowerCase();
-    const filtered = !q ? baseline : baseline.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      p.deck.toLowerCase().includes(q) ||
-      (p.tags || []).join(" ").toLowerCase().includes(q)
-    );
-    renderList(listMountId, filtered, "No stories match your search.");
+    const filtered = !q ? baseline : baseline.filter(p => {
+      const title = String(ssField(p, "title")).toLowerCase();
+      const deck = String(ssField(p, "deck")).toLowerCase();
+      const tags = ssListField(p, "tags").join(" ").toLowerCase();
+      return title.includes(q) || deck.includes(q) || tags.includes(q);
+    });
+    renderList(listMountId, filtered, ssUi("ui.noSearchResults"));
   });
 }
-
