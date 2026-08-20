@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poster Studio — Soul &amp; Script</title>
+  <meta name="description" content="Create a readable social-media poster from any Soul & Script post.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/misc.css">
+  <link rel="stylesheet" href="css/art-gallery.css">
+  <link rel="stylesheet" href="css/poster-tool.css">
+</head>
+<body class="art-page art-page-poster">
+  <header class="poster-header">
+    <div class="poster-header-inner wrap">
+      <a class="poster-brand" href="index.html" aria-label="Back to Soul &amp; Script home">
+        <span>Soul</span><b>&amp;</b><em>Script</em>
+      </a>
+      <div class="poster-header-actions">
+        <a href="editor.html">Editorial Access</a>
+        <a href="index.html">Back to site ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="poster-main wrap">
+    <section class="poster-intro">
+      <p class="poster-eyebrow">Social image maker · 1080 × 1350</p>
+      <h1>Poster<br><i>Studio.</i></h1>
+      <p class="poster-lede">Turn any published story into a calm, expressive poster that is ready to share. The original post stays untouched.</p>
+    </section>
+
+    <section class="poster-workspace" aria-label="Poster Studio workspace">
+      <aside class="poster-controls" aria-label="Poster controls">
+        <div class="poster-control-heading">
+          <span>01</span>
+          <h2>Choose a story</h2>
+        </div>
+        <label class="poster-field" for="poster-post-select">
+          <span>Published post</span>
+          <select id="poster-post-select"></select>
+        </label>
+        <p class="poster-selection-meta" id="poster-selection-meta">Loading published posts…</p>
+
+        <div class="poster-control-heading poster-control-heading-spaced">
+          <span>02</span>
+          <h2>Set the voice</h2>
+        </div>
+        <fieldset class="poster-language-group">
+          <legend>Poster language</legend>
+          <div class="poster-segmented">
+            <button type="button" class="is-active" data-poster-language="en" aria-pressed="true">English</button>
+            <button type="button" data-poster-language="ur" aria-pressed="false">اردو</button>
+          </div>
+        </fieldset>
+        <p class="poster-help">Urdu titles use the post’s <code>title_ur</code> field when available, with English fallback.</p>
+
+        <div class="poster-control-heading poster-control-heading-spaced">
+          <span>03</span>
+          <h2>Shape the frame</h2>
+        </div>
+        <label class="poster-field" for="poster-palette">
+          <span>Palette</span>
+          <select id="poster-palette">
+            <option value="plum">Plum / Coral</option>
+            <option value="lilac">Lilac / Ink</option>
+            <option value="sage">Sage / Plum</option>
+            <option value="night">Night / Gold</option>
+          </select>
+        </label>
+        <label class="poster-check" for="poster-show-image">
+          <input type="checkbox" id="poster-show-image" checked>
+          <span>Use the post artwork when available</span>
+        </label>
+        <p class="poster-help">Artwork is placed behind a readable overlay. Posts without artwork receive an abstract editorial composition.</p>
+
+        <div class="poster-actions">
+          <button type="button" class="poster-download" id="poster-download">Download PNG ↗</button>
+          <button type="button" class="poster-copy" id="poster-copy">Copy image</button>
+        </div>
+        <p class="poster-status" id="poster-status" role="status" aria-live="polite"></p>
+        <p class="poster-note">This tool only reads the generated <code>js/content.js</code> inventory in your browser. It does not modify, publish, upload, or overwrite any CMS data.</p>
+      </aside>
+
+      <div class="poster-preview-column">
+        <div class="poster-preview-label"><span>Live canvas</span><span>Social portrait</span></div>
+        <div class="poster-canvas-frame">
+          <canvas id="poster-canvas" width="1080" height="1350" aria-label="Generated social-media poster preview"></canvas>
+        </div>
+        <p class="poster-preview-caption">PNG export is generated locally at 1080 × 1350 pixels for a crisp 4:5 social post.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/content.js"></script>
+  <script src="js/lib/format.js"></script>
+  <script src="js/pages/poster.js"></script>
+</body>
+</html>
