@@ -1,134 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gallery — Soul &amp; Script</title>
 <meta name="description" content="Photography, painting, and sketches from the Soul &amp; Script community.">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/misc.css">
-<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/misc.css"><link rel="stylesheet" href="css/animations.css"><link rel="stylesheet" href="css/art-gallery.css">
 </head>
-<body>
-
-<div class="utility-bar">
-  <div class="wrap">
-    <span id="utility-date"></span>
-    <span><span class="divider">|</span><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">Instagram</a><span class="divider">|</span><a href="https://l.instagram.com/?u=https%3A%2F%2Fchat.whatsapp.com%2FCTA39UN7TfU97Ges3nD7Qv%3Fmode%3Dgi_t&amp;e=AUAepJVC_8tI0yx_r99SeFSSV0EsHG72k8zv1Iacd_0PrS_ssVRQuzxrH6Kgr0WTOoquH9e6f3poeLnNvfajVt3S9D4C0wSfT87WRcBZhtxiE5EDFoaEJ9etF3svOja-GPStzHY" target="_blank" rel="noopener">Join our WhatsApp</a></span>
-  </div>
-</div>
-
-<header class="masthead">
-  <div class="wrap">
-    <div class="kicker">Est. 2026 &middot; A Home For Every Art</div>
-    <h1><a href="index.html">Soul <span class="amp">&amp;</span> Script</a></h1>
-    <div class="tagline">For readers, writers, thinkers, painters &mdash; and artists of every kind</div>
-  </div>
-  <div class="wrap"><div class="pulse-rule-mount"></div></div>
-</header>
-
-<nav class="nav">
-  <div class="wrap">
-    <button class="nav-burger" id="nav-burger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul id="nav-menu">
-      <li><a href="index.html" data-page="index.html">Home</a></li>
-      <li class="has-mega">
-        <a href="news.html" data-page="news.html">Writing</a>
-        <button class="mega-toggle" aria-label="Show Writing submenu" aria-expanded="false">▾</button>
-        <div class="mega" id="mega-news"></div>
-      </li>
-      <li class="has-mega">
-        <a href="videos.html" data-page="videos.html">Films &amp; Talks</a>
-        <button class="mega-toggle" aria-label="Show Films &amp; Talks submenu" aria-expanded="false">▾</button>
-        <div class="mega" id="mega-videos"></div>
-      </li>
-      <li class="has-mega">
-        <a href="photos.html" data-page="photos.html">Gallery</a>
-        <button class="mega-toggle" aria-label="Show Gallery submenu" aria-expanded="false">▾</button>
-        <div class="mega" id="mega-photos"></div>
-      </li>
-      <li><a href="events.html" data-page="events.html">Events</a></li>
-      <li><a href="team.html" data-page="team.html">Team</a></li>
-      <li><a href="about.html" data-page="about.html">Manifesto</a></li>
-      <li><a href="contact.html" data-page="contact.html">Contact</a></li>
-      <li class="nav-cta-item"><a href="contribute.html" class="nav-cta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Share Your Work</span></a></li>
-    </ul>
-  </div>
-</nav>
-
-
-<main class="wrap">
-  <div class="page-hero hero-gallery">
-    <div class="hero-decor">
-      <div class="wblob w1"></div><div class="wblob w2"></div>
-      <div class="ring ra"></div><div class="ring rb"></div>
-    </div>
-    <div class="hero-inner">
-      <div class="kicker-sm">Seen And Made</div>
-      <h1>Gallery</h1>
-      <p>Photography, painting, and sketches from the Soul &amp; Script community — every visual art, in one gallery.</p>
-    </div>
-  </div>
-
-  <div class="grid cols-4" id="photos-grid" style="margin-top:30px;"></div>
-</main>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <div class="masthead-mini">Soul &amp; Script</div>
-        <p style="margin-top:10px;">A creative collective for readers, writers, thinkers, painters, and artists of every kind.</p>
-      </div>
-      <div>
-        <h5>Explore</h5>
-        <ul>
-          <li><a href="news.html">Writing</a></li>
-          <li><a href="videos.html">Films &amp; Talks</a></li>
-          <li><a href="photos.html">Gallery</a></li>
-          <li><a href="events.html">Events</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>About</h5>
-        <ul>
-          <li><a href="about.html">Manifesto</a></li>
-          <li><a href="team.html">Team</a></li>
-          <li><a href="contact.html">Contact &amp; Submissions</a></li>
-          <li><a href="contribute.html">Share Your Work</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5>Reach Us</h5>
-        <ul>
-          <li><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">@soulnscript_</a></li>
-          <li><a href="tel:+923185119794">+92 318 5119794</a></li>
-          <li><a href="mailto:soulnscript26@gmail.com">soulnscript26@gmail.com</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <span>© <span id="footer-year"></span> Soul &amp; Script. A home for every art.</span>
-      <span>An independent creative collective. <a href="contribute.html" style="color:inherit; opacity:.8;">Share Your Work</a> · <a href="editor.html" style="color:inherit; opacity:.8;">Team: Editorial Access</a></span>
-    </div>
-  </div>
-</footer>
-
-<script src="js/content.js"></script>
-<script src="js/lib/format.js"></script>
-<script src="js/lib/sanitize.js"></script>
-<script src="js/lib/content-data.js"></script>
-<script src="js/render/cards.js"></script>
-<script src="js/render/sections.js"></script>
-<script src="js/render/article-page.js"></script>
-<script src="js/render/share-and-rails.js"></script>
-<script src="js/nav.js"></script>
-<script src="js/richtext.js"></script>
-<script src="js/bootstrap.js"></script>
-<script src="js/reveal.js"></script>
-<script src="js/pages/photos.js"></script>
+<body class="art-page art-page-gallery">
+<div class="utility-bar"><div class="wrap"><span id="utility-date"></span><span><span class="divider">|</span><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">Instagram</a><span class="divider">|</span><a href="https://l.instagram.com/?u=https%3A%2F%2Fchat.whatsapp.com%2FCTA39UN7TfU97Ges3nD7Qv%3Fmode%3Dgi_t&amp;e=AUAepJVC_8tI0yx_r99SeFSSV0EsHG72k8zv1Iacd_0PrS_ssVRQuzxrH6Kgr0WTOoquH9e6f3poeLnNvfajVt3S9D4C0wSfT87WRcBZhtxiE5EDFoaEJ9etF3svOja-GPStzHY" target="_blank" rel="noopener"><span data-i18n="ui.joinWhatsApp">Join our WhatsApp</span></a></span></div></div>
+<header class="masthead"><div class="wrap"><div class="kicker" data-i18n="shell.est">Est. 2026 · Seen and made</div><h1 class="brand-lockup">
+  <a class="brand-link" href="index.html" aria-label="Soul &amp; Script">
+    <svg class="ss-logo" viewBox="0 0 700 165" role="img" aria-labelledby="ss-logo-title ss-logo-desc">
+      <title id="ss-logo-title">Soul &amp; Script</title>
+      <desc id="ss-logo-desc">A bilingual creative arts collective for writing, reading, sketches, painting, open mic, debates, movie talks, videography, and photography.</desc>
+      <defs>
+        <linearGradient id="ssLogoInk" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="var(--art-plum)" />
+          <stop offset=".58" stop-color="var(--art-coral)" />
+          <stop offset="1" stop-color="var(--art-plum-deep)" />
+        </linearGradient>
+        <filter id="ssLogoRoughen" x="-8%" y="-20%" width="116%" height="145%">
+          <feTurbulence type="fractalNoise" baseFrequency=".015" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.6" />
+        </filter>
+      </defs>
+      <g class="ss-logo-flourish-group" fill="none" stroke="url(#ssLogoInk)" stroke-linecap="round" filter="url(#ssLogoRoughen)">
+        <path class="ss-logo-flourish" d="M24 121 C109 106 174 133 247 116 C322 99 382 121 458 111 C539 101 598 105 672 82" />
+        <path class="ss-logo-flourish-secondary" d="M34 132 C127 118 182 145 274 127 C355 111 408 135 493 119" />
+      </g>
+      <g class="ss-logo-words">
+        <text class="ss-logo-soul" x="28" y="84">Soul</text>
+        <text class="ss-logo-amp" x="279" y="94">&amp;</text>
+        <text class="ss-logo-script" x="348" y="90">Script</text>
+      </g>
+      <circle class="ss-logo-ink-dot" cx="634" cy="119" r="4" />
+    </svg>
+  </a>
+</h1><div class="tagline" data-i18n="shell.tagline">Light, shadow, texture, and the pause between.</div></div></header>
+<nav class="nav"><div class="wrap"><button class="nav-burger" id="nav-burger" aria-label="Toggle menu" data-i18n-aria="nav.toggleMenu" aria-expanded="false" aria-controls="nav-menu"><span></span><span></span><span></span></button><ul id="nav-menu"><li><a href="index.html" data-page="index.html" data-i18n="nav.home">Home</a></li><li class="has-mega"><a href="news.html" data-page="news.html" data-i18n="nav.writing">Writing</a><button class="mega-toggle" aria-label="Show Writing submenu" data-i18n-aria="nav.showWriting" aria-expanded="false">⌄</button><div class="mega" id="mega-news"></div></li><li class="has-mega"><a href="videos.html" data-page="videos.html" data-i18n="nav.films">Films &amp; Talks</a><button class="mega-toggle" aria-label="Show Films &amp; Talks submenu" data-i18n-aria="nav.showFilms" aria-expanded="false">⌄</button><div class="mega" id="mega-videos"></div></li><li class="has-mega"><a href="photos.html" data-page="photos.html" data-i18n="nav.gallery">Gallery</a><button class="mega-toggle" aria-label="Show Gallery submenu" data-i18n-aria="nav.showGallery" aria-expanded="false">⌄</button><div class="mega" id="mega-photos"></div></li><li><a href="events.html" data-page="events.html" data-i18n="nav.events">Events</a></li><li><a href="team.html" data-page="team.html" data-i18n="nav.team">Team</a></li><li><a href="about.html" data-page="about.html" data-i18n="nav.manifesto">Manifesto</a></li><li><a href="contact.html" data-page="contact.html" data-i18n="nav.contact">Contact</a></li><li class="nav-lang-item"><button type="button" class="lang-toggle" data-lang-toggle data-lang-label>اردو</button></li><li class="nav-cta-item"><a href="contribute.html" class="nav-cta"><span data-i18n="nav.share">Share Your Work ↗</span></a></li></ul></div></nav>
+<main class="wrap"><section class="page-hero hero-gallery"><div class="hero-decor"><div class="wblob w1"></div><div class="wblob w2"></div><div class="ring ra"></div><div class="ring rb"></div></div><div class="hero-inner"><div class="kicker-sm" data-i18n="gallery.kicker">The visual archive</div><h1 data-i18n="gallery.title">Gallery.</h1><p data-i18n="gallery.description">Photography, painting, sketches, and the strange little frames that make a day worth remembering.</p></div></section><div id="photos-grid" aria-label="Gallery works"></div></main>
+<footer><div class="wrap"><div class="foot-grid"><div><div class="masthead-mini">Soul &amp; Script</div><p style="margin-top:10px;"><span data-i18n="footer.description">A creative collective for readers, writers, thinkers, painters, and artists of every kind.</span></p></div><div><h5 data-i18n="ui.explore">Explore</h5><ul><li><a href="news.html" data-i18n="nav.writing">Writing</a></li><li><a href="videos.html" data-i18n="nav.films">Films &amp; Talks</a></li><li><a href="photos.html" data-i18n="nav.gallery">Gallery</a></li><li><a href="events.html" data-i18n="nav.events">Events</a></li></ul></div><div><h5 data-i18n="ui.about">About</h5><ul><li><a href="about.html" data-i18n="nav.manifesto">Manifesto</a></li><li><a href="team.html" data-i18n="nav.team">Team</a></li><li><a href="contact.html" data-i18n="nav.contactSubmissions">Contact &amp; Submissions</a></li><li><a href="contribute.html" data-i18n="nav.share">Share Your Work</a></li></ul></div><div><h5 data-i18n="ui.reach">Reach us</h5><ul><li><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">@soulnscript_</a></li><li><a href="tel:+923185119794">+92 318 5119794</a></li><li><a href="mailto:soulnscript26@gmail.com">soulnscript26@gmail.com</a></li></ul></div></div><div class="foot-bottom"><span>© <span id="footer-year"></span> Soul &amp; Script.</span><span>An independent creative collective. <a href="contribute.html">Share Your Work</a> · <a href="editor.html" data-i18n="footer.editorial">Editorial Access</a></span></div></div></footer>
+<script src="js/content.js"></script><script src="js/i18n.js"></script><script src="js/lib/format.js"></script><script src="js/lib/sanitize.js"></script><script src="js/lib/content-data.js"></script><script src="js/render/cards.js"></script><script src="js/render/sections.js"></script><script src="js/render/article-page.js"></script><script src="js/render/share-and-rails.js"></script><script src="js/nav.js"></script><script src="js/richtext.js"></script><script src="js/bootstrap.js"></script><script src="js/reveal.js"></script><script src="js/pages/photos.js"></script><script src="js/art-motion.js"></script>
 </body>
 </html>
