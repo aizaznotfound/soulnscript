@@ -17,7 +17,9 @@
   const splitWords = (node) => {
     if (!node || node.dataset.wordReveal === 'true' || node.querySelector('br')) return;
     const text = node.textContent.trim();
-    if (!text || text.length > 220) return;
+    // Keep Arabic-script text as one isolated bidi run; splitting Urdu words into spans
+    // can visually reorder particles such as نے, مجھے, and دیا؟.
+    if (!text || text.length > 220 || /[\u0600-\u06FF]/u.test(text)) return;
     node.dataset.wordReveal = 'true';
     node.setAttribute('aria-label', text);
     node.textContent = '';
