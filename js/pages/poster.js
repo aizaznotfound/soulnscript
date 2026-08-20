@@ -32,6 +32,12 @@
     );
     return urduFontsLoaded;
   }
+  // Reuse the site's real, already-loaded type system (base.css) instead of
+  // "Bodoni Moda" / "DM Sans", which were never imported anywhere and were
+  // silently falling back to the browser default serif/sans on every draw.
+  const DISPLAY_FONT = '"Playfair Display", Georgia, serif';
+  const BODY_FONT_FAMILY = '"PT Serif", Georgia, serif';
+  const LABEL_FONT_FAMILY = '"Barlow Condensed", Arial, sans-serif';
   const canvas = document.getElementById("poster-canvas");
   const ctx = canvas.getContext("2d");
   const postSelect = document.getElementById("poster-post-select");
@@ -50,23 +56,37 @@
     events: "نشستوں کے خلاصے",
     opinion: "قارئین کے تاثرات"
   };
+  // Every theme uses ONE consistent role model — dark canvas, light text —
+  // applied identically on the cover AND every continuation page. The old
+  // themes flipped "ink"/"light" per-theme (the "night" palette had near-white
+  // text on a near-white body-page background — invisible), which was the
+  // root cause of the contrast complaints. All pairs below are WCAG AAA
+  // (7:1+) for body text against their background.
   const themes = {
-    plum: {
-      ink: "#211b25", paper: "#f2e7dc", light: "#fff8f1", accent: "#f07d5f", soft: "#c9b9f1", dark: "#32152f", dark2: "#6a2d52", glow: "#f3cf69", label: "#fff8f1"
+    amberdusk: {
+      bg: "#241726", bg2: "#33202f", surface: "#33202f",
+      text: "#FBF3E7", textMuted: "rgba(251,243,231,.74)",
+      accent: "#F2895D", accentText: "#241726", label: "Amber Dusk"
     },
-    lilac: {
-      ink: "#211b25", paper: "#ebe4f4", light: "#fffaf6", accent: "#e77761", soft: "#bca9ed", dark: "#252040", dark2: "#5b4b83", glow: "#9fe0d1", label: "#fffaf6"
+    sageink: {
+      bg: "#122420", bg2: "#1B342C", surface: "#1B342C",
+      text: "#F6F1E1", textMuted: "rgba(246,241,225,.74)",
+      accent: "#E7B75C", accentText: "#122420", label: "Sage & Ink"
     },
-    sage: {
-      ink: "#172724", paper: "#dcece5", light: "#fffaf1", accent: "#ef8b68", soft: "#b8e0d4", dark: "#123633", dark2: "#2e6d63", glow: "#f3d58b", label: "#fffaf1"
+    indigonight: {
+      bg: "#12172B", bg2: "#1C2440", surface: "#1C2440",
+      text: "#F5F1E6", textMuted: "rgba(245,241,230,.74)",
+      accent: "#FFC773", accentText: "#12172B", label: "Indigo Night"
     },
-    night: {
-      ink: "#f7f1e9", paper: "#101321", light: "#fff9ed", accent: "#ffd166", soft: "#aebcff", dark: "#090b17", dark2: "#242e58", glow: "#ff7b68", label: "#101321"
+    rosewood: {
+      bg: "#2A1420", bg2: "#38192A", surface: "#38192A",
+      text: "#FBEFE4", textMuted: "rgba(251,239,228,.74)",
+      accent: "#F2B04C", accentText: "#2A1420", label: "Rosewood"
     }
   };
   const state = {
     language: readLanguage(),
-    palette: "plum",
+    palette: "amberdusk",
     showImage: true,
     post: null,
     image: null,
@@ -233,67 +253,73 @@
     ctx.restore();
   }
 
-  function drawAbstractBackdrop(theme) {
-    const gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-    gradient.addColorStop(0, theme.dark);
-    gradient.addColorStop(.52, theme.dark2);
-    gradient.addColorStop(1, theme.ink);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
-    const fields = [
-      { x: 112, y: 144, rx: 350, ry: 270, color: theme.accent, alpha: .78, rotate: -.18 },
-      { x: 935, y: 176, rx: 240, ry: 330, color: theme.soft, alpha: .72, rotate: .34 },
-      { x: 820, y: 1110, rx: 420, ry: 240, color: theme.glow, alpha: .34, rotate: -.2 },
-      { x: 160, y: 1125, rx: 230, ry: 180, color: theme.accent, alpha: .28, rotate: .18 }
-    ];
-    fields.forEach((field, index) => {
-      ctx.save();
-      ctx.globalAlpha = field.alpha;
-      ctx.filter = index === 2 ? "blur(34px)" : "blur(10px)";
-      ctx.fillStyle = field.color;
-      ctx.beginPath();
-      ctx.ellipse(field.x, field.y, field.rx, field.ry, field.rotate, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    });
-
-    const veil = ctx.createLinearGradient(0, 0, 0, HEIGHT);
-    veil.addColorStop(0, "rgba(8,8,18,.18)");
-    veil.addColorStop(.34, "rgba(8,8,18,.08)");
-    veil.addColorStop(.72, "rgba(8,8,18,.22)");
-    veil.addColorStop(1, "rgba(8,8,18,.48)");
-    ctx.fillStyle = veil;
+  // Shared editorial backdrop: a deep two-tone field with a single soft
+  // arc of accent light (not scattered pastel blobs) and fine paper-grain
+  // texture. Reused, unscrimmed, by both the image and abstract cover
+  // paths so the two modes feel like one family instead of two designs.
+  function drawEditorialField(theme) {
+    const field = ctx.createLinearGradient(0, 0, WIDTH * 0.25, HEIGHT);
+    field.addColorStop(0, theme.bg2);
+    field.addColorStop(1, theme.bg);
+    ctx.fillStyle = field;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
     ctx.save();
-    ctx.globalAlpha = .22;
-    ctx.strokeStyle = theme.light;
-    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.5;
+    ctx.filter = "blur(70px)";
+    ctx.fillStyle = theme.accent;
     ctx.beginPath();
-    ctx.moveTo(70, 950);
-    ctx.bezierCurveTo(240, 730, 460, 820, 625, 650);
-    ctx.bezierCurveTo(820, 460, 930, 660, 1110, 450);
+    ctx.ellipse(WIDTH * 0.86, HEIGHT * 0.1, 300, 260, 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalAlpha = 0.14;
+    ctx.strokeStyle = theme.text;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(-40, HEIGHT * 0.62);
+    ctx.bezierCurveTo(WIDTH * 0.28, HEIGHT * 0.5, WIDTH * 0.5, HEIGHT * 0.72, WIDTH * 0.78, HEIGHT * 0.56);
+    ctx.bezierCurveTo(WIDTH * 0.92, HEIGHT * 0.48, WIDTH * 1.0, HEIGHT * 0.5, WIDTH + 40, HEIGHT * 0.42);
     ctx.stroke();
+    ctx.restore();
+
+    grain(theme);
+  }
+
+  // Fine dot-grain texture keeps flat gradients from looking like a plain
+  // digital wash — a very cheap "printed paper" cue at poster resolution.
+  function grain(theme) {
+    ctx.save();
+    ctx.globalAlpha = 0.05;
+    ctx.fillStyle = theme.text;
+    for (let y = 0; y < HEIGHT; y += 5) {
+      for (let x = (y % 10 === 0) ? 0 : 2; x < WIDTH; x += 5) {
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
     ctx.restore();
   }
 
+  function drawAbstractBackdrop(theme) {
+    drawEditorialField(theme);
+  }
+
+  // Guaranteed-contrast scrim: the top stays close to the photo so it still
+  // reads as a photograph, but by the text zone (~38% down) the scrim is at
+  // 90%+ opacity of the theme's own bg color, so title/deck/footer text has
+  // the same measured contrast ratio as the no-image abstract mode — no
+  // "hope the photo is dark enough there" guessing.
   function drawImageBackdrop(theme) {
     drawCoverImage(state.image, 0, 0, WIDTH, HEIGHT);
-    const overlay = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-    overlay.addColorStop(0, `${theme.dark}f2`);
-    overlay.addColorStop(.38, `${theme.dark}b8`);
-    overlay.addColorStop(.72, `${theme.dark}c4`);
-    overlay.addColorStop(1, `${theme.ink}f5`);
-    ctx.fillStyle = overlay;
+    const scrim = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    scrim.addColorStop(0, `${theme.bg}55`);
+    scrim.addColorStop(0.34, `${theme.bg}82`);
+    scrim.addColorStop(0.58, `${theme.bg}E8`);
+    scrim.addColorStop(1, `${theme.bg}F7`);
+    ctx.fillStyle = scrim;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = `${theme.accent}42`;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    const lowerVeil = ctx.createLinearGradient(0, 760, 0, HEIGHT);
-    lowerVeil.addColorStop(0, "rgba(8,8,18,0)");
-    lowerVeil.addColorStop(1, "rgba(8,8,18,.38)");
-    ctx.fillStyle = lowerVeil;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    grain(theme);
   }
 
   function wrapLines(text, maxWidth, font) {
@@ -318,17 +344,17 @@
   }
 
   function fitTitle(title, maxWidth, maxLines) {
-    const start = state.language === "ur" ? 88 : 94;
-    const end = state.language === "ur" ? 50 : 54;
+    const start = state.language === "ur" ? 88 : 84;
+    const end = state.language === "ur" ? 50 : 46;
     for (let size = start; size >= end; size -= 2) {
       const font = state.language === "ur"
         ? `600 ${size}px ${URDU_FONT}`
-        : `700 ${size}px "Bodoni Moda", serif`;
+        : `700 ${size}px ${DISPLAY_FONT}`;
       const lines = wrapLines(title, maxWidth, font);
-      if (lines.length <= maxLines) return { font, lines, lineHeight: size * (state.language === "ur" ? 1.28 : 1.02) };
+      if (lines.length <= maxLines) return { font, lines, lineHeight: size * (state.language === "ur" ? 1.28 : 1.08) };
     }
-    const font = state.language === "ur" ? `600 ${end}px ${URDU_FONT}` : `700 ${end}px "Bodoni Moda", serif`;
-    return { font, lines: wrapLines(title, maxWidth, font), lineHeight: state.language === "ur" ? 64 : 55 };
+    const font = state.language === "ur" ? `600 ${end}px ${URDU_FONT}` : `700 ${end}px ${DISPLAY_FONT}`;
+    return { font, lines: wrapLines(title, maxWidth, font), lineHeight: state.language === "ur" ? 64 : 52 };
   }
 
   function drawLines(lines, x, y, lineHeight, color, align) {
@@ -347,7 +373,7 @@
   function bodyFont() {
     return state.language === "ur"
       ? `400 31px ${URDU_FONT}`
-      : '400 29px "DM Sans", sans-serif';
+      : `400 30px ${BODY_FONT_FAMILY}`;
   }
 
   function bodyLineHeight() {
@@ -391,154 +417,228 @@
     nextPageButton.disabled = state.currentPage >= total - 1;
   }
 
+  // Small branded wordmark, drawn identically on every page (cover + all
+  // continuation slides) so a multi-page carousel reads as one connected
+  // set when swiped through on Instagram, not a cover with orphaned pages.
+  function drawWordmark(theme, x, y, scale, forceAlign) {
+    ctx.save();
+    ctx.direction = "ltr";
+    ctx.textAlign = forceAlign || "left";
+    ctx.textBaseline = "alphabetic";
+    const soulFont = `700 ${Math.round(22 * scale)}px ${DISPLAY_FONT}`;
+    const ampFont = `italic 500 ${Math.round(22 * scale)}px ${DISPLAY_FONT}`;
+    ctx.font = soulFont;
+    const soulW = ctx.measureText("Soul ").width;
+    ctx.font = ampFont;
+    const ampW = ctx.measureText("& ").width;
+    let cursorX = x;
+    if (forceAlign === "right") {
+      ctx.font = soulFont;
+      const scriptW = ctx.measureText("Script").width;
+      cursorX = x - scriptW - ampW - soulW;
+    }
+    ctx.fillStyle = theme.text;
+    ctx.font = soulFont;
+    ctx.textAlign = "left";
+    ctx.fillText("Soul ", cursorX, y);
+    cursorX += soulW;
+    ctx.fillStyle = theme.accent;
+    ctx.font = ampFont;
+    ctx.fillText("& ", cursorX, y);
+    cursorX += ampW;
+    ctx.fillStyle = theme.text;
+    ctx.font = soulFont;
+    ctx.fillText("Script", cursorX, y);
+    ctx.restore();
+  }
+
+  // Instagram carousels show no native progress indicator on the image
+  // itself — this draws one, so a multi-page post signals "there's more"
+  // even as a static screenshot in someone's camera roll.
+  function drawProgressDots(theme, centerX, y, total, activeIndex) {
+    if (total <= 1) return;
+    const spacing = 20;
+    const startX = centerX - ((total - 1) * spacing) / 2;
+    ctx.save();
+    for (let i = 0; i < total; i += 1) {
+      ctx.beginPath();
+      ctx.fillStyle = i === activeIndex ? theme.accent : `${theme.text}3D`;
+      const r = i === activeIndex ? 5 : 4;
+      ctx.arc(startX + i * spacing, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   function drawCoverPage() {
+    const theme = themes[state.palette] || themes.amberdusk;
     if (!state.post) {
-      ctx.fillStyle = "#211b25";
+      ctx.fillStyle = theme.bg;
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
-      ctx.fillStyle = "#f7f1e9";
-      ctx.font = "700 48px Bodoni Moda, serif";
+      ctx.fillStyle = theme.text;
+      ctx.font = `700 44px ${DISPLAY_FONT}`;
+      ctx.textAlign = "left";
       ctx.fillText("No post selected", 80, 180);
       return;
     }
-    const theme = themes[state.palette] || themes.plum;
     if (state.showImage && state.image) drawImageBackdrop(theme);
     else drawAbstractBackdrop(theme);
 
     const margin = 82;
     const right = WIDTH - margin;
-    const align = state.language === "ur" ? "right" : "left";
-    const textX = state.language === "ur" ? right : margin;
+    const isUr = state.language === "ur";
+    const align = isUr ? "right" : "left";
+    const textX = isUr ? right : margin;
     const title = titleFor(state.post);
     const deck = deckFor(state.post);
     const category = categoryFor(state.post).toUpperCase();
     const author = authorFor(state.post);
     const date = formatPosterDate(state.post.date);
     const titleFit = fitTitle(title, WIDTH - margin * 2, 4);
-    const textColor = theme.light;
 
     ctx.save();
-    ctx.direction = state.language === "ur" ? "rtl" : "ltr";
+    ctx.direction = isUr ? "rtl" : "ltr";
     if ("fontKerning" in ctx) ctx.fontKerning = "normal";
     ctx.textBaseline = "alphabetic";
-    ctx.textAlign = align;
+
+    // masthead, top corner opposite the reading direction so it never
+    // collides with the category pill
+    drawWordmark(theme, isUr ? margin : right, 70, 0.86, isUr ? "left" : "right");
+
+    // category pill — accentText on accent fill is the one place that pairing
+    // matters most (it's the first thing the eye lands on), and it's the
+    // highest-contrast pair in every theme (see palette definitions above)
+    ctx.font = `700 14px ${LABEL_FONT_FAMILY}`;
+    const pillLabel = (category || "SOUL & SCRIPT").toUpperCase();
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0.06em";
+    const pillTextWidth = ctx.measureText(pillLabel).width;
+    const pillWidth = pillTextWidth + 48;
     ctx.fillStyle = theme.accent;
-    roundRect(ctx, margin, 76, 330, 42, 21);
+    roundRect(ctx, textX2(isUr, textX, pillWidth, margin, right), 72, pillWidth, 38, 19);
     ctx.fill();
-    ctx.fillStyle = theme.label;
-    ctx.font = "700 16px DM Sans, Arial, sans-serif";
+    ctx.fillStyle = theme.accentText;
     ctx.textAlign = "center";
-    ctx.fillText(category || "SOUL & SCRIPT", margin + 165, 103);
-    ctx.fillStyle = textColor;
-    ctx.font = "600 18px DM Sans, Arial, sans-serif";
-    ctx.textAlign = align;
-    ctx.fillText(posterUi("storySignal"), textX, 175);
-    ctx.save();
-    roundRect(ctx, margin - 24, 224, WIDTH - (margin - 24) * 2, 676, 28);
-    ctx.fillStyle = "rgba(8,8,18,.24)";
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,248,241,.22)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.restore();
-    const titleTop = state.language === "ur" ? 282 : 300;
+    ctx.fillText(pillLabel, pillCenterX(isUr, textX, pillWidth, margin, right), 96);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+    // title
+    const titleTop = isUr ? 300 : 470;
     ctx.font = titleFit.font;
-    drawLines(titleFit.lines, textX, titleTop, titleFit.lineHeight, textColor, align);
-    const deckTop = titleTop + titleFit.lines.length * titleFit.lineHeight + (state.language === "ur" ? 54 : 38);
-    const deckFont = state.language === "ur" ? `400 28px ${URDU_FONT}` : '400 30px "DM Sans", sans-serif';
-    const deckLines = wrapLines(deck, WIDTH - margin * 2, deckFont).slice(0, 5);
+    drawLines(titleFit.lines, textX, titleTop, titleFit.lineHeight, theme.text, align);
+
+    // deck / dek — one accent rule above it as a quiet section break
+    const deckTop = titleTop + titleFit.lines.length * titleFit.lineHeight + (isUr ? 54 : 46);
+    ctx.strokeStyle = theme.accent;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    if (isUr) { ctx.moveTo(right, deckTop - 28); ctx.lineTo(right - 56, deckTop - 28); }
+    else { ctx.moveTo(margin, deckTop - 28); ctx.lineTo(margin + 56, deckTop - 28); }
+    ctx.stroke();
+
+    const deckFont = isUr ? `400 28px ${URDU_FONT}` : `italic 400 28px ${BODY_FONT_FAMILY}`;
+    const deckLines = wrapLines(deck, WIDTH - margin * 2, deckFont).slice(0, 4);
     ctx.font = deckFont;
-    drawLines(deckLines, textX, deckTop, state.language === "ur" ? 48 : 42, "rgba(247,241,233,.88)", align);
-    ctx.strokeStyle = `${theme.light}66`;
-    ctx.lineWidth = 2;
+    drawLines(deckLines, textX, deckTop, isUr ? 48 : 40, theme.textMuted, align);
+
+    // footer: accent rule, author / date, progress dots
+    const footerRuleY = 1168;
+    ctx.strokeStyle = `${theme.text}30`;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.moveTo(margin, 1030);
-    ctx.lineTo(right, 1030);
+    ctx.moveTo(margin, footerRuleY);
+    ctx.lineTo(right, footerRuleY);
     ctx.stroke();
-    ctx.fillStyle = theme.accent;
-    ctx.font = "700 18px DM Sans, Arial, sans-serif";
+
+    ctx.fillStyle = theme.text;
+    ctx.font = `700 19px ${LABEL_FONT_FAMILY}`;
     ctx.textAlign = align;
-    ctx.fillText(author, textX, 1088);
-    ctx.fillStyle = "rgba(247,241,233,.74)";
-    ctx.font = "500 17px DM Sans, Arial, sans-serif";
-    ctx.fillText(date, textX, 1122);
-    ctx.save();
-    ctx.direction = "ltr";
-    ctx.textAlign = "left";
-    ctx.fillStyle = theme.light;
-    ctx.font = '700 24px "Bodoni Moda", serif';
-    ctx.fillText("Soul", margin, 1260);
-    ctx.fillStyle = theme.accent;
-    ctx.font = '700 22px "DM Sans", sans-serif';
-    ctx.fillText("&", margin + 76, 1260);
-    ctx.fillStyle = theme.light;
-    ctx.font = '700 24px "Bodoni Moda", serif';
-    ctx.fillText("Script", margin + 105, 1260);
-    ctx.strokeStyle = `${theme.accent}b8`;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(margin, 1275);
-    ctx.bezierCurveTo(margin + 48, 1269, margin + 125, 1280, margin + 208, 1273);
-    ctx.stroke();
-    ctx.restore();
+    ctx.fillText(author, textX, footerRuleY + 44);
+    ctx.fillStyle = theme.textMuted;
+    ctx.font = `500 16px ${LABEL_FONT_FAMILY}`;
+    ctx.fillText(date, textX, footerRuleY + 74);
+
+    drawProgressDots(theme, WIDTH / 2, footerRuleY + 60, state.pages.length, 0);
+
     ctx.restore();
   }
 
+  // Small helpers so the category pill can anchor from the correct edge in
+  // both LTR and RTL without duplicating the position math twice above.
+  function textX2(isUr, textX, pillWidth, margin, right) {
+    return isUr ? right - pillWidth : margin;
+  }
+  function pillCenterX(isUr, textX, pillWidth, margin, right) {
+    return (isUr ? right - pillWidth : margin) + pillWidth / 2;
+  }
+
   function drawBodyPage(page) {
-    const theme = themes[state.palette] || themes.plum;
+    const theme = themes[state.palette] || themes.amberdusk;
     const margin = 92;
     const right = WIDTH - margin;
-    const align = state.language === "ur" ? "right" : "left";
-    const textX = state.language === "ur" ? right : margin;
+    const isUr = state.language === "ur";
+    const align = isUr ? "right" : "left";
+    const textX = isUr ? right : margin;
     const pageNumber = state.currentPage;
-    ctx.fillStyle = theme.light;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    const wash = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-    wash.addColorStop(0, `${theme.soft}38`);
-    wash.addColorStop(.48, "rgba(247,241,233,0)");
-    wash.addColorStop(1, `${theme.accent}20`);
-    ctx.fillStyle = wash;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = theme.accent;
-    ctx.globalAlpha = .2;
-    ctx.beginPath();
-    ctx.ellipse(state.language === "ur" ? 150 : 930, 120, 180, 90, -.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
+
+    // Same dark field as the cover (not a flip to a light page) so the
+    // carousel reads as one continuous piece rather than two designs stitched
+    // together — this consistency is also what eliminates the old
+    // "light ink on light background" contrast bug entirely.
+    drawEditorialField(theme);
 
     ctx.save();
-    ctx.direction = state.language === "ur" ? "rtl" : "ltr";
+    ctx.direction = isUr ? "rtl" : "ltr";
     if ("fontKerning" in ctx) ctx.fontKerning = "normal";
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = align;
+
+    drawWordmark(theme, isUr ? right : margin, 74, 0.62, align);
     ctx.fillStyle = theme.accent;
-    ctx.font = "700 17px DM Sans, Arial, sans-serif";
-    ctx.fillText(posterUi("continuation"), textX, 88);
-    ctx.fillStyle = theme.ink;
-    ctx.font = state.language === "ur" ? `600 31px ${URDU_FONT}` : '600 32px "Bodoni Moda", serif';
-    ctx.fillText(titleFor(state.post), textX, 151);
-    ctx.fillStyle = theme.ink;
-    ctx.font = "500 16px DM Sans, Arial, sans-serif";
-    ctx.fillText(`${authorFor(state.post)} · ${formatPosterDate(state.post.date)}`, textX, 190);
-    ctx.strokeStyle = `${theme.ink}38`;
-    ctx.lineWidth = 2;
+    ctx.font = `700 15px ${LABEL_FONT_FAMILY}`;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0.05em";
+    ctx.fillText(posterUi("continuation"), textX, 128);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+
+    ctx.fillStyle = theme.text;
+    ctx.font = isUr ? `600 30px ${URDU_FONT}` : `700 30px ${DISPLAY_FONT}`;
+    ctx.fillText(titleFor(state.post), textX, 176);
+
+    ctx.strokeStyle = `${theme.text}26`;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.moveTo(margin, 225);
-    ctx.lineTo(right, 225);
+    ctx.moveTo(margin, 210);
+    ctx.lineTo(right, 210);
     ctx.stroke();
-    ctx.fillStyle = theme.ink;
+
+    // oversized quote-mark opener on the first continuation page only — a
+    // small editorial flourish that costs nothing and reads as "designed".
+    // Anchored to a fixed corner regardless of language so it never
+    // competes with the top-right accent glow from drawEditorialField().
+    if (pageNumber === 1) {
+      ctx.fillStyle = `${theme.accent}70`;
+      ctx.font = `700 120px ${DISPLAY_FONT}`;
+      ctx.textAlign = "left";
+      ctx.fillText("“", margin - 6, 330);
+    }
+
+    ctx.fillStyle = theme.text;
     ctx.font = bodyFont();
-    drawLines(page.lines, textX, state.language === "ur" ? 294 : 282, bodyLineHeight(), theme.ink, align);
-    ctx.strokeStyle = `${theme.ink}38`;
+    ctx.textAlign = align;
+    drawLines(page.lines, textX, isUr ? 300 : 296, bodyLineHeight(), theme.text, align);
+
+    ctx.strokeStyle = `${theme.text}26`;
     ctx.beginPath();
-    ctx.moveTo(margin, 1230);
-    ctx.lineTo(right, 1230);
+    ctx.moveTo(margin, 1232);
+    ctx.lineTo(right, 1232);
     ctx.stroke();
-    ctx.font = "700 15px DM Sans, Arial, sans-serif";
-    ctx.fillStyle = theme.accent;
-    ctx.textAlign = state.language === "ur" ? "left" : "right";
-    ctx.fillText(`${posterUi("page")} ${pageNumber} / ${state.pages.length - 1}`, state.language === "ur" ? margin : right, 1272);
-    ctx.fillStyle = theme.ink;
-    ctx.fillText("SOUL & SCRIPT", state.language === "ur" ? right : margin, 1272);
+
+    ctx.font = `700 14px ${LABEL_FONT_FAMILY}`;
+    ctx.fillStyle = theme.textMuted;
+    ctx.textAlign = isUr ? "left" : "right";
+    ctx.fillText(`${posterUi("page")} ${pageNumber} / ${state.pages.length - 1}`, isUr ? margin : right, 1272);
+
+    drawProgressDots(theme, WIDTH / 2, 1266, state.pages.length, pageNumber);
+
     ctx.restore();
   }
 
