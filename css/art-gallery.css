@@ -1013,3 +1013,68 @@ body.art-page.art-page-writing.is-philosophy > main.wrap::before {
 @media (prefers-reduced-motion: reduce) {
   body.art-page { background-attachment: scroll; }
 }
+
+/* Homepage priority: invite people to share what they make. */
+.art-page-home .home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+.art-page-home .home-primary-cta {
+  background: var(--art-coral);
+  color: var(--art-white);
+  border: 1px solid rgba(250,248,244,.5);
+  box-shadow: 5px 5px 0 var(--art-yellow);
+  font-weight: 700;
+}
+.art-page-home .home-primary-cta:hover,
+.art-page-home .home-primary-cta:focus-visible {
+  background: var(--art-white);
+  color: var(--art-plum-deep);
+  box-shadow: 7px 7px 0 var(--art-yellow);
+}
+.art-page-home .home-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 4px;
+  color: var(--art-white);
+  border-bottom: 1px solid rgba(250,248,244,.65);
+  font: 700 10px/1.2 var(--art-sans);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.art-page-home .home-secondary-cta:hover,
+.art-page-home .home-secondary-cta:focus-visible { color: var(--art-yellow); border-bottom-color: var(--art-yellow); }
+.art-page-home .contribute-banner-primary {
+  margin-top: 4px;
+  margin-bottom: clamp(42px, 6vw, 82px);
+  border: 2px solid rgba(33,27,37,.16);
+  box-shadow: 12px 12px 0 var(--art-plum-deep);
+  transform: rotate(.4deg);
+}
+.art-page-home .contribute-banner-primary .kicker-cta { color: var(--art-plum-deep); }
+@media (max-width: 640px) {
+  .art-page-home .home-hero-actions { align-items: stretch; flex-direction: column; }
+  .art-page-home .home-primary-cta { align-self: flex-start; }
+  .art-page-home .home-secondary-cta { align-self: flex-start; }
+  .art-page-home .contribute-banner-primary { margin-inline: 2px; box-shadow: 7px 7px 0 var(--art-plum-deep); }
+}
+
+/* Global stacking correction: navigation must always paint above hero/content boxes. */
+body.art-page > .utility-bar { position: relative; z-index: 70; }
+body.art-page > .masthead { position: relative; z-index: 60; }
+body.art-page > .nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  isolation: isolate;
+  background: color-mix(in srgb, var(--art-paper) 94%, transparent);
+}
+body.art-page > main,
+body.art-page > footer { position: relative; z-index: 1; }
+body.art-page .nav ul { position: relative; z-index: 1; }
+body.art-page .nav .mega { position: absolute; z-index: 100; }
