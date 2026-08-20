@@ -8,6 +8,7 @@
 
   const WIDTH = 1080;
   const HEIGHT = 1350;
+  const URDU_FONT = '"Noto Naskh Arabic", "Noto Nastaliq Urdu", serif';
   const canvas = document.getElementById("poster-canvas");
   const ctx = canvas.getContext("2d");
   const postSelect = document.getElementById("poster-post-select");
@@ -28,16 +29,16 @@
   };
   const themes = {
     plum: {
-      ink: "#211b25", paper: "#e9e0d5", light: "#f7f1e9", accent: "#dc7657", soft: "#bfaeea", dark: "#3a1934", label: "#f7f1e9"
+      ink: "#211b25", paper: "#f2e7dc", light: "#fff8f1", accent: "#f07d5f", soft: "#c9b9f1", dark: "#32152f", dark2: "#6a2d52", glow: "#f3cf69", label: "#fff8f1"
     },
     lilac: {
-      ink: "#211b25", paper: "#d8cbed", light: "#f7f1e9", accent: "#5a2c49", soft: "#dc7657", dark: "#2d2140", label: "#f7f1e9"
+      ink: "#211b25", paper: "#ebe4f4", light: "#fffaf6", accent: "#e77761", soft: "#bca9ed", dark: "#252040", dark2: "#5b4b83", glow: "#9fe0d1", label: "#fffaf6"
     },
     sage: {
-      ink: "#211b25", paper: "#b9d7cb", light: "#f7f1e9", accent: "#5a2c49", soft: "#efd373", dark: "#173934", label: "#f7f1e9"
+      ink: "#172724", paper: "#dcece5", light: "#fffaf1", accent: "#ef8b68", soft: "#b8e0d4", dark: "#123633", dark2: "#2e6d63", glow: "#f3d58b", label: "#fffaf1"
     },
     night: {
-      ink: "#f7f1e9", paper: "#100d16", light: "#f7f1e9", accent: "#efd373", soft: "#dc7657", dark: "#21172b", label: "#100d16"
+      ink: "#f7f1e9", paper: "#101321", light: "#fff9ed", accent: "#ffd166", soft: "#aebcff", dark: "#090b17", dark2: "#242e58", glow: "#ff7b68", label: "#101321"
     }
   };
   const state = {
@@ -58,6 +59,15 @@
     } catch (_error) {
       return "en";
     }
+  }
+
+  function posterUi(key) {
+    const labels = {
+      storySignal: ["SOUL & SCRIPT / STORY SIGNAL", "SOUL & SCRIPT / تحریری جھلک"],
+      continuation: ["SOUL & SCRIPT / CONTINUATION", "SOUL & SCRIPT / جاری تحریر"],
+      page: ["PAGE", "صفحہ"]
+    };
+    return (labels[key] || [key, key])[state.language === "ur" ? 1 : 0];
   }
 
   function field(post, key) {
@@ -203,34 +213,44 @@
   function drawAbstractBackdrop(theme) {
     const gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
     gradient.addColorStop(0, theme.dark);
-    gradient.addColorStop(.56, theme.dark);
+    gradient.addColorStop(.52, theme.dark2);
     gradient.addColorStop(1, theme.ink);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-    const blobs = [
-      { x: 70, y: 120, r: 310, color: theme.accent, alpha: .8 },
-      { x: 920, y: 180, r: 220, color: theme.soft, alpha: .82 },
-      { x: 780, y: 1120, r: 360, color: theme.accent, alpha: .4 },
-      { x: 190, y: 1020, r: 180, color: theme.soft, alpha: .28 }
+    const fields = [
+      { x: 112, y: 144, rx: 350, ry: 270, color: theme.accent, alpha: .78, rotate: -.18 },
+      { x: 935, y: 176, rx: 240, ry: 330, color: theme.soft, alpha: .72, rotate: .34 },
+      { x: 820, y: 1110, rx: 420, ry: 240, color: theme.glow, alpha: .34, rotate: -.2 },
+      { x: 160, y: 1125, rx: 230, ry: 180, color: theme.accent, alpha: .28, rotate: .18 }
     ];
-    blobs.forEach((blob, index) => {
+    fields.forEach((field, index) => {
       ctx.save();
-      ctx.globalAlpha = blob.alpha;
-      ctx.filter = index === 2 ? "blur(24px)" : "blur(8px)";
-      ctx.fillStyle = blob.color;
+      ctx.globalAlpha = field.alpha;
+      ctx.filter = index === 2 ? "blur(34px)" : "blur(10px)";
+      ctx.fillStyle = field.color;
       ctx.beginPath();
-      ctx.ellipse(blob.x, blob.y, blob.r * (index % 2 ? .72 : 1), blob.r * (index % 2 ? 1 : .72), index * .42, 0, Math.PI * 2);
+      ctx.ellipse(field.x, field.y, field.rx, field.ry, field.rotate, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     });
+
+    const veil = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    veil.addColorStop(0, "rgba(8,8,18,.18)");
+    veil.addColorStop(.34, "rgba(8,8,18,.08)");
+    veil.addColorStop(.72, "rgba(8,8,18,.22)");
+    veil.addColorStop(1, "rgba(8,8,18,.48)");
+    ctx.fillStyle = veil;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
     ctx.save();
-    ctx.globalAlpha = .16;
+    ctx.globalAlpha = .22;
     ctx.strokeStyle = theme.light;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.bezierCurveTo(50, 890, 300, 620, 560, 760);
-    ctx.bezierCurveTo(790, 884, 880, 520, 1110, 430);
+    ctx.moveTo(70, 950);
+    ctx.bezierCurveTo(240, 730, 460, 820, 625, 650);
+    ctx.bezierCurveTo(820, 460, 930, 660, 1110, 450);
     ctx.stroke();
     ctx.restore();
   }
@@ -238,12 +258,18 @@
   function drawImageBackdrop(theme) {
     drawCoverImage(state.image, 0, 0, WIDTH, HEIGHT);
     const overlay = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-    overlay.addColorStop(0, `${theme.dark}ee`);
-    overlay.addColorStop(.45, `${theme.dark}b8`);
-    overlay.addColorStop(1, `${theme.ink}f2`);
+    overlay.addColorStop(0, `${theme.dark}f2`);
+    overlay.addColorStop(.38, `${theme.dark}b8`);
+    overlay.addColorStop(.72, `${theme.dark}c4`);
+    overlay.addColorStop(1, `${theme.ink}f5`);
     ctx.fillStyle = overlay;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = `${theme.accent}33`;
+    ctx.fillStyle = `${theme.accent}42`;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    const lowerVeil = ctx.createLinearGradient(0, 760, 0, HEIGHT);
+    lowerVeil.addColorStop(0, "rgba(8,8,18,0)");
+    lowerVeil.addColorStop(1, "rgba(8,8,18,.38)");
+    ctx.fillStyle = lowerVeil;
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
   }
 
@@ -269,13 +295,17 @@
   }
 
   function fitTitle(title, maxWidth, maxLines) {
-    for (let size = 94; size >= 54; size -= 2) {
-      const font = `${state.language === "ur" ? 600 : 700} ${size}px ${state.language === "ur" ? '"Noto Nastaliq Urdu"' : '"Bodoni Moda"'}, serif`;
+    const start = state.language === "ur" ? 88 : 94;
+    const end = state.language === "ur" ? 50 : 54;
+    for (let size = start; size >= end; size -= 2) {
+      const font = state.language === "ur"
+        ? `600 ${size}px ${URDU_FONT}`
+        : `700 ${size}px "Bodoni Moda", serif`;
       const lines = wrapLines(title, maxWidth, font);
-      if (lines.length <= maxLines) return { font, lines, lineHeight: size * (state.language === "ur" ? 1.5 : 1.02) };
+      if (lines.length <= maxLines) return { font, lines, lineHeight: size * (state.language === "ur" ? 1.28 : 1.02) };
     }
-    const font = `${state.language === "ur" ? 600 : 700} 54px ${state.language === "ur" ? '"Noto Nastaliq Urdu"' : '"Bodoni Moda"'}, serif`;
-    return { font, lines: wrapLines(title, maxWidth, font), lineHeight: state.language === "ur" ? 81 : 55 };
+    const font = state.language === "ur" ? `600 ${end}px ${URDU_FONT}` : `700 ${end}px "Bodoni Moda", serif`;
+    return { font, lines: wrapLines(title, maxWidth, font), lineHeight: state.language === "ur" ? 64 : 55 };
   }
 
   function drawLines(lines, x, y, lineHeight, color, align) {
@@ -293,12 +323,12 @@
 
   function bodyFont() {
     return state.language === "ur"
-      ? '400 25px "Noto Nastaliq Urdu", serif'
+      ? `400 31px ${URDU_FONT}`
       : '400 29px "DM Sans", sans-serif';
   }
 
   function bodyLineHeight() {
-    return state.language === "ur" ? 52 : 43;
+    return state.language === "ur" ? 53 : 43;
   }
 
   function paginateBody(post) {
@@ -365,6 +395,7 @@
 
     ctx.save();
     ctx.direction = state.language === "ur" ? "rtl" : "ltr";
+    if ("fontKerning" in ctx) ctx.fontKerning = "normal";
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = align;
     ctx.fillStyle = theme.accent;
@@ -377,15 +408,23 @@
     ctx.fillStyle = textColor;
     ctx.font = "600 18px DM Sans, Arial, sans-serif";
     ctx.textAlign = align;
-    ctx.fillText("SOUL & SCRIPT / STORY SIGNAL", textX, 175);
+    ctx.fillText(posterUi("storySignal"), textX, 175);
+    ctx.save();
+    roundRect(ctx, margin - 24, 224, WIDTH - (margin - 24) * 2, 676, 28);
+    ctx.fillStyle = "rgba(8,8,18,.24)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,248,241,.22)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
     const titleTop = state.language === "ur" ? 282 : 300;
     ctx.font = titleFit.font;
     drawLines(titleFit.lines, textX, titleTop, titleFit.lineHeight, textColor, align);
     const deckTop = titleTop + titleFit.lines.length * titleFit.lineHeight + (state.language === "ur" ? 54 : 38);
-    const deckFont = `${state.language === "ur" ? 400 : 400} ${state.language === "ur" ? 27 : 30}px ${state.language === "ur" ? '"Noto Nastaliq Urdu"' : '"DM Sans"'}, sans-serif`;
+    const deckFont = state.language === "ur" ? `400 28px ${URDU_FONT}` : '400 30px "DM Sans", sans-serif';
     const deckLines = wrapLines(deck, WIDTH - margin * 2, deckFont).slice(0, 5);
     ctx.font = deckFont;
-    drawLines(deckLines, textX, deckTop, state.language === "ur" ? 51 : 42, "rgba(247,241,233,.88)", align);
+    drawLines(deckLines, textX, deckTop, state.language === "ur" ? 48 : 42, "rgba(247,241,233,.88)", align);
     ctx.strokeStyle = `${theme.light}66`;
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -399,13 +438,25 @@
     ctx.fillStyle = "rgba(247,241,233,.74)";
     ctx.font = "500 17px DM Sans, Arial, sans-serif";
     ctx.fillText(date, textX, 1122);
-    ctx.textAlign = state.language === "ur" ? "left" : "right";
+    ctx.save();
+    ctx.direction = "ltr";
+    ctx.textAlign = "left";
     ctx.fillStyle = theme.light;
-    ctx.font = "600 20px DM Sans, Arial, sans-serif";
-    ctx.fillText("SOUL & SCRIPT", state.language === "ur" ? margin : right, 1254);
+    ctx.font = '700 24px "Bodoni Moda", serif';
+    ctx.fillText("Soul", margin, 1260);
     ctx.fillStyle = theme.accent;
-    ctx.font = "700 26px Bodoni Moda, serif";
-    ctx.fillText("&", state.language === "ur" ? margin + 155 : right - 155, 1255);
+    ctx.font = '700 22px "DM Sans", sans-serif';
+    ctx.fillText("&", margin + 76, 1260);
+    ctx.fillStyle = theme.light;
+    ctx.font = '700 24px "Bodoni Moda", serif';
+    ctx.fillText("Script", margin + 105, 1260);
+    ctx.strokeStyle = `${theme.accent}b8`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(margin, 1275);
+    ctx.bezierCurveTo(margin + 48, 1269, margin + 125, 1280, margin + 208, 1273);
+    ctx.stroke();
+    ctx.restore();
     ctx.restore();
   }
 
@@ -433,13 +484,14 @@
 
     ctx.save();
     ctx.direction = state.language === "ur" ? "rtl" : "ltr";
+    if ("fontKerning" in ctx) ctx.fontKerning = "normal";
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = align;
     ctx.fillStyle = theme.accent;
     ctx.font = "700 17px DM Sans, Arial, sans-serif";
-    ctx.fillText("SOUL & SCRIPT / CONTINUATION", textX, 88);
+    ctx.fillText(posterUi("continuation"), textX, 88);
     ctx.fillStyle = theme.ink;
-    ctx.font = `${state.language === "ur" ? 600 : 600} ${state.language === "ur" ? 29 : 32}px ${state.language === "ur" ? '"Noto Nastaliq Urdu"' : '"Bodoni Moda"'}, serif`;
+    ctx.font = state.language === "ur" ? `600 31px ${URDU_FONT}` : '600 32px "Bodoni Moda", serif';
     ctx.fillText(titleFor(state.post), textX, 151);
     ctx.fillStyle = theme.ink;
     ctx.font = "500 16px DM Sans, Arial, sans-serif";
@@ -461,7 +513,7 @@
     ctx.font = "700 15px DM Sans, Arial, sans-serif";
     ctx.fillStyle = theme.accent;
     ctx.textAlign = state.language === "ur" ? "left" : "right";
-    ctx.fillText(`PAGE ${pageNumber} / ${state.pages.length - 1}`, state.language === "ur" ? margin : right, 1272);
+    ctx.fillText(`${posterUi("page")} ${pageNumber} / ${state.pages.length - 1}`, state.language === "ur" ? margin : right, 1272);
     ctx.fillStyle = theme.ink;
     ctx.fillText("SOUL & SCRIPT", state.language === "ur" ? right : margin, 1272);
     ctx.restore();
@@ -573,8 +625,13 @@
   document.getElementById("poster-download").addEventListener("click", downloadPoster);
   document.getElementById("poster-copy").addEventListener("click", copyPoster);
 
-  renderPostOptions();
-  setLanguage(state.language);
-  selectPost(postSelect.value);
-})();
+  async function initializePosterStudio() {
+    renderPostOptions();
+    setLanguage(state.language);
+    selectPost(postSelect.value);
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    renderPoster();
+  }
 
+  initializePosterStudio();
+})();
