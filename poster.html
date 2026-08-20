@@ -76,8 +76,8 @@
         <p class="poster-help">Artwork is placed behind a readable overlay. Posts without artwork receive an abstract editorial composition.</p>
 
         <div class="poster-actions">
-          <button type="button" class="poster-download" id="poster-download">Download PNG ↗</button>
-          <button type="button" class="poster-copy" id="poster-copy">Copy image</button>
+          <button type="button" class="poster-download" id="poster-download">Download poster set ↗</button>
+          <button type="button" class="poster-copy" id="poster-copy">Copy current page</button>
         </div>
         <p class="poster-status" id="poster-status" role="status" aria-live="polite"></p>
         <p class="poster-note">This tool only reads the generated <code>js/content.js</code> inventory in your browser. It does not modify, publish, upload, or overwrite any CMS data.</p>
@@ -88,7 +88,12 @@
         <div class="poster-canvas-frame">
           <canvas id="poster-canvas" width="1080" height="1350" aria-label="Generated social-media poster preview"></canvas>
         </div>
-        <p class="poster-preview-caption">PNG export is generated locally at 1080 × 1350 pixels for a crisp 4:5 social post.</p>
+        <div class="poster-page-controls" aria-label="Poster page navigation">
+          <button type="button" id="poster-prev" aria-label="Previous poster page">←</button>
+          <span id="poster-page-indicator">Page 1 / 1</span>
+          <button type="button" id="poster-next" aria-label="Next poster page">→</button>
+        </div>
+        <p class="poster-preview-caption">The cover is followed by continuation posters containing the complete post body. Each page exports locally as a separate 1080 × 1350 PNG.</p>
       </div>
     </section>
   </main>
