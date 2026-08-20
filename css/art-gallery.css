@@ -878,3 +878,104 @@ html[dir="rtl"] .art-page-article .article-head h1 {
   html[dir="rtl"] .art-page-home .front-grid .medium h3 { font-size: 1rem; line-height: 1.8; }
   html[dir="rtl"] .art-page-article .article-head h1 { font-size: clamp(1.65rem, 7vw, 2.8rem); line-height: 1.85; }
 }
+
+/* ---------------------------------------------------------
+   Homepage lower-section mobile overflow fix
+--------------------------------------------------------- */
+@media (max-width: 780px) {
+  .art-page-home main.wrap,
+  .art-page-home .layout-2col,
+  .art-page-home .layout-2col > div,
+  .art-page-home .layout-2col > aside,
+  .art-page-home .strip,
+  .art-page-home .rail,
+  .art-page-home .grid,
+  .art-page-home .grid .card {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .art-page-home .layout-2col { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .art-page-home .layout-2col > div { overflow: hidden; }
+  .art-page-home .strip { display: block; overflow: visible; }
+  .art-page-home .strip-row {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-inline: 0;
+    box-sizing: border-box;
+  }
+  .art-page-home .strip-row .sr-body { min-width: 0; overflow-wrap: anywhere; }
+  .art-page-home .grid { grid-template-columns: minmax(0, 1fr); }
+  .art-page-home .grid .card { min-width: 0; }
+  .art-page-home .rail { overflow-x: auto; overflow-y: hidden; }
+  .art-page-home .rail-card { flex: 0 0 min(220px, 78vw); }
+  .art-page-home aside { min-width: 0; width: 100%; }
+  .art-page-home .tag-cloud { max-width: 100%; overflow-wrap: anywhere; }
+}
+
+/* ---------------------------------------------------------
+   Mobile article reading width and typography
+--------------------------------------------------------- */
+@media (max-width: 780px) {
+  .art-page-article main.wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding-inline: 18px;
+    box-sizing: border-box;
+  }
+  .art-page-article main.wrap > article,
+  .art-page-article .article-head,
+  .art-page-article .article-body,
+  .art-page-article .article-body figure,
+  .art-page-article .article-body figure img {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .art-page-article .article-head { padding-bottom: 22px; }
+  .art-page-article .article-head h1 {
+    max-width: none;
+    font-size: clamp(2rem, 8vw, 3.15rem);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+  .art-page-article .article-head .deck {
+    max-width: none;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .art-page-article .article-body {
+    max-width: none;
+    padding: 30px 0 48px;
+    font-size: 1.08rem;
+    line-height: 1.78;
+  }
+  .art-page-article .article-body p { margin-bottom: 1.45em; }
+  .art-page-article .article-body figure { margin-bottom: 30px; }
+  .art-page-article .article-body figure img { height: auto; }
+  .art-page-article .related-grid { grid-template-columns: minmax(0, 1fr); }
+  .art-page-article .article-tags { max-width: 100%; overflow-wrap: anywhere; }
+}
+@media (max-width: 560px) {
+  .art-page-article main.wrap { padding-inline: 16px; }
+  .art-page-article .article-body { font-size: 1.05rem; line-height: 1.8; }
+  .art-page-article .article-head h1 { font-size: clamp(1.85rem, 9vw, 2.7rem); }
+}
+
+@media (max-width: 780px) {
+  .art-page-article .article-head.art-reveal,
+  .art-page-article .article-body.art-reveal,
+  .art-page-article #most-read-mount.art-reveal {
+    transform: none !important;
+  }
+}
+
+@media (max-width: 780px) {
+  .art-page-article .section-head.art-reveal { transform: none !important; }
+  .art-page-article > section.wrap { min-width: 0; max-width: 100%; box-sizing: border-box; }
+}
