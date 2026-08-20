@@ -8,7 +8,30 @@
 
   const WIDTH = 1080;
   const HEIGHT = 1350;
-  const URDU_FONT = '"Noto Naskh Arabic", "Noto Nastaliq Urdu", serif';
+  // Nastaliq is the correct traditional face for Urdu display/body text;
+  // Naskh Arabic is kept as an intermediate fallback before the generic serif.
+  const URDU_FONT = '"Noto Nastaliq Urdu", "Noto Naskh Arabic", serif';
+  const URDU_WEIGHTS = [400, 500, 600, 700];
+  let urduFontsLoaded = null;
+
+  // document.fonts.ready only resolves for fonts the page already triggered a
+  // fetch for. Canvas text doesn't trigger that on its own, so without this,
+  // ctx.fillText() can silently fall back to the browser's generic serif —
+  // which doesn't shape Urdu letterforms correctly — especially the first
+  // time a poster is drawn or right after switching the language toggle.
+  function loadUrduFonts() {
+    if (urduFontsLoaded) return urduFontsLoaded;
+    if (!(window.FontFace && document.fonts)) return Promise.resolve();
+    const specs = [];
+    URDU_WEIGHTS.forEach((w) => {
+      specs.push(`${w} 32px "Noto Nastaliq Urdu"`);
+      specs.push(`${w} 32px "Noto Naskh Arabic"`);
+    });
+    urduFontsLoaded = Promise.all(
+      specs.map((spec) => document.fonts.load(spec).catch(() => null))
+    );
+    return urduFontsLoaded;
+  }
   const canvas = document.getElementById("poster-canvas");
   const ctx = canvas.getContext("2d");
   const postSelect = document.getElementById("poster-post-select");
@@ -545,7 +568,15 @@
     });
     renderPostOptions();
     updateSelectionMeta();
-    renderPoster();
+    if (state.language === "ur") {
+      // Draw once immediately so the UI doesn't feel stuck, then redraw
+      // once the Urdu webfont is confirmed loaded (this second draw is the
+      // one that actually matters — the first may still be in fallback serif).
+      renderPoster();
+      loadUrduFonts().then(renderPoster);
+    } else {
+      renderPoster();
+    }
   }
 
   function canvasBlob() {
@@ -627,9 +658,10 @@
 
   async function initializePosterStudio() {
     renderPostOptions();
-    setLanguage(state.language);
     selectPost(postSelect.value);
+    if (state.language === "ur") await loadUrduFonts();
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    setLanguage(state.language);
     renderPoster();
   }
 
