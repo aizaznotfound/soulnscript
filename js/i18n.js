@@ -51,6 +51,7 @@ const SS_TRANSLATIONS = {
     "page.teamTitle": "The Team", "page.teamDescription": "The people who keep Soul & Script running — from the stage to the spreadsheet.",
     "page.videosTitle": "Films & Talks", "page.videosDescription": "Short films, videography, and movie-talk recordings from the Soul & Script community.",
     "page.aboutTitle": "About Soul & Script", "page.contactTitle": "Contact & Submissions", "page.contactDescription": "Pitch a piece, ask about an event, share a tip, or find out how to join the team.", "page.eventsTitle": "Events", "page.eventsDescription": "Active competitions where members can participate and win exclusive prizes, plus recaps of sessions we've already run.",
+    "events.activeTitle": "Active Events", "events.activeDescription": "Competitions and calls for participation that are currently open.", "events.pastTitle": "Past Events", "events.pastDescription": "Open mic sessions, book sessions, and movie talks we have already held.",
     "page.notFoundDescription": "The page you are looking for has moved, disappeared, or was never here."
   },
   ur: {
@@ -97,6 +98,7 @@ const SS_TRANSLATIONS = {
     "page.teamTitle": "ٹیم", "page.teamDescription": "وہ لوگ جو اسٹیج سے اسپریڈشیٹ تک Soul & Script کو چلاتے ہیں۔",
     "page.videosTitle": "فلمز اور گفتگو", "page.videosDescription": "Soul & Script کی برادری کی مختصر فلمیں، ویڈیوگرافی اور فلمی گفتگو۔",
     "page.aboutTitle": "Soul & Script کے بارے میں", "page.contactTitle": "رابطہ اور گذارشات", "page.contactDescription": "اپنی تحریر پیش کریں، تقریب کے بارے میں پوچھیں، کوئی اطلاع دیں یا ٹیم میں شامل ہونے کا طریقہ جانیں۔", "page.eventsTitle": "تقریبات", "page.eventsDescription": "فعال مقابلے جہاں ارکان حصہ لے کر خصوصی انعامات جیت سکتے ہیں، اور ان نشستوں کے خلاصے جو ہم پہلے منعقد کر چکے ہیں۔",
+    "events.activeTitle": "فعال تقریبات", "events.activeDescription": "وہ مقابلے اور شرکت کی دعوتیں جو اس وقت جاری ہیں۔", "events.pastTitle": "گزشتہ تقریبات", "events.pastDescription": "وہ اوپن مائک نشستیں، کتابی نشستیں اور فلمی گفتگو جو ہم پہلے منعقد کر چکے ہیں۔",
     "page.notFoundDescription": "آپ جس صفحے کو تلاش کر رہے ہیں وہ منتقل ہو چکا ہے، غائب ہے یا یہاں کبھی تھا ہی نہیں۔"
   }
 };
