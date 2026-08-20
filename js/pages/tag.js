@@ -10,9 +10,9 @@
   const tag = new URLSearchParams(window.location.search).get("tag");
   if(tag){
     const safeTag = escapeHtml(tag);
-    document.getElementById("page-header").innerHTML = `<h1>Tag: ${safeTag}</h1><p>All stories, opinions, and videos tagged "${safeTag}".</p>`;
+    document.getElementById("page-header").innerHTML = `<h1>${escapeHtml(ssUi("page.tagTitle"))}: ${safeTag}</h1><p>${escapeHtml(ssUi("page.tagDescription"))}</p>`;
     const matches = postsByTag(tag);
-    renderList("tag-grid", matches, `No stories tagged "${safeTag}" yet.`);
+    renderList("tag-grid", matches, `${ssUi("ui.noStories")} ${safeTag}`);
   } else {
     renderList("tag-grid", allPostsSorted().slice(0,6));
   }

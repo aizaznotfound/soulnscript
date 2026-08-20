@@ -8,7 +8,7 @@
   const sorted = allPostsSorted();
 
   if(!sorted.length){
-    document.getElementById("front-grid-mount").innerHTML = `<p class="empty-state">No stories published yet. Check back soon.</p>`;
+    document.getElementById("front-grid-mount").innerHTML = `<p class="empty-state">${escapeHtml(ssUi("ui.noStories"))}</p>`;
     document.getElementById("picks-rail").innerHTML = "";
   } else {
     const lead = sorted.find(p => p.featured) || sorted[0];
@@ -18,18 +18,18 @@
     const mediums = rest.slice(0, 2);
     document.getElementById("front-grid-mount").innerHTML = `
       <article class="big${lead.image ? "" : " no-image"}">
-        ${lead.image ? `<a href="article.html?slug=${lead.slug}"><img src="${lead.image}" alt="${escapeHtml(lead.title)}"></a>` : ""}
-        <span class="tag-pill ${lead.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(CATEGORY_LABELS[lead.category] || lead.category)}</span>
-        <h2><a href="article.html?slug=${lead.slug}">${escapeHtml(lead.title)}</a></h2>
-        <p class="deck-sm">${escapeHtml(lead.deck)}</p>
-        <div class="byline">${escapeHtml(lead.author)} · ${formatDate(lead.date)}</div>
+        ${lead.image ? `<a href="article.html?slug=${lead.slug}"><img src="${lead.image}" alt="${escapeHtml(ssField(lead, "title"))}"></a>` : ""}
+        <span class="tag-pill ${lead.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(ssCategory(lead.category))}</span>
+        <h2><a href="article.html?slug=${lead.slug}">${escapeHtml(ssField(lead, "title"))}</a></h2>
+        <p class="deck-sm">${escapeHtml(ssField(lead, "deck"))}</p>
+        <div class="byline">${escapeHtml(ssField(lead, "author"))} · ${formatDate(lead.date)}</div>
       </article>
       ${mediums.map(p => `
       <article class="medium${p.image ? "" : " no-image"}">
-        ${p.image ? `<a href="article.html?slug=${p.slug}"><img src="${p.image}" alt="${escapeHtml(p.title)}"></a>` : ""}
-        <span class="tag-pill ${p.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(CATEGORY_LABELS[p.category] || p.category)}</span>
-        <h3><a href="article.html?slug=${p.slug}">${escapeHtml(p.title)}</a></h3>
-        <p class="deck-sm">${escapeHtml(p.deck)}</p>
+        ${p.image ? `<a href="article.html?slug=${p.slug}"><img src="${p.image}" alt="${escapeHtml(ssField(p, "title"))}"></a>` : ""}
+        <span class="tag-pill ${p.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(ssCategory(p.category))}</span>
+        <h3><a href="article.html?slug=${p.slug}">${escapeHtml(ssField(p, "title"))}</a></h3>
+        <p class="deck-sm">${escapeHtml(ssField(p, "deck"))}</p>
         <div class="byline">${formatDate(p.date)}</div>
       </article>`).join("")}
     `;
@@ -43,9 +43,9 @@
 
   // Category strips
   document.getElementById("strip-campus").innerHTML =
-    postsByCategory("campus").slice(0,3).map(stripRowHTML).join("") || `<p class="empty-state">No campus life stories yet.</p>`;
+    postsByCategory("campus").slice(0,3).map(stripRowHTML).join("") || `<p class="empty-state">${escapeHtml(ssUi("ui.noStories"))}</p>`;
   document.getElementById("strip-academics").innerHTML =
-    postsByCategory("academics").slice(0,3).map(stripRowHTML).join("") || `<p class="empty-state">No academics stories yet.</p>`;
+    postsByCategory("academics").slice(0,3).map(stripRowHTML).join("") || `<p class="empty-state">${escapeHtml(ssUi("ui.noStories"))}</p>`;
 
   renderList("home-opinions-grid", postsByCategory("opinion").slice(0,2));
 
@@ -55,7 +55,7 @@
   const homePhotos = allPhotosSorted().slice(0,8);
   document.getElementById("home-photos-rail").innerHTML = homePhotos.length
     ? homePhotos.map(photoRailCardHTML).join("")
-    : `<p class="empty-state">No photos published yet.</p>`;
+    : `<p class="empty-state">${escapeHtml(ssUi("ui.noPhotos"))}</p>`;
 
   document.getElementById("home-tag-cloud").innerHTML = tagCloudHTML(10);
 

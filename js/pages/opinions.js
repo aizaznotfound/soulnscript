@@ -5,4 +5,4 @@
    shared js/lib, js/render, js/nav.js, js/richtext.js, js/bootstrap.js.
    ========================================================= */
 
-  renderList("opinions-grid", postsByCategory("opinion"), "No opinion pieces published yet.");
+  renderList("opinions-grid", postsByCategory("opinion"), ssUi("ui.noOpinions"));

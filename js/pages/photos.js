@@ -8,4 +8,4 @@
   const sortedPhotos = allPhotosSorted();
   document.getElementById("photos-grid").innerHTML = sortedPhotos.length
     ? sortedPhotos.map(photoCardHTML).join("")
-    : `<div class="empty-state">No photos published yet.</div>`;
+    : `<div class="empty-state">${escapeHtml(ssUi("ui.noPhotos"))}</div>`;

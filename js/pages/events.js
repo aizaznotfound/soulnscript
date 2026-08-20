@@ -7,4 +7,4 @@
    shared js/lib, js/render, js/nav.js, js/richtext.js, js/bootstrap.js.
    ========================================================= */
 
-renderList("events-grid", postsByCategory("events"), "No session recaps published yet.");
+renderList("events-grid", postsByCategory("events"), ssUi("ui.noRecaps"));

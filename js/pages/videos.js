@@ -8,4 +8,4 @@
   const sortedVideos = [...window.VIDEOS].sort((a,b) => new Date(b.date) - new Date(a.date));
   document.getElementById("videos-grid").innerHTML = sortedVideos.length
     ? sortedVideos.map(videoCardHTML).join("")
-    : `<div class="empty-state">No videos published yet.</div>`;
+    : `<div class="empty-state">${escapeHtml(ssUi("ui.noVideos"))}</div>`;
