@@ -92,6 +92,7 @@
     <button type="button" class="active" data-mode="post" onclick="setMode('post')">Writing</button>
     <button type="button" data-mode="video" onclick="setMode('video')">Video</button>
     <button type="button" data-mode="photo" onclick="setMode('photo')">Gallery Piece</button>
+    <button type="button" data-mode="event" onclick="setMode('event')">Event</button>
     <button type="button" data-mode="team" onclick="setMode('team')">Team Member</button>
   </div>
 
@@ -296,6 +297,85 @@
       <div class="preview-frame">
         <div style="font-family:var(--utility); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--maroon); margin-bottom:12px; font-weight:700;">Live Preview</div>
         <div id="photo-preview-mount"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENT FORM (hidden by default) -->
+  <div class="editor-shell" id="event-shell" style="display:none;">
+    <div>
+      <form id="event-form">
+        <div class="form-field">
+          <label for="ev-title">Event Title</label>
+          <input type="text" id="ev-title" required placeholder="e.g. Open Mic Night, Vol. 3">
+        </div>
+        <div class="form-field">
+          <label for="ev-slug">URL Slug (auto-filled, edit if you like)</label>
+          <input type="text" id="ev-slug" placeholder="auto-generated-from-title">
+        </div>
+        <div class="form-field">
+          <label for="ev-description">Description</label>
+          <textarea id="ev-description" placeholder="What's happening, who it's for, why people should show up."></textarea>
+        </div>
+        <div class="form-field-row">
+          <div class="form-field">
+            <label for="ev-date">Start Date</label>
+            <input type="date" id="ev-date" required>
+          </div>
+          <div class="form-field">
+            <label for="ev-end-date">End Date (optional — for multi-day or open calls)</label>
+            <input type="date" id="ev-end-date">
+          </div>
+        </div>
+        <div class="form-field-row">
+          <div class="form-field">
+            <label for="ev-time">Time (optional)</label>
+            <input type="text" id="ev-time" placeholder="e.g. 6:00 PM">
+          </div>
+          <div class="form-field">
+            <label for="ev-location">Location (optional)</label>
+            <input type="text" id="ev-location" placeholder="e.g. Lecture Theatre 3, GKMC">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="ev-status">Status</label>
+          <select id="ev-status">
+            <option value="auto" selected>Auto (based on the dates above)</option>
+            <option value="active">Force Active — keep showing under Active Events</option>
+            <option value="past">Force Past — move to Past Events</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="ev-link">RSVP / Details Link (optional)</label>
+          <input type="text" id="ev-link" placeholder="https://... (Google Form, WhatsApp link, Instagram post, etc.)">
+        </div>
+        <div class="form-field">
+          <label>Poster / Photo (optional)</label>
+          <div class="image-input-toggle">
+            <button type="button" class="active" data-imgmode="upload" onclick="setEventImageMode('upload')">Upload from computer</button>
+            <button type="button" data-imgmode="url" onclick="setEventImageMode('url')">Paste image URL</button>
+          </div>
+          <div id="ev-image-upload-wrap">
+            <input type="file" id="ev-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="image-preview" id="ev-image-preview" style="display:none;"><img id="ev-image-preview-img" alt="Preview"></div>
+          </div>
+          <div id="ev-image-url-wrap" style="display:none;">
+            <input type="text" id="ev-image" placeholder="https://...">
+          </div>
+        </div>
+        <p class="helper-text">Events show under <strong>Active Events</strong> automatically while today falls within the start/end dates, then move to <strong>Past Events</strong> on their own — no need to come back and edit anything when one ends. Use the Status dropdown only to override that (e.g. an open-ended call for submissions with no fixed end date).</p>
+        <div class="gh-actions">
+          <button type="button" class="btn" id="ev-publish-btn" onclick="publishEvent()">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" onclick="downloadEvent()">⬇ Download File Instead</button>
+        </div>
+        <div id="ev-warning" class="editor-warning" style="display:none;"></div>
+        <div id="ev-status-msg" class="publish-status"></div>
+      </form>
+    </div>
+    <div>
+      <div class="preview-frame">
+        <div style="font-family:var(--utility); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--maroon); margin-bottom:12px; font-weight:700;">Live Preview</div>
+        <div id="event-preview-mount"></div>
       </div>
     </div>
   </div>
