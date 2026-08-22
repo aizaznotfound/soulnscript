@@ -663,7 +663,15 @@ html[dir="rtl"] body.art-page-gallery::after { background-position: 100% 0, 100%
 /* ---------------------------------------------------------
    Atelier motion layer
 --------------------------------------------------------- */
-html.atelier-ready body.art-page { animation: atelier-page-in .62s var(--art-ease) both; }
+/* fill-mode intentionally omitted (defaults to none): with animation-delay
+   at 0 there's no "backwards" window to fill, and using "both"/"forwards"
+   here left body.transform permanently resolving to an identity matrix
+   after the animation finished (an active-but-completed CSS Animation on
+   `transform` never resolves back to the literal keyword "none" via
+   getComputedStyle) — which silently broke IntersectionObserver's
+   intersection-ratio math for descendants in complex nested grids (e.g.
+   the photo-tile masonry on photos.html never received .is-visible). */
+html.atelier-ready body.art-page { animation: atelier-page-in .62s var(--art-ease); }
 body.art-page.atelier-leaving { opacity: 0 !important; transform: translateY(8px); transition: opacity .26s var(--art-ease), transform .26s var(--art-ease); }
 
 .art-page .art-reveal {
@@ -674,7 +682,16 @@ body.art-page.atelier-leaving { opacity: 0 !important; transform: translateY(8px
 }
 .art-page .art-reveal[data-motion="rise-rotate"] { transform: translate3d(0, 34px, 0) rotate(1.2deg); }
 .art-page .art-reveal[data-motion="slide-left"] { transform: translate3d(34px, 0, 0); }
-.art-page .art-reveal[data-motion="wipe"] { clip-path: inset(0 0 100% 0); transform: none; }
+/* "wipe" variant: previously hid the element via clip-path: inset(0 0 100% 0)
+   (a zero-area clip). IntersectionObserver correctly computes zero
+   intersection for a target with zero effective visible area, so it could
+   never detect the element entering the viewport — which meant .is-visible
+   could never be added — which meant it could never un-clip. A permanent
+   catch-22 that left every .photo-tile and .card > a invisible forever.
+   Falls back to the same opacity fade every other variant uses (proven to
+   work), with clip-path now purely a decorative wipe-in motion on reveal,
+   not the mechanism blocking visibility. */
+.art-page .art-reveal[data-motion="wipe"] { transform: none; }
 .art-page .art-reveal.is-visible { opacity: 1; transform: none; clip-path: inset(0 0 0 0); }
 
 .art-page [data-word-reveal="true"] { overflow: clip; }
