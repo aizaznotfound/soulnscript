@@ -28,14 +28,14 @@ export async function onRequestPost(context) {
   if (!env.GH_TOKEN || !env.GH_OWNER || !env.GH_REPO || !env.GH_BRANCH) {
     return json({ ok: false, error: "Server isn't configured — GH_TOKEN / GH_OWNER / GH_REPO / GH_BRANCH are missing." }, 500);
   }
-  if (type !== "post" && type !== "video" && type !== "photo" && type !== "team") {
+  if (type !== "post" && type !== "video" && type !== "photo" && type !== "team" && type !== "event") {
     return json({ ok: false, error: "Unknown content type." }, 400);
   }
   if (!slug) {
     return json({ ok: false, error: "Missing slug." }, 400);
   }
 
-  const folder = type === "post" ? "content/posts" : type === "video" ? "content/videos" : type === "photo" ? "content/photos" : "content/team";
+  const folder = type === "post" ? "content/posts" : type === "video" ? "content/videos" : type === "photo" ? "content/photos" : type === "event" ? "content/events" : "content/team";
   const jsonPath = `${folder}/${slug}.json`;
 
   try {

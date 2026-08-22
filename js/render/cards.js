@@ -91,3 +91,28 @@ function photoCardHTML(photo){
     </div>
   </a>`;
 }
+
+// Events are self-contained promo cards (not full articles) — a title,
+// when/where, a short description, and an optional RSVP/details link.
+// `active` controls the pill style; the caller (events.js) decides which
+// bucket an event falls into via isEventActive().
+function eventCardHTML(event, active){
+  const title = escapeHtml(ssField(event, "title"));
+  const description = escapeHtml(ssField(event, "description"));
+  const location = escapeHtml(ssField(event, "location"));
+  const when = [formatDate(event.date), event.time ? escapeHtml(event.time) : ""].filter(Boolean).join(" · ");
+  const whereLine = [when, location].filter(Boolean).join(" — ");
+  const thumb = event.image ? `<div class="thumb"><img src="${event.image}" alt="${title}" loading="lazy"></div>` : "";
+  const cta = event.link
+    ? `<a class="event-cta" href="${event.link}" target="_blank" rel="noopener">${escapeHtml(active ? ssUi("ui.rsvp") : ssUi("ui.learnMore"))} →</a>`
+    : "";
+  return `
+  <article class="card event-card${event.image ? "" : " no-image"}${active ? " is-active" : " is-past"}">
+    ${thumb}
+    <span class="tag-pill ${active ? "event-active" : ""}">${escapeHtml(active ? ssUi("ui.openNow") : ssUi("ui.pastEvent"))}</span>
+    <h3>${title}</h3>
+    ${whereLine ? `<div class="meta event-when">${whereLine}</div>` : ""}
+    <p>${description}</p>
+    ${cta}
+  </article>`;
+}

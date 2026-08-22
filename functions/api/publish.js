@@ -41,7 +41,7 @@ export async function onRequestPost(context) {
   if (!env.GH_TOKEN || !env.GH_OWNER || !env.GH_REPO || !env.GH_BRANCH) {
     return json({ ok: false, error: "Server isn't configured — GH_TOKEN / GH_OWNER / GH_REPO / GH_BRANCH are missing." }, 500);
   }
-  if (type !== "post" && type !== "video" && type !== "photo" && type !== "team") {
+  if (type !== "post" && type !== "video" && type !== "photo" && type !== "team" && type !== "event") {
     return json({ ok: false, error: "Unknown content type." }, 400);
   }
   if (!data || !data.slug) {
@@ -56,8 +56,11 @@ export async function onRequestPost(context) {
   if (type === "photo" && !(image && image.base64 && image.filename) && !data.image) {
     return json({ ok: false, error: "A photo post needs an actual photo — upload one or paste an image URL." }, 400);
   }
+  if (type === "event" && !data.date) {
+    return json({ ok: false, error: "An event needs a date." }, 400);
+  }
 
-  const folder = type === "post" ? "content/posts" : type === "video" ? "content/videos" : type === "photo" ? "content/photos" : "content/team";
+  const folder = type === "post" ? "content/posts" : type === "video" ? "content/videos" : type === "photo" ? "content/photos" : type === "event" ? "content/events" : "content/team";
   const jsonPath = `${folder}/${data.slug}.json`;
 
   try {
@@ -67,8 +70,8 @@ export async function onRequestPost(context) {
       return json({ ok: false, exists: true, error: `A ${type} with the slug "${data.slug}" already exists.` }, 409);
     }
 
-    // ---- Upload image first (posts, photos, and team member avatars) ----
-    if ((type === "post" || type === "photo" || type === "team") && image && image.base64 && image.filename) {
+    // ---- Upload image first (posts, photos, events, and team member avatars) ----
+    if ((type === "post" || type === "photo" || type === "team" || type === "event") && image && image.base64 && image.filename) {
       const ext = (image.filename.split(".").pop() || "jpg").toLowerCase();
       const imagePath = `images/${data.slug}.${ext}`;
       const imgSha = await ghGetSha(env, imagePath);

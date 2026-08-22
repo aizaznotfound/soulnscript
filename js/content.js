@@ -3,9 +3,9 @@
    ---------------------------------------------------------
    This file is rebuilt automatically by build-content.js from
    every file in content/posts/, content/videos/,
-   content/photos/, and content/team/ each time you push to
-   GitHub. Any changes made directly to this file will be
-   overwritten on the next deploy.
+   content/photos/, content/team/, and content/events/ each
+   time you push to GitHub. Any changes made directly to this
+   file will be overwritten on the next deploy.
 
    To publish something new, use editor.html — see README.md.
    ========================================================= */
@@ -337,8 +337,11 @@ const TEAM = [
   }
 ];
 
+const EVENTS = [];
+
 // Expose globally for main.js
 window.POSTS = POSTS;
 window.VIDEOS = VIDEOS;
 window.PHOTOS = PHOTOS;
 window.TEAM = TEAM;
+window.EVENTS = EVENTS;

@@ -10,6 +10,7 @@
 
   document.getElementById("p-date").valueAsDate = new Date();
   document.getElementById("v-date").valueAsDate = new Date();
+  document.getElementById("ev-date").valueAsDate = new Date();
 
   function slugify(str){
     return str.toLowerCase().trim()
@@ -136,6 +137,7 @@
     document.getElementById("post-shell").style.display = mode === "post" ? "grid" : "none";
     document.getElementById("video-shell").style.display = mode === "video" ? "grid" : "none";
     document.getElementById("photo-shell").style.display = mode === "photo" ? "grid" : "none";
+    document.getElementById("event-shell").style.display = mode === "event" ? "grid" : "none";
     document.getElementById("team-shell").style.display = mode === "team" ? "grid" : "none";
   }
 
@@ -155,6 +157,12 @@
     document.querySelectorAll("#team-shell .image-input-toggle button").forEach(b => b.classList.toggle("active", b.dataset.imgmode === mode));
     document.getElementById("tm-image-upload-wrap").style.display = mode === "upload" ? "block" : "none";
     document.getElementById("tm-image-url-wrap").style.display = mode === "url" ? "block" : "none";
+  }
+
+  function setEventImageMode(mode){
+    document.querySelectorAll("#event-shell .image-input-toggle button").forEach(b => b.classList.toggle("active", b.dataset.imgmode === mode));
+    document.getElementById("ev-image-upload-wrap").style.display = mode === "upload" ? "block" : "none";
+    document.getElementById("ev-image-url-wrap").style.display = mode === "url" ? "block" : "none";
   }
 
   document.getElementById("p-image-file").addEventListener("change", (e) => {
@@ -196,6 +204,19 @@
     renderPhotoPreview();
   });
 
+  document.getElementById("ev-image-file").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    const wrap = document.getElementById("ev-image-preview");
+    const img = document.getElementById("ev-image-preview-img");
+    if(file){
+      img.src = URL.createObjectURL(file);
+      wrap.style.display = "block";
+    } else {
+      wrap.style.display = "none";
+    }
+    renderEventPreview();
+  });
+
   // Auto-slug from title as the user types
   document.getElementById("p-title").addEventListener("input", (e) => {
     if(!document.getElementById("p-slug").dataset.manual){
@@ -221,6 +242,42 @@
   ["ph-caption","ph-author","ph-date","ph-image","ph-tags"].forEach(id => {
     document.getElementById(id).addEventListener("input", renderPhotoPreview);
   });
+
+  document.getElementById("ev-title").addEventListener("input", (e) => {
+    if(!document.getElementById("ev-slug").dataset.manual){
+      document.getElementById("ev-slug").value = slugify(e.target.value);
+    }
+    renderEventPreview();
+  });
+  document.getElementById("ev-slug").addEventListener("input", (e) => { e.target.dataset.manual = "true"; });
+  ["ev-description","ev-date","ev-end-date","ev-time","ev-location","ev-status","ev-link","ev-image"].forEach(id => {
+    document.getElementById(id).addEventListener("input", renderEventPreview);
+  });
+
+  /* ============ Live preview for event form ============ */
+  function renderEventPreview(){
+    const mount = document.getElementById("event-preview-mount");
+    if(!mount) return;
+    const title = document.getElementById("ev-title").value.trim() || "Your Event Title Here";
+    const description = document.getElementById("ev-description").value.trim();
+    const date = document.getElementById("ev-date").value;
+    const endDate = document.getElementById("ev-end-date").value;
+    const time = document.getElementById("ev-time").value.trim();
+    const location = document.getElementById("ev-location").value.trim();
+    const statusField = document.getElementById("ev-status").value;
+    const link = document.getElementById("ev-link").value.trim();
+    const uploadFile = document.getElementById("ev-image-file").files[0];
+    const imgSrc = uploadFile ? document.getElementById("ev-image-preview-img").src : (document.getElementById("ev-image").value || "");
+
+    const previewEvent = {
+      title, description, date: date || new Date().toISOString().slice(0,10),
+      endDate: endDate || null, time, location,
+      status: statusField === "auto" ? null : statusField,
+      link, image: imgSrc
+    };
+    const active = date ? isEventActive(previewEvent) : true;
+    mount.innerHTML = eventCardHTML(previewEvent, active);
+  }
 
   /* ============ Live preview for photo form ============ */
   function renderPhotoPreview(){
@@ -474,6 +531,28 @@
     return { slug, title, caption, author, date, tags, image };
   }
 
+  function readEventForm(){
+    const title = document.getElementById("ev-title").value || "Untitled Event";
+    const slug = document.getElementById("ev-slug").value || slugify(title) || "untitled-event";
+    const description = document.getElementById("ev-description").value || "";
+    const date = document.getElementById("ev-date").value || new Date().toISOString().slice(0,10);
+    const endDate = document.getElementById("ev-end-date").value || null;
+    const time = document.getElementById("ev-time").value || "";
+    const location = document.getElementById("ev-location").value || "";
+    const statusField = document.getElementById("ev-status").value;
+    const status = statusField === "auto" ? null : statusField;
+    const link = document.getElementById("ev-link").value || "";
+    const uploadFile = document.getElementById("ev-image-file").files[0];
+    const image = uploadFile
+      ? (document.getElementById("ev-image-preview-img").src || "")
+      : (document.getElementById("ev-image").value || "");
+    const event = { slug, title, description, date, time, location, link };
+    if(endDate) event.endDate = endDate;
+    if(status) event.status = status;
+    if(image) event.image = image;
+    return event;
+  }
+
   function downloadPhoto(){
     const p = readPhotoForm();
     const warn = document.getElementById("ph-warning");
@@ -481,6 +560,17 @@
     warn.style.display="none";
     downloadJSON(p, `${p.slug}.json`);
     downloadLog.unshift({ icon: "📸", title: p.title, detail: `downloaded content/photos/${p.slug}.json` });
+    refreshDraftList();
+  }
+
+  function downloadEvent(){
+    const ev = readEventForm();
+    const warn = document.getElementById("ev-warning");
+    if(!document.getElementById("ev-title").value.trim()){ warn.style.display="block"; warn.textContent = "Please add a title first."; return; }
+    if(!document.getElementById("ev-date").value){ warn.style.display="block"; warn.textContent = "Please add a start date first."; return; }
+    warn.style.display="none";
+    downloadJSON(ev, `${ev.slug}.json`);
+    downloadLog.unshift({ icon: "📅", title: ev.title, detail: `downloaded content/events/${ev.slug}.json` });
     refreshDraftList();
   }
 
@@ -665,6 +755,68 @@
     }
   }
 
+  async function publishEvent(){
+    const auth = requireAuth("ev-status-msg");
+    if(!auth) return;
+
+    if(!document.getElementById("ev-title").value.trim()){
+      showStatus("ev-status-msg", "error", "Please add a title first.");
+      return;
+    }
+    if(!document.getElementById("ev-date").value){
+      showStatus("ev-status-msg", "error", "Please add a start date first.");
+      return;
+    }
+    const uploadFile = document.getElementById("ev-image-file").files[0];
+    const ev = readEventForm();
+    if(!ev.slug){
+      showStatus("ev-status-msg", "error", "Please add a title or slug first.");
+      return;
+    }
+
+    const btn = document.getElementById("ev-publish-btn");
+    btn.disabled = true;
+    showStatus("ev-status-msg", "working", "Publishing…");
+
+    try{
+      let image = null;
+      if(uploadFile){
+        const base64 = await fileToBase64(uploadFile);
+        image = { filename: uploadFile.name, base64 };
+      }
+
+      let { status, data } = await callPublishApi({
+        username: auth.username, password: auth.password,
+        type: "event", data: ev, image
+      });
+
+      if(status === 409 && data.exists){
+        const proceed = confirm(`An event with the slug "${ev.slug}" already exists. Publishing will overwrite it. Continue?`);
+        if(!proceed){ btn.disabled = false; hideStatus("ev-status-msg"); return; }
+        showStatus("ev-status-msg", "working", "Overwriting…");
+        ({ status, data } = await callPublishApi({
+          username: auth.username, password: auth.password,
+          type: "event", data: ev, image, confirmOverwrite: true
+        }));
+      }
+
+      if(!data.ok){
+        throw new Error(data.error || "Publish failed.");
+      }
+
+      showStatus("ev-status-msg", "success", `✅ Published! Your site will rebuild within about a minute — check the Events page shortly.`);
+      downloadLog.unshift({ icon: "📅", title: ev.title, detail: "published live" });
+      refreshDraftList();
+      allEvents = allEvents.filter(x => x.slug !== ev.slug);
+      allEvents.push(ev);
+      renderManageList();
+    } catch(e){
+      showStatus("ev-status-msg", "error", `⚠ Publish failed: ${e.message}`);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
   async function publishTeamMember(){
     const auth = requireAuth("tm-status");
     if(!auth) return;
@@ -723,6 +875,7 @@
   let allVideos = Array.isArray(window.VIDEOS) ? window.VIDEOS.slice() : [];
   let allPhotos = Array.isArray(window.PHOTOS) ? window.PHOTOS.slice() : [];
   let allTeam = Array.isArray(window.TEAM) ? window.TEAM.slice() : [];
+  let allEvents = Array.isArray(window.EVENTS) ? window.EVENTS.slice() : [];
 
   document.getElementById("manage-panel-toggle").addEventListener("click", () => {
     const body = document.getElementById("manage-panel-body");
@@ -743,6 +896,7 @@
       ...allPosts.map(p => ({ ...p, _kind: "post" })),
       ...allVideos.map(v => ({ ...v, _kind: "video" })),
       ...allPhotos.map(p => ({ ...p, _kind: "photo" })),
+      ...allEvents.map(e => ({ ...e, _kind: "event" })),
       ...allTeam.map(m => ({ ...m, _kind: "team" }))
     ].filter(it => !q || (it.title || it.name || "").toLowerCase().includes(q))
      .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
@@ -754,10 +908,10 @@
       list.innerHTML = `<div class="manage-empty">Nothing found. Publish something above, or try a different search.</div>`;
       return;
     }
-    const ICONS = { video: "🎬", photo: "📸", post: "📰", team: "👤" };
-    const EDIT_FN = { video: "editVideo", photo: "editPhoto", post: "editPost", team: "editTeamMember" };
-    const DELETE_FN = { video: "confirmDeleteVideo", photo: "confirmDeletePhoto", post: "confirmDeletePost", team: "confirmDeleteTeamMember" };
-    const META = { video: "Video", photo: "Photo" };
+    const ICONS = { video: "🎬", photo: "📸", post: "📰", team: "👤", event: "📅" };
+    const EDIT_FN = { video: "editVideo", photo: "editPhoto", post: "editPost", team: "editTeamMember", event: "editEvent" };
+    const DELETE_FN = { video: "confirmDeleteVideo", photo: "confirmDeletePhoto", post: "confirmDeletePost", team: "confirmDeleteTeamMember", event: "confirmDeleteEvent" };
+    const META = { video: "Video", photo: "Photo", event: "Event" };
     list.innerHTML = items.map(it => `
       <div class="manage-item">
         <div class="manage-item-info">
@@ -775,6 +929,7 @@
   function findVideo(slug){ return allVideos.find(v => v.slug === slug); }
   function findPhoto(slug){ return allPhotos.find(p => p.slug === slug); }
   function findTeamMember(slug){ return allTeam.find(m => m.slug === slug); }
+  function findEvent(slug){ return allEvents.find(e => e.slug === slug); }
 
   function editTeamMember(slug){
     const m = findTeamMember(slug);
@@ -884,6 +1039,29 @@
     window.scrollTo({ top: document.getElementById("photo-form").getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
   }
 
+  function editEvent(slug){
+    const ev = findEvent(slug);
+    if(!ev) return;
+    setMode("event");
+    document.getElementById("ev-title").value = ev.title || "";
+    document.getElementById("ev-slug").value = ev.slug || "";
+    document.getElementById("ev-slug").dataset.manual = "true";
+    document.getElementById("ev-description").value = ev.description || "";
+    document.getElementById("ev-date").value = ev.date || "";
+    document.getElementById("ev-end-date").value = ev.endDate || "";
+    document.getElementById("ev-time").value = ev.time || "";
+    document.getElementById("ev-location").value = ev.location || "";
+    document.getElementById("ev-status").value = ev.status === "active" || ev.status === "past" ? ev.status : "auto";
+    document.getElementById("ev-link").value = ev.link || "";
+    setEventImageMode("url");
+    document.getElementById("ev-image").value = ev.image || "";
+    document.getElementById("ev-image-file").value = "";
+    document.getElementById("ev-image-preview").style.display = "none";
+    renderEventPreview();
+    showStatus("ev-status-msg", "working", `Editing "${escapeHtml(ev.title)}" — change what you like, then hit Publish to save.`);
+    window.scrollTo({ top: document.getElementById("event-form").getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
+  }
+
   async function confirmDeletePost(slug){
     const post = findPost(slug);
     if(!post) return;
@@ -956,6 +1134,32 @@
       const imgNote = data.imagesRemoved ? ` (and ${data.imagesRemoved} file${data.imagesRemoved === 1 ? "" : "s"} used in it)` : "";
       showStatus("manage-status", "success", `✅ Deleted "${escapeHtml(p.title)}"${imgNote}. Your site will update within about a minute.`);
       downloadLog.unshift({ icon: "🗑️", title: p.title, detail: "deleted" });
+      refreshDraftList();
+    } catch(e){
+      showStatus("manage-status", "error", `⚠ Delete failed: ${e.message}`);
+    }
+  }
+
+  async function confirmDeleteEvent(slug){
+    const ev = findEvent(slug);
+    if(!ev) return;
+    if(!confirm(`Delete event "${ev.title}" permanently? This can't be undone from here.`)) return;
+    const auth = requireAuth("manage-status");
+    if(!auth) return;
+    showStatus("manage-status", "working", `Deleting "${escapeHtml(ev.title)}"…`);
+    try{
+      const res = await fetch("/api/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: auth.username, password: auth.password, type: "event", slug })
+      });
+      const data = await res.json();
+      if(!data.ok) throw new Error(data.error || "Delete failed.");
+      allEvents = allEvents.filter(x => x.slug !== slug);
+      renderManageList();
+      const imgNote = data.imagesRemoved ? ` (and ${data.imagesRemoved} file${data.imagesRemoved === 1 ? "" : "s"} used in it)` : "";
+      showStatus("manage-status", "success", `✅ Deleted "${escapeHtml(ev.title)}"${imgNote}. Your site will update within about a minute.`);
+      downloadLog.unshift({ icon: "🗑️", title: ev.title, detail: "deleted" });
       refreshDraftList();
     } catch(e){
       showStatus("manage-status", "error", `⚠ Delete failed: ${e.message}`);
