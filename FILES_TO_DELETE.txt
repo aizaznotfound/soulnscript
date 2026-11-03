@@ -1,0 +1,4 @@
+css/animations.css
+css/art-gallery.css
+js/art-motion.js
+js/reveal.js
