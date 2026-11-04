@@ -17,8 +17,9 @@ function renderArticleDetail(){
     const title = ssField(video, "title");
     const deck = ssField(video, "deck") || ssUi("ui.videoDescription");
     document.title = title + " — Soul & Script";
+    head.dataset.room = "cin";
     head.innerHTML = `<span class="tag-pill video">${escapeHtml(ssUi("ui.video"))}</span><h1>${escapeHtml(title)}</h1><p class="deck">${escapeHtml(deck)}</p><div class="byline">${escapeHtml(ssField(video, "author"))} · ${formatDate(video.date)}</div>`;
-    body.innerHTML = `<div style="position:relative;padding-top:56.25%;margin-bottom:24px;border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 14px 32px rgba(30,26,46,.14);"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(video.youtubeId)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div><p>${escapeHtml(deck)}</p><div class="share-bar-mount"></div>`;
+    body.innerHTML = `<div style="position:relative;padding-top:56.25%;margin-bottom:24px;border-radius:var(--radius-lg);overflow:hidden;"><iframe src="https://www.youtube.com/embed/${encodeURIComponent(video.youtubeId)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div><p>${escapeHtml(deck)}</p><div class="share-bar-mount"></div>`;
     wireShareBar(body.querySelector(".share-bar-mount"), title);
     if(mostRead) renderMostRead("most-read-mount", null);
     return;
@@ -30,8 +31,9 @@ function renderArticleDetail(){
     const title = ssField(photo, "title");
     const caption = ssField(photo, "caption");
     document.title = title + " — Soul & Script";
+    head.dataset.room = "art";
     head.innerHTML = `<span class="tag-pill">${escapeHtml(ssUi("ui.photo"))}</span><h1>${escapeHtml(title)}</h1>${caption ? `<p class="deck">${escapeHtml(caption)}</p>` : ""}<div class="byline">${escapeHtml(ssField(photo, "author"))} · ${formatDate(photo.date)}</div>`;
-    body.innerHTML = `<figure style="margin:0 0 24px;"><img src="${photo.image}" alt="${escapeHtml(title)}" style="width:100%; border-radius:var(--radius-lg); box-shadow:0 14px 32px rgba(30,26,46,.14); display:block;"></figure><div class="share-bar-mount"></div><div class="article-tags">${articleTagsHTML(ssListField(photo, "tags"))}</div>`;
+    body.innerHTML = `<figure style="margin:0 0 24px;"><img src="${photo.image}" alt="${escapeHtml(title)}" style="width:100%; border-radius:var(--radius-lg);  display:block;"></figure><div class="share-bar-mount"></div><div class="article-tags">${articleTagsHTML(ssListField(photo, "tags"))}</div>`;
     wireShareBar(body.querySelector(".share-bar-mount"), title);
     if(mostRead) renderMostRead("most-read-mount", null);
     return;
@@ -43,6 +45,7 @@ function renderArticleDetail(){
   const deck = ssField(post, "deck");
   document.title = title + " — Soul & Script";
   const author = ssField(post, "author");
+  head.dataset.room = roomOfCategory(post.category);
   head.innerHTML = `<span class="tag-pill ${post.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(ssCategory(post.category))}</span><h1>${escapeHtml(title)}</h1><p class="deck">${escapeHtml(deck)}</p><div class="byline-block"><div class="avatar">${escapeHtml((author || "?").charAt(0))}</div><div><div class="byline" style="margin:0;">${escapeHtml(author)}</div><div class="byline" style="margin:0;opacity:.7;">${formatDate(post.date)} · ${escapeHtml(ssField(post, "readTime"))}</div></div></div>`;
 
   const imageCaption = ssField(post, "imageCaption");

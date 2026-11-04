@@ -1,0 +1,9 @@
+# Old section pages → the four rooms
+/news.html        /literature.html   301
+/news             /literature.html   301
+/opinions.html    /philosophy.html   301
+/opinions         /philosophy.html   301
+/photos.html      /art.html          301
+/photos           /art.html          301
+/videos.html      /cinema.html       301
+/videos           /cinema.html       301

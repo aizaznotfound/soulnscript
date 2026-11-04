@@ -5,9 +5,9 @@
    ========================================================= */
 
 const CATEGORY_LABELS = {
-  news: "Prose & Picture Stories",
+  news: "Prose",
   campus: "Poetry",
-  academics: "Philosophy & Reflections",
+  academics: "Reflections",
   events: "Session Recaps",
   opinion: "Reader Reflections"
 };

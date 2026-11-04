@@ -1,66 +1,82 @@
 /* =========================================================
    SOUL & SCRIPT — js/pages/index.js
-   Homepage-only rendering: hero/grid, Editor's Picks rail, category strips, mega-menu data.
-   Page-specific script for index.html. Loaded last, after all
-   shared js/lib, js/render, js/nav.js, js/richtext.js, js/bootstrap.js.
+   Homepage: hero plate, the four doors, one block per room,
+   events strip. Everything is driven by window.POSTS/PHOTOS/
+   VIDEOS/EVENTS from js/content.js.
    ========================================================= */
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const empty = (msg) => `<div class="empty-state">${escapeHtml(msg || ssUi("ui.noStories"))}</div>`;
+  const posts = allPostsSorted();
+  const photos = allPhotosSorted();
 
-  const sorted = allPostsSorted();
-
-  if(!sorted.length){
-    document.getElementById("front-grid-mount").innerHTML = `<p class="empty-state">${escapeHtml(ssUi("ui.noStories"))}</p>`;
-    document.getElementById("picks-rail").innerHTML = "";
-  } else {
-    const lead = sorted.find(p => p.featured) || sorted[0];
-    const rest = sorted.filter(p => p.slug !== lead.slug);
-
-    // Top mixed-size grid: 1 big lead + up to 2 medium (gracefully handles fewer posts)
-    const mediums = rest.slice(0, 2);
-    document.getElementById("front-grid-mount").innerHTML = `
-      <article class="big${lead.image ? "" : " no-image"}">
-        ${lead.image ? `<a href="article.html?slug=${lead.slug}"><img src="${lead.image}" alt="${escapeHtml(ssField(lead, "title"))}"></a>` : ""}
-        <span class="tag-pill ${lead.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(ssCategory(lead.category))}</span>
-        <h2><a href="article.html?slug=${lead.slug}">${escapeHtml(ssField(lead, "title"))}</a></h2>
-        <p class="deck-sm">${escapeHtml(ssField(lead, "deck"))}</p>
-        <div class="byline">${escapeHtml(ssField(lead, "author"))} · ${formatDate(lead.date)}</div>
-      </article>
-      ${mediums.map(p => `
-      <article class="medium${p.image ? "" : " no-image"}">
-        ${p.image ? `<a href="article.html?slug=${p.slug}"><img src="${p.image}" alt="${escapeHtml(ssField(p, "title"))}"></a>` : ""}
-        <span class="tag-pill ${p.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(ssCategory(p.category))}</span>
-        <h3><a href="article.html?slug=${p.slug}">${escapeHtml(ssField(p, "title"))}</a></h3>
-        <p class="deck-sm">${escapeHtml(ssField(p, "deck"))}</p>
-        <div class="byline">${formatDate(p.date)}</div>
-      </article>`).join("")}
-    `;
-
-    // Editor's Picks rail — next few after the top three
-    document.getElementById("picks-rail").innerHTML =
-      rest.slice(2, 9).map(railCardHTML).join("") || sorted.slice(0,6).map(railCardHTML).join("");
-
-    renderMostRead("most-read-mount", lead.slug);
+  /* ----- Hero plate: newest artwork, else the lead story's image ----- */
+  const plate = $("hero-plate");
+  const leadPost = posts.find(p => p.featured && p.image) || posts.find(p => p.image);
+  const heroItem = photos[0]
+    ? { img: photos[0].image, title: ssField(photos[0], "title"), sub: `${ssUi("room.art.name")} · ${formatDate(photos[0].date)}`, href: `article.html?photo=${photos[0].slug}` }
+    : leadPost
+      ? { img: leadPost.image, title: ssField(leadPost, "title"), sub: `${ssCategory(leadPost.category)} · ${formatDate(leadPost.date)}`, href: `article.html?slug=${leadPost.slug}` }
+      : null;
+  if(plate){
+    if(heroItem){
+      plate.innerHTML = `<a href="${heroItem.href}"><div class="plate-frame"><img src="${heroItem.img}" alt="${escapeHtml(heroItem.title)}"></div>
+        <figcaption class="plaque"><b>${escapeHtml(heroItem.title)}</b>${escapeHtml(heroItem.sub)}</figcaption></a>`;
+    } else { plate.remove(); document.querySelector(".hero").style.gridTemplateColumns = "1fr"; }
   }
 
-  // Category strips
-  document.getElementById("strip-campus").innerHTML =
-    postsByCategory("campus").slice(0,3).map(stripRowHTML).join("") || `<p class="empty-state">${escapeHtml(ssUi("ui.noStories"))}</p>`;
-  document.getElementById("strip-academics").innerHTML =
-    postsByCategory("academics").slice(0,3).map(stripRowHTML).join("") || `<p class="empty-state">${escapeHtml(ssUi("ui.noStories"))}</p>`;
+  /* ----- The four doors ----- */
+  $("doors").innerHTML = ROOM_ORDER.map(k => {
+    const first = roomItems(k)[0];
+    const latest = first ? ssField(first, "title") : "";
+    return `
+    <a class="door room-${k}" href="${ROOMS[k].page}">
+      <div class="num">${ROOMS[k].num}</div>
+      <div>
+        <h3>${escapeHtml(ssUi(`room.${k}.name`))}</h3>
+        <p class="d">${escapeHtml(ssUi(`room.${k}.desc`))}</p>
+        ${latest ? `<div class="latest"><b>${escapeHtml(ssUi("home.latest"))}</b>${escapeHtml(latest)}</div>` : ""}
+        <div class="go"><span>${pieceCount(k)}</span><span>→</span></div>
+      </div>
+    </a>`;
+  }).join("");
 
-  renderList("home-opinions-grid", postsByCategory("opinion").slice(0,2));
+  /* ----- I · Literature ----- */
+  const lit = postsInRoom("lit");
+  if(!lit.length){ $("home-lit").innerHTML = empty(); }
+  else {
+    const lead = lit.find(p => p.featured) || lit[0];
+    const rest = lit.filter(p => p.slug !== lead.slug).slice(0, 3);
+    $("home-lit").innerHTML = `
+    <div class="lit-grid">
+      <article class="lit-lead">
+        ${lead.image ? `<a href="article.html?slug=${lead.slug}"><img src="${lead.image}" alt="${escapeHtml(ssField(lead, "title"))}"></a>` : ""}
+        <span class="tag-pill">${escapeHtml(ssCategory(lead.category))}</span>
+        <h3><a href="article.html?slug=${lead.slug}">${escapeHtml(ssField(lead, "title"))}</a></h3>
+        <p class="deck">${escapeHtml(ssField(lead, "deck"))}</p>
+        <div class="meta">${escapeHtml(ssField(lead, "author"))} · ${formatDate(lead.date)}</div>
+      </article>
+      <ul class="reading">${rest.map(readingItemHTML).join("")}</ul>
+    </div>`;
+  }
 
-  document.getElementById("home-videos-grid").innerHTML =
-    window.VIDEOS.slice(0,2).map(videoCardHTML).join("");
+  /* ----- II · Art ----- */
+  $("home-art").innerHTML = photos.length
+    ? `<div class="plates">${photos.slice(0, 4).map(plateHTML).join("")}</div>`
+    : empty(ssUi("ui.noPhotos"));
 
-  const homePhotos = allPhotosSorted().slice(0,8);
-  document.getElementById("home-photos-rail").innerHTML = homePhotos.length
-    ? homePhotos.map(photoRailCardHTML).join("")
-    : `<p class="empty-state">${escapeHtml(ssUi("ui.noPhotos"))}</p>`;
+  /* ----- III · Philosophy ----- */
+  const phil = postsInRoom("phil").slice(0, 3);
+  $("home-phil").innerHTML = phil.length ? `<ul class="thoughts">${phil.map(thoughtHTML).join("")}</ul>` : empty();
 
-  document.getElementById("home-tag-cloud").innerHTML = tagCloudHTML(10);
+  /* ----- IV · Cinema ----- */
+  const films = roomItems("cin");
+  $("home-cin").innerHTML = screenHTML(films[0]) +
+    (films.length > 1 ? `<div class="reel">${films.slice(1, 4).map(videoCardHTML).join("")}</div>` : "");
 
-  document.getElementById("newsletter-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("newsletter-email").value;
-    window.location.href = `mailto:soulnscript26@gmail.com?subject=${encodeURIComponent("Newsletter signup")}&body=${encodeURIComponent("Please add this address to the Soul & Script newsletter list: " + email)}`;
-  });
+  /* ----- Events strip ----- */
+  const active = activeEventsSorted();
+  $("home-events-body").innerHTML = active.length
+    ? active.slice(0, 2).map(e => `<p><b>${escapeHtml(ssUi("home.eventsOpen"))}:</b> ${escapeHtml(ssField(e, "title"))} — ${formatDate(e.date)}</p>`).join("")
+    : `<p>${escapeHtml(ssUi("home.eventsNone"))}</p>`;
+})();

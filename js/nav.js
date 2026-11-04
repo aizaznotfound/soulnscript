@@ -7,7 +7,7 @@
 /* ---------- Nav active state ---------- */
 function markActiveNav(){
   const page = window.location.pathname.split("/").pop() || "index.html";
-  document.querySelectorAll(".nav a[data-page]").forEach(a => {
+  document.querySelectorAll(".site-nav a[data-page]").forEach(a => {
     if(a.dataset.page === page) a.classList.add("active");
   });
 }
@@ -18,7 +18,7 @@ function markActiveNav(){
    Nav height isn't constant (it grows on mobile when the menu opens), so we
    measure it and expose it as --nav-h for the ticker's sticky "top" offset. */
 function syncNavHeight(){
-  const nav = document.querySelector(".nav");
+  const nav = document.querySelector(".site-nav");
   if(!nav) return;
   document.documentElement.style.setProperty("--nav-h", nav.offsetHeight + "px");
 }
@@ -45,7 +45,7 @@ function initMobileNav(){
   });
   // Collapse the mobile menu automatically if the viewport is widened past the breakpoint
   window.addEventListener("resize", () => {
-    if(window.innerWidth > 780 && menu){
+    if(window.innerWidth > 960 && menu){
       menu.classList.remove("open");
       if(burger) burger.setAttribute("aria-expanded", "false");
     }

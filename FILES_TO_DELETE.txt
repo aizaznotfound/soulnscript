@@ -1,4 +1,12 @@
 css/animations.css
 css/art-gallery.css
 js/art-motion.js
+js/pages/news.js
+js/pages/opinions.js
+js/pages/photos.js
+js/pages/videos.js
 js/reveal.js
+news.html
+opinions.html
+photos.html
+videos.html

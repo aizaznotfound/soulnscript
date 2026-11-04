@@ -11,10 +11,10 @@ A creative collective for readers, writers, thinkers, painters, and artists of e
 ```
 soul-and-script/
 ├── index.html            Homepage (front grid, Poetry/Philosophy strips, Reflections, Films & Talks, Gallery)
-├── news.html              Writing listing (Poetry, Prose & Picture Stories, Philosophy, Session Recaps — filterable + search)
-├── opinions.html          Reflections listing (reader opinion pieces)
-├── videos.html            Films & Talks gallery (YouTube embeds)
-├── photos.html             Gallery listing (photography, painting, sketching)
+├── literature.html        Room I — Literature (Prose + Poetry; filter + search)
+├── philosophy.html        Room III — Philosophy (Reflections + Reader Reflections)
+├── cinema.html            Room IV — Cinema (films & talks, YouTube embeds)
+├── art.html               Room II — Art (photography, painting, sketching)
 ├── events.html            Active Events (competitions/prizes) + Session Recaps (open mic, book sessions, movie talks)
 ├── team.html               Team roster, grouped by Founders/Media/Promotion/Judges/Communication/Finance
 ├── article.html            Single piece / video / photo detail page (?slug=... or ?video=... or ?photo=...)
@@ -59,7 +59,7 @@ Four kinds of content, each its own folder in `content/`, each built by `build-c
 
 | Folder | Shows up on | Categories? |
 |---|---|---|
-| `content/posts/` | news.html (Writing) or opinions.html (Reflections), depending on `category` | `news`, `campus`, `academics`, `events`, `opinion` — labeled Prose & Picture Stories / Poetry / Philosophy & Reflections / Session Recaps / Reader Reflections in the UI (see `CATEGORY_LABELS` in `js/lib/format.js`) |
+| `content/posts/` | literature.html (`news`, `campus`) or philosophy.html (`academics`, `opinion`), depending on `category` | `news`, `campus`, `academics`, `events`, `opinion` — labeled Prose & Picture Stories / Poetry / Philosophy & Reflections / Session Recaps / Reader Reflections in the UI (see `CATEGORY_LABELS` in `js/lib/format.js`) |
 | `content/videos/` | videos.html (Films & Talks) | — |
 | `content/photos/` | photos.html (Gallery) | — |
 | `content/team/` | team.html, grouped by the `team` field | `founders`, `media`, `promotion`, `judges`, `communication`, `finance` |
@@ -235,3 +235,11 @@ All design tokens (colors, fonts, spacing) live at the top of `css/base.css` und
 - `--utility` — nav/meta/label font (Barlow Condensed)
 
 Change these once and the whole site updates consistently.
+
+
+## Design system (2026 redesign)
+
+- `css/shell.css` — colour tokens, header, footer, buttons (loaded on every page). Each room owns a colour: Literature = ink blue, Art = vermilion, Philosophy = verdigris, Cinema = oxblood.
+- `css/site.css` — all public pages (home, the four rooms, article, events, about, team, contact, tags).
+- `js/render/rooms.js` — which content belongs to which room + how each room draws its pieces. `js/pages/room.js` powers all four room pages (`<body data-room="lit|art|phil|cin">`).
+- Old URLs (`news`, `opinions`, `photos`, `videos`) redirect via `_redirects`. The staff tools (editor, poster) keep their own stylesheets.

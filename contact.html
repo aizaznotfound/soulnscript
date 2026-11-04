@@ -5,68 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact &amp; Submissions — Soul &amp; Script</title>
 <meta name="description" content="Reach Soul &amp; Script — pitch a piece, ask about an event, or just say hello.">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/components.css">
-<link rel="stylesheet" href="css/misc.css">
-<link rel="stylesheet" href="css/theme.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@400;500;600&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/site.css">
 </head>
-<body class="art-page art-page-contact">
-
-<div class="utility-bar">
-  <div class="wrap">
-    <span id="utility-date"></span>
-    <span><span class="divider">|</span><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">Instagram</a><span class="divider">|</span><a href="https://l.instagram.com/?u=https%3A%2F%2Fchat.whatsapp.com%2FCTA39UN7TfU97Ges3nD7Qv%3Fmode%3Dgi_t&amp;e=AUAepJVC_8tI0yx_r99SeFSSV0EsHG72k8zv1Iacd_0PrS_ssVRQuzxrH6Kgr0WTOoquH9e6f3poeLnNvfajVt3S9D4C0wSfT87WRcBZhtxiE5EDFoaEJ9etF3svOja-GPStzHY" target="_blank" rel="noopener"><span data-i18n="ui.joinWhatsApp">Join our WhatsApp</span></a></span>
-  </div>
-</div>
-
-<header class="masthead">
-  <div class="wrap">
-    <div class="kicker">Est. 2026 &middot; A Home For Every Art</div>
-    <h1 class="brand-lockup">
-  <a class="brand-link" href="index.html" aria-label="Soul &amp; Script">
-    <span class="wordmark">Soul <span class="amp">&amp;</span> Script</span>
-  </a>
-</h1>
-    <div class="tagline">For readers, writers, thinkers, painters &mdash; and artists of every kind</div>
-  </div>
-  <div class="wrap"><div class="pulse-rule-mount"></div></div>
-</header>
-
-<nav class="nav">
-  <div class="wrap">
-    <button class="nav-burger" id="nav-burger" aria-label="Toggle menu" data-i18n-aria="nav.toggleMenu" aria-expanded="false" aria-controls="nav-menu">
-      <span></span><span></span><span></span>
-    </button>
-    <ul id="nav-menu">
-      <li><a href="index.html" data-page="index.html" data-i18n="nav.home">Home</a></li>
-      <li class="has-mega">
-        <a href="news.html" data-page="news.html" data-i18n="nav.writing">Writing</a>
-        <button class="mega-toggle" aria-label="Show Writing submenu" data-i18n-aria="nav.showWriting" aria-expanded="false">▾</button>
-        <div class="mega" id="mega-news"></div>
-      </li>
-      <li class="has-mega">
-        <a href="videos.html" data-page="videos.html" data-i18n="nav.films">Films &amp; Talks</a>
-        <button class="mega-toggle" aria-label="Show Films &amp; Talks submenu" data-i18n-aria="nav.showFilms" aria-expanded="false">▾</button>
-        <div class="mega" id="mega-videos"></div>
-      </li>
-      <li class="has-mega">
-        <a href="photos.html" data-page="photos.html" data-i18n="nav.gallery">Gallery</a>
-        <button class="mega-toggle" aria-label="Show Gallery submenu" data-i18n-aria="nav.showGallery" aria-expanded="false">▾</button>
-        <div class="mega" id="mega-photos"></div>
-      </li>
-      <li><a href="events.html" data-page="events.html" data-i18n="nav.events">Events</a></li>
-      <li><a href="team.html" data-page="team.html" data-i18n="nav.team">Team</a></li>
-      <li><a href="about.html" data-page="about.html" data-i18n="nav.manifesto">Manifesto</a></li>
-      <li><a href="contact.html" data-page="contact.html" data-i18n="nav.contact">Contact</a></li>
-      <li class="nav-lang-item"><button type="button" class="lang-toggle" data-lang-toggle data-lang-label>اردو</button></li><li class="nav-cta-item"><a href="contribute.html" class="nav-cta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Share Your Work</span></a></li>
-    </ul>
-  </div>
-</nav>
-
-
-<main class="wrap">
+<body>
+<a class="skip" href="#main" data-i18n="ui.skip">Skip to content</a>
+<header class="site-header"><div class="wrap bar">
+  <a class="brand" href="index.html" aria-label="Soul &amp; Script"><span class="quad" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">Soul <i>&amp;</i> Script</span></a>
+  <button class="nav-burger" id="nav-burger" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu" data-i18n-aria="nav.menu"><span></span><span></span><span></span></button>
+  <nav class="site-nav" id="nav-menu" aria-label="Primary"><ul>
+    <li><a class="lit" href="literature.html" data-page="literature.html" data-i18n="nav.literature">Literature</a></li>
+    <li><a class="art" href="art.html" data-page="art.html" data-i18n="nav.art">Art</a></li>
+    <li><a class="phil" href="philosophy.html" data-page="philosophy.html" data-i18n="nav.philosophy">Philosophy</a></li>
+    <li><a class="cin" href="cinema.html" data-page="cinema.html" data-i18n="nav.cinema">Cinema</a></li>
+    <li><a href="events.html" data-page="events.html" data-i18n="nav.events">Events</a></li>
+    <li><a href="about.html" data-page="about.html" data-i18n="nav.about">About</a></li>
+    <li class="nav-tools"><button type="button" class="lang-toggle" data-lang-toggle data-lang-label>اردو</button><a class="btn sm" href="contribute.html" data-i18n="nav.submit">Submit work</a></li>
+  </ul></nav>
+</div></header>
+<main id="main" class="wrap">
   <div class="page-hero hero-contact">
-    <div class="hero-decor"><div class="blob b1"></div></div>
     <div class="hero-inner">
       <div class="kicker-sm">Reach Us</div>
       <h1 data-i18n="page.contactTitle">Contact &amp; Submissions</h1>
@@ -126,52 +87,33 @@
   </div>
 </main>
 
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <div class="masthead-mini">Soul &amp; Script</div>
-        <p style="margin-top:10px;"><span data-i18n="footer.description">A creative collective for readers, writers, thinkers, painters, and artists of every kind.</span></p>
-      </div>
-      <div>
-        <h5 data-i18n="ui.explore">Explore</h5>
-        <ul>
-          <li><a href="news.html" data-i18n="nav.writing">Writing</a></li>
-          <li><a href="videos.html" data-i18n="nav.films">Films &amp; Talks</a></li>
-          <li><a href="photos.html" data-i18n="nav.gallery">Gallery</a></li>
-          <li><a href="events.html" data-i18n="nav.events">Events</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5 data-i18n="ui.about">About</h5>
-        <ul>
-          <li><a href="about.html" data-i18n="nav.manifesto">Manifesto</a></li>
-          <li><a href="team.html" data-i18n="nav.team">Team</a></li>
-          <li><a href="contact.html" data-i18n="nav.contactSubmissions">Contact &amp; Submissions</a></li>
-          <li><a href="contribute.html" data-i18n="nav.share">Share Your Work</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5 data-i18n="ui.reach">Reach Us</h5>
-        <ul>
-          <li><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">@soulnscript_</a></li>
-          <li><a href="tel:+923185119794">+92 318 5119794</a></li>
-          <li><a href="mailto:soulnscript26@gmail.com">soulnscript26@gmail.com</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <span>© <span id="footer-year"></span> Soul &amp; Script. A home for every art.</span>
-      <span>An independent creative collective. <a href="contribute.html" style="color:inherit; opacity:.8;">Share Your Work</a> · <a href="editor.html" style="color:inherit; opacity:.8;">Team: Editorial Access</a></span>
-    </div>
+<footer class="site-footer"><div class="wrap">
+  <div class="foot-top">
+    <div class="foot-brand"><div class="brand"><span class="quad" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">Soul <i>&amp;</i> Script</span></div>
+      <p data-i18n="footer.description">A creative collective for readers, writers, thinkers, painters, and artists of every kind.</p></div>
+    <div class="foot-rooms"><h5 data-i18n="footer.rooms">The rooms</h5><ul>
+      <li><a class="lit" href="literature.html" data-i18n="nav.literature">Literature</a></li>
+      <li><a class="art" href="art.html" data-i18n="nav.art">Art</a></li>
+      <li><a class="phil" href="philosophy.html" data-i18n="nav.philosophy">Philosophy</a></li>
+      <li><a class="cin" href="cinema.html" data-i18n="nav.cinema">Cinema</a></li></ul></div>
+    <div><h5 data-i18n="ui.about">About</h5><ul>
+      <li><a href="about.html" data-i18n="nav.manifesto">Manifesto</a></li>
+      <li><a href="team.html" data-i18n="nav.team">Team</a></li>
+      <li><a href="events.html" data-i18n="nav.events">Events</a></li>
+      <li><a href="contact.html" data-i18n="nav.contactSubmissions">Contact &amp; Submissions</a></li></ul></div>
+    <div><h5 data-i18n="ui.reach">Reach us</h5><ul>
+      <li><a href="https://www.instagram.com/soulnscript_/" target="_blank" rel="noopener">@soulnscript_</a></li>
+      <li><a href="tel:+923185119794">+92 318 5119794</a></li>
+      <li><a href="mailto:soulnscript26@gmail.com">soulnscript26@gmail.com</a></li></ul></div>
   </div>
-</footer>
-
+  <div class="foot-bottom"><span>© <span id="footer-year"></span> Soul &amp; Script.</span>
+    <span><a href="contribute.html" data-i18n="nav.share">Share Your Work</a> · <a href="editor.html" data-i18n="footer.editorial">Editorial Access</a></span></div>
+</div></footer>
 <script src="js/content.js"></script><script src="js/i18n.js"></script>
 <script src="js/lib/format.js"></script>
 <script src="js/lib/sanitize.js"></script>
 <script src="js/lib/content-data.js"></script>
-<script src="js/render/cards.js"></script>
+<script src="js/render/cards.js"></script><script src="js/render/rooms.js"></script>
 <script src="js/render/sections.js"></script>
 <script src="js/render/article-page.js"></script>
 <script src="js/render/share-and-rails.js"></script>
