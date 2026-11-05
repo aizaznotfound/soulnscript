@@ -21,6 +21,15 @@
     <li><a class="art" href="art.html" data-page="art.html" data-i18n="nav.art">Art</a></li>
     <li><a class="phil" href="philosophy.html" data-page="philosophy.html" data-i18n="nav.philosophy">Philosophy</a></li>
     <li><a class="cin" href="cinema.html" data-page="cinema.html" data-i18n="nav.cinema">Cinema</a></li>
+    <li class="has-menu"><button type="button" class="menu-toggle" aria-expanded="false" aria-haspopup="true"><span data-i18n="nav.explore">Explore</span><span class="caret" aria-hidden="true">▾</span></button>
+      <div class="menu">
+        <a class="lib" href="library.html" data-page="library.html"><b data-i18n="explore.library">The Library</b><span data-i18n="explore.libraryDesc">Every written piece, in one list</span></a>
+        <a class="floor" href="open-floor.html" data-page="open-floor.html"><b data-i18n="explore.floor">The Open Floor</b><span data-i18n="explore.floorDesc">Readers’ reflections and opinions</span></a>
+        <a class="sess" href="session-notes.html" data-page="session-notes.html"><b data-i18n="explore.sessions">Session Notes</b><span data-i18n="explore.sessionsDesc">What happened, in our own words</span></a>
+        <a class="wall" href="the-wall.html" data-page="the-wall.html"><b data-i18n="explore.wall">The Wall</b><span data-i18n="explore.wallDesc">Every artwork, hung together</span></a>
+        <a class="voice" href="voices.html" data-page="voices.html"><b data-i18n="explore.voices">Voices</b><span data-i18n="explore.voicesDesc">The people behind the pieces</span></a>
+        <a class="themes" href="tag.html" data-page="tag.html"><b data-i18n="explore.themes">Themes</b><span data-i18n="explore.themesDesc">Follow a topic across rooms</span></a>
+      </div></li>
     <li><a href="events.html" data-page="events.html" data-i18n="nav.events">Events</a></li>
     <li><a href="about.html" data-page="about.html" data-i18n="nav.about">About</a></li>
     <li class="nav-tools"><button type="button" class="lang-toggle" data-lang-toggle data-lang-label>اردو</button><a class="btn sm" href="contribute.html" data-i18n="nav.submit">Submit work</a></li>
@@ -59,6 +68,13 @@
       <li><a class="art" href="art.html" data-i18n="nav.art">Art</a></li>
       <li><a class="phil" href="philosophy.html" data-i18n="nav.philosophy">Philosophy</a></li>
       <li><a class="cin" href="cinema.html" data-i18n="nav.cinema">Cinema</a></li></ul></div>
+    <div><h5 data-i18n="footer.house">The house</h5><ul>
+      <li><a href="library.html" data-i18n="explore.library">The Library</a></li>
+      <li><a href="open-floor.html" data-i18n="explore.floor">The Open Floor</a></li>
+      <li><a href="session-notes.html" data-i18n="explore.sessions">Session Notes</a></li>
+      <li><a href="the-wall.html" data-i18n="explore.wall">The Wall</a></li>
+      <li><a href="voices.html" data-i18n="explore.voices">Voices</a></li>
+      <li><a href="tag.html" data-i18n="explore.themes">Themes</a></li></ul></div>
     <div><h5 data-i18n="ui.about">About</h5><ul>
       <li><a href="about.html" data-i18n="nav.manifesto">Manifesto</a></li>
       <li><a href="team.html" data-i18n="nav.team">Team</a></li>
@@ -82,7 +98,7 @@
 <script src="js/render/share-and-rails.js"></script>
 <script src="js/nav.js"></script>
 <script src="js/richtext.js"></script>
-<script src="js/bootstrap.js"></script>
+<script src="js/search.js"></script><script src="js/bootstrap.js"></script>
 <script src="js/pages/events.js"></script>
 </body>
 </html>

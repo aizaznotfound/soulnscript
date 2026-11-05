@@ -74,6 +74,13 @@
   $("home-cin").innerHTML = screenHTML(films[0]) +
     (films.length > 1 ? `<div class="reel">${films.slice(1, 4).map(videoCardHTML).join("")}</div>` : "");
 
+  /* ----- Fresh across the house + voices ----- */
+  const fresh = $("home-fresh");
+  if(fresh) fresh.innerHTML = `<ul>${houseFeed().slice(0, 6).map(ledgerRowHTML).join("")}</ul>`;
+  const vs = $("home-voices");
+  if(vs) vs.innerHTML = allVoices().slice(0, 10).map(v =>
+    `<a href="voices.html#${v.slug}">${avatarHTML(v.name)}<span>${escapeHtml(v.name)} <small>${v.pieces.length}</small></span></a>`).join("");
+
   /* ----- Events strip ----- */
   const active = activeEventsSorted();
   $("home-events-body").innerHTML = active.length

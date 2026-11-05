@@ -8,4 +8,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if(yearEl) yearEl.textContent = new Date().getFullYear();
   markActiveNav();
   initMobileNav();
+  initMenus();
 });

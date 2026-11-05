@@ -243,3 +243,16 @@ Change these once and the whole site updates consistently.
 - `css/site.css` — all public pages (home, the four rooms, article, events, about, team, contact, tags).
 - `js/render/rooms.js` — which content belongs to which room + how each room draws its pieces. `js/pages/room.js` powers all four room pages (`<body data-room="lit|art|phil|cin">`).
 - Old URLs (`news`, `opinions`, `photos`, `videos`) redirect via `_redirects`. The staff tools (editor, poster) keep their own stylesheets.
+
+## The house pages (beyond the four rooms)
+
+| Page | What it is | Script |
+|---|---|---|
+| `library.html` — The Library | Every written piece; filter by category, sort, search | `js/pages/collection.js` (`data-collection="library"`) |
+| `open-floor.html` — The Open Floor | Reader reflections & opinions (`category: opinion`) | same, `floor` |
+| `session-notes.html` — Session Notes | Session recaps as a timeline (`category: events`) | same, `sessions` |
+| `the-wall.html` — The Wall | Every artwork, masonry + keyboard lightbox | same, `wall` |
+| `voices.html` — Voices | Contributors directory built from the `author` fields | same, `voices` |
+| `tag.html` — Themes | Browse by tag | `js/pages/tag.js` |
+
+Site-wide search (header icon or the `/` key) lives in `js/search.js`. The header "Explore" menu is plain HTML in each page's header.

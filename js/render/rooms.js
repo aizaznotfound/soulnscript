@@ -87,3 +87,57 @@ function screenHTML(video){
     <div class="in"><h3>${title}</h3><p>${escapeHtml(ssField(video, "deck"))}</p><span class="btn sm">${escapeHtml(ssUi("ui.play"))}</span></div>
   </a>`;
 }
+
+/* ---------- v3 helpers: pages per room, voices, everything-in-one-feed ---------- */
+const ROOM_PAGE = { lit: "literature.html", art: "art.html", phil: "philosophy.html", cin: "cinema.html", events: "session-notes.html" };
+function roomName(key){ return key === "events" ? ssUi("explore.sessions") : ssUi(`room.${key}.name`); }
+
+function authorName(raw){
+  let s = String(raw || "").trim();
+  s = s.split(/\s+[-–—]\s+/)[0];
+  s = s.replace(/\s+(?:\d+(?:st|nd|rd|th)\b|final\b|MBBS|BDS|GKMC|SMC|BKMC|KMC|student\b).*$/i, "");
+  return s.trim() || String(raw || "").trim();
+}
+function voiceSlug(name){
+  return String(name).toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g, "-").replace(/^-+|-+$/g, "");
+}
+function pieceHref(kind, item){
+  return kind === "photo" ? `article.html?photo=${item.slug}` : kind === "video" ? `article.html?video=${item.slug}` : `article.html?slug=${item.slug}`;
+}
+/* Every piece in the house as one normalised, newest-first list */
+function houseFeed(){
+  const out = [];
+  allPostsSorted().forEach(p => out.push({ kind: "post", room: roomOfCategory(p.category), item: p }));
+  allPhotosSorted().forEach(p => out.push({ kind: "photo", room: "art", item: p }));
+  (window.VIDEOS || []).forEach(v => out.push({ kind: "video", room: "cin", item: v }));
+  return out.sort((a, b) => new Date(b.item.date) - new Date(a.item.date));
+}
+function allVoices(){
+  const map = new Map();
+  houseFeed().forEach(({ kind, room, item }) => {
+    const raw = ssField(item, "author"); if(!raw) return;
+    const name = authorName(raw), k = voiceSlug(name) || name;
+    if(!map.has(k)) map.set(k, { slug: k, name, affil: "", pieces: [], rooms: new Set() });
+    const v = map.get(k);
+    v.pieces.push({ kind, room, item }); v.rooms.add(room);
+    if(raw !== name && raw.length > v.affil.length) v.affil = raw;
+  });
+  return [...map.values()].sort((a, b) => b.pieces.length - a.pieces.length || a.name.localeCompare(b.name));
+}
+function avatarHTML(name){ return `<div class="avatar" aria-hidden="true">${escapeHtml((name || "?").trim().charAt(0))}</div>`; }
+
+/* One row of the ledger (Library + home) */
+function ledgerRowHTML(entry){
+  const { kind, room, item } = entry;
+  const label = kind === "post" ? ssCategory(item.category) : roomName(room);
+  return `
+  <li class="room-${room}">
+    <time datetime="${item.date}">${formatDate(item.date)}</time>
+    <div>
+      <h4><a href="${pieceHref(kind, item)}">${escapeHtml(ssField(item, "title"))}</a></h4>
+      ${kind === "post" ? `<p>${escapeHtml(ssField(item, "deck"))}</p>` : ""}
+      <div class="meta">${escapeHtml(ssField(item, "author"))}${item.readTime ? " · " + escapeHtml(ssField(item, "readTime")) : ""}</div>
+    </div>
+    <span class="chip room-${room}">${escapeHtml(label)}</span>
+  </li>`;
+}
