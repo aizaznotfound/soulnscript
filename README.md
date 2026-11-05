@@ -256,3 +256,11 @@ Change these once and the whole site updates consistently.
 | `tag.html` — Themes | Browse by tag | `js/pages/tag.js` |
 
 Site-wide search (header icon or the `/` key) lives in `js/search.js`. The header "Explore" menu is plain HTML in each page's header.
+
+## Design notes (v4)
+
+- Contrast: muted text (`--ink-3`) and text on coloured panels meet WCAG AA (4.5:1). Re-check if you change room colours in `css/shell.css`.
+- Each room has its own art direction in `css/site.css` (header pattern + faded icon, door texture). Icons live in `js/render/rooms.js` (`ROOM_ICONS`).
+- `js/toc.js` builds the sticky contents list on any page with 3+ headings in its `.article-body` (currently About).
+- `favicon.svg`, theme-colour and basic Open Graph tags are in every page head. For rich WhatsApp/Twitter previews add an absolute `og:image` URL once the domain is final.
+- Print styles hide the header, footer and share bar so articles print cleanly.

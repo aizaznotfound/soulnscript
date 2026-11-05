@@ -8,6 +8,15 @@ const SS_LANG_KEY = "soulnscript-language";
 const SS_DEFAULT_LANGUAGE = "en";
 const SS_TRANSLATIONS = {
   en: {
+    "stat.rooms": "Rooms",
+    "stat.written": "Pieces written",
+    "stat.artworks": "Artworks",
+    "stat.films": "Films",
+    "stat.voices": "Voices",
+    "article.writtenBy": "Written by",
+    "article.seeVoice": "All their pieces →",
+    "toc.title": "On this page",
+    "ui.top": "Back to top ↑",
     "nav.explore": "Explore",
     "search.open": "Search",
     "search.placeholder": "Search pieces, artworks, films, people…",
@@ -146,6 +155,15 @@ const SS_TRANSLATIONS = {
     "page.notFoundDescription": "The page you are looking for has moved, disappeared, or was never here."
   },
   ur: {
+    "stat.rooms": "کمرے",
+    "stat.written": "تحریریں",
+    "stat.artworks": "فن پارے",
+    "stat.films": "فلمیں",
+    "stat.voices": "آوازیں",
+    "article.writtenBy": "مصنف",
+    "article.seeVoice": "ان کی تمام تخلیقات ←",
+    "toc.title": "اس صفحے پر",
+    "ui.top": "اوپر جائیں ↑",
     "nav.explore": "مزید",
     "search.open": "تلاش",
     "search.placeholder": "تخلیقات، فن پارے، فلمیں، لوگ تلاش کریں…",

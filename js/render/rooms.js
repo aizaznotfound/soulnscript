@@ -141,3 +141,14 @@ function ledgerRowHTML(entry){
     <span class="chip room-${room}">${escapeHtml(label)}</span>
   </li>`;
 }
+
+/* Line icons for the four rooms (24x24, inherit colour) */
+const ROOM_ICONS = {
+  lit:  '<path d="M3 5.5C5.5 4.5 8.5 4.5 12 6c3.5-1.5 6.5-1.5 9-.5V19c-2.5-1-5.5-1-9 .5-3.5-1.5-6.5-1.5-9-.5z"/><path d="M12 6v13.5"/>',
+  art:  '<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>',
+  phil: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>',
+  cin:  '<path d="M3 10h18v10H3z"/><path d="M3 10l2-5h16l-2 5M8 5l-2 5M13 5l-2 5M18 5l-2 5"/>'
+};
+function roomIconSVG(key){
+  return `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ROOM_ICONS[key] || ""}</svg>`;
+}

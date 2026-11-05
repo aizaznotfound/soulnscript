@@ -31,7 +31,7 @@
     const latest = first ? ssField(first, "title") : "";
     return `
     <a class="door room-${k}" href="${ROOMS[k].page}">
-      <div class="num">${ROOMS[k].num}</div>
+      <div class="top"><div class="num">${ROOMS[k].num}</div>${roomIconSVG(k)}</div>
       <div>
         <h3>${escapeHtml(ssUi(`room.${k}.name`))}</h3>
         <p class="d">${escapeHtml(ssUi(`room.${k}.desc`))}</p>
@@ -61,9 +61,9 @@
   }
 
   /* ----- II · Art ----- */
-  $("home-art").innerHTML = photos.length
-    ? `<div class="plates">${photos.slice(0, 4).map(plateHTML).join("")}</div>`
-    : empty(ssUi("ui.noPhotos"));
+  $("home-art").innerHTML = photos.length >= 3
+    ? `<div class="salon">${photos.slice(0, 3).map(plateHTML).join("")}</div>`
+    : photos.length ? `<div class="plates">${photos.map(plateHTML).join("")}</div>` : empty(ssUi("ui.noPhotos"));
 
   /* ----- III · Philosophy ----- */
   const phil = postsInRoom("phil").slice(0, 3);
@@ -73,6 +73,15 @@
   const films = roomItems("cin");
   $("home-cin").innerHTML = screenHTML(films[0]) +
     (films.length > 1 ? `<div class="reel">${films.slice(1, 4).map(videoCardHTML).join("")}</div>` : "");
+
+  /* ----- Stats ribbon ----- */
+  const stats = $("home-stats");
+  if(stats){
+    const films = roomItems("cin").length;
+    const nums = [[posts.length, "stat.written"], [photos.length, "stat.artworks"], [allVoices().length, "stat.voices"],
+                  films ? [films, "stat.films"] : [ROOM_ORDER.length, "stat.rooms"]];
+    stats.innerHTML = nums.map(([n, k]) => `<li><b>${n}</b><span>${escapeHtml(ssUi(k))}</span></li>`).join("");
+  }
 
   /* ----- Fresh across the house + voices ----- */
   const fresh = $("home-fresh");

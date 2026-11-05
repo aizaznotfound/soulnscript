@@ -107,11 +107,13 @@ function renderRelated(mountId, post){
 
 
 function crumbHTML(room, label){
+  const wrap = document.querySelector(".article-wrap"); if(wrap) wrap.dataset.room = room;  // lets the whole article pick up the room colour
   return `<nav class="crumb" aria-label="Breadcrumb"><a href="${ROOM_PAGE[room]}">${escapeHtml(roomName(room))}</a><i>›</i><span>${escapeHtml(label)}</span></nav>`;
 }
 /* Newer / older piece within the same room */
 function renderPrevNext(kind, item){
   const el = document.getElementById("article-nav"); if(!el) return;
+  renderAuthorBox(item, el);
   const room = kind === "photo" ? "art" : kind === "video" ? "cin" : roomOfCategory(item.category);
   const list = houseFeed().filter(f => f.room === room).map(f => f.item);
   const i = list.findIndex(x => x.slug === item.slug); if(i < 0) return;
@@ -119,4 +121,16 @@ function renderPrevNext(kind, item){
   const k = kind === "post" ? "post" : kind;
   el.innerHTML = link(list[i - 1], k, "pv", "article.prev") + link(list[i + 1], k, "nx", "article.next");
   if(!el.innerHTML) el.remove();
+}
+
+/* "Written by" card linking to the author's page in Voices */
+function renderAuthorBox(item, anchor){
+  const raw = ssField(item, "author"); if(!raw) return;
+  const name = authorName(raw), slug = voiceSlug(name);
+  const v = allVoices().find(x => x.slug === slug);
+  const n = v ? v.pieces.length : 1;
+  const box = document.createElement("aside");
+  box.className = "author-box";
+  box.innerHTML = `${avatarHTML(name)}<div><small>${escapeHtml(ssUi("article.writtenBy"))}</small><b>${escapeHtml(name)}</b><span>${n} ${escapeHtml(ssUi(n === 1 ? "ui.piece" : "ui.pieces"))}</span></div><a class="more" href="voices.html#${slug}">${escapeHtml(ssUi("article.seeVoice"))}</a>`;
+  anchor.parentNode.insertBefore(box, anchor);
 }
