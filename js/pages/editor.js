@@ -8,6 +8,292 @@
   let downloadLog = [];
   const AUTH_KEY = "gkmc_editor_auth_v1";
 
+
+/* =========================================================================
+   Bilingual fields · safer publishing · drafts · approval options
+   ========================================================================= */
+
+// ---- Urdu companion fields (the site reads <field>_ur when a reader picks اردو) ----
+const UR_FIELDS = {
+  post:  [["p-title-ur","title_ur"],["p-deck-ur","deck_ur"],["p-author-ur","author_ur"],["p-readtime-ur","readTime_ur"],["p-caption-ur","imageCaption_ur"]],
+  video: [["v-title-ur","title_ur"],["v-deck-ur","deck_ur"],["v-author-ur","author_ur"]],
+  photo: [["ph-title-ur","title_ur"],["ph-caption-ur","caption_ur"],["ph-author-ur","author_ur"]],
+  event: [["ev-title-ur","title_ur"],["ev-description-ur","description_ur"],["ev-location-ur","location_ur"]],
+  team:  [["tm-name-ur","name_ur"],["tm-role-ur","role_ur"],["tm-bio-ur","bio_ur"]]
+};
+const UR_BLOCKS = { post: "p-ur-block", video: "v-ur-block", photo: "ph-ur-block", event: "ev-ur-block", team: "tm-ur-block" };
+function readUrdu(type){
+  const out = {};
+  UR_FIELDS[type].forEach(([id, key]) => { const v = (document.getElementById(id).value || "").trim(); if(v) out[key] = v; });
+  return out;
+}
+function fillUrdu(type, item){
+  let any = false;
+  UR_FIELDS[type].forEach(([id, key]) => { const v = (item && item[key]) || ""; document.getElementById(id).value = v; if(v) any = true; });
+  if(type === "post" && item && item.body_ur && item.body_ur.length) any = true;
+  document.getElementById(UR_BLOCKS[type]).open = any;
+}
+
+// ---- Fields the form models, per type. Anything else in a saved file is carried over on re-publish ----
+const MODELED = {
+  post:  ["slug","category","featured","title","deck","author","date","readTime","image","imageCaption","tags","body","body_ur"],
+  video: ["slug","title","deck","author","date","youtubeId","thumbnail","tags"],
+  photo: ["slug","title","caption","author","date","tags","image"],
+  event: ["slug","title","description","date","time","location","link","endDate","status","image"],
+  team:  ["slug","name","role","team","order","bio","photo"]
+};
+const editingOriginal = { post: null, video: null, photo: null, event: null, team: null };
+function withExtras(type, data){
+  const orig = editingOriginal[type];
+  if(!orig || orig.slug !== data.slug) return data;           // new item, or the slug was changed on purpose
+  const merged = { ...orig };
+  MODELED[type].forEach(k => delete merged[k]);               // the form owns these (so clearing a field really clears it)
+  UR_FIELDS[type].forEach(([, k]) => delete merged[k]);
+  return Object.assign(merged, data);
+}
+function afterEdit(type, item){
+  editingOriginal[type] = item;
+  fillUrdu(type, item);
+  if(type === "post"){
+    document.getElementById("p-body-ur-editor").innerHTML = bodyArrayToEditorHTML(item.body_ur);
+    updateUrCounts();
+  }
+  if(type === "video"){
+    document.getElementById("v-tags").value = (item.tags || []).join(", ");
+    const isAuto = !item.thumbnail || /img\.youtube\.com\/vi\/[^/]+\/(maxres|hq)default\.jpg$/.test(item.thumbnail);
+    document.getElementById("v-thumb").value = isAuto ? "" : item.thumbnail;
+  }
+}
+
+// ---- YouTube helpers ----
+function parseYouTubeId(input){
+  const s = String(input || "").trim();
+  if(!s) return "";
+  if(/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  try{
+    const u = new URL(/^https?:\/\//i.test(s) ? s : "https://" + s);
+    if(u.hostname.includes("youtu.be")) return u.pathname.slice(1).split("/")[0].slice(0, 11);
+    const v = u.searchParams.get("v"); if(v) return v.slice(0, 11);
+    const m = u.pathname.match(/\/(?:embed|shorts|live|v)\/([A-Za-z0-9_-]{11})/); if(m) return m[1];
+  }catch(e){}
+  return "";
+}
+function imageLoads(url, ms){
+  return new Promise(resolve => {
+    const img = new Image(); const t = setTimeout(() => resolve(false), ms || 4000);
+    img.onload = () => { clearTimeout(t); resolve(img.naturalWidth > 200); };
+    img.onerror = () => { clearTimeout(t); resolve(false); };
+    img.src = url;
+  });
+}
+async function pickYouTubeThumb(id){
+  const hd = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+  return (await imageLoads(hd)) ? hd : `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+document.getElementById("v-youtube").addEventListener("change", (e) => {
+  const id = parseYouTubeId(e.target.value);
+  if(id) e.target.value = id;
+  renderVideoPreview();
+});
+["v-tags","v-thumb","v-youtube"].forEach(id => document.getElementById(id).addEventListener("input", renderVideoPreview));
+
+// ---- Validation before anything is published ----
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const val = (id) => (document.getElementById(id).value || "").trim();
+function slugProblem(slug, titleFieldName){
+  if(!slug) return `The ${titleFieldName} has no English letters — type an English URL slug (letters, numbers, hyphens) in the slug box.`;
+  if(!SLUG_RE.test(slug)) return "The URL slug can only contain lowercase letters, numbers and single hyphens (e.g. my-article-title).";
+  return "";
+}
+const PUBLISH_CFG = {
+  post: { status: "p-status", read: () => readPostForm(), check(){
+    if(!val("p-title")) return "Add a headline first.";
+    const sp = slugProblem(val("p-slug") || slugify(val("p-title")), "headline"); if(sp) return sp;
+    if(!val("p-deck")) return "Add a subheading (deck) — it shows under the headline and on cards.";
+    if(!val("p-author")) return "Add the author’s name.";
+    if(!extractStaffBody().length) return "The story body is empty.";
+    return ""; } },
+  video: { status: "v-status", read: () => readVideoForm(), check(){
+    if(!val("v-title")) return "Add a video title first.";
+    const sp = slugProblem(val("v-slug") || slugify(val("v-title")), "title"); if(sp) return sp;
+    if(!val("v-deck")) return "Add a short description.";
+    if(!parseYouTubeId(val("v-youtube"))) return "That doesn’t look like a YouTube link or ID. Paste the full link from the address bar or the Share button.";
+    return ""; } },
+  photo: { status: "ph-status", read: () => readPhotoForm(), check(){
+    if(!val("ph-title")) return "Add a title first.";
+    const sp = slugProblem(val("ph-slug") || slugify(val("ph-title")), "title"); if(sp) return sp;
+    if(!val("ph-author")) return "Add the artist / photographer’s name.";
+    if(!document.getElementById("ph-image-file").files[0] && !val("ph-image")) return "An art piece needs an image — upload one or paste an image URL.";
+    return ""; } },
+  event: { status: "ev-status-msg", read: () => readEventForm(), check(){
+    if(!val("ev-title")) return "Add a title first.";
+    const sp = slugProblem(val("ev-slug") || slugify(val("ev-title")), "title"); if(sp) return sp;
+    if(!val("ev-date")) return "Add a start date.";
+    if(val("ev-end-date") && val("ev-end-date") < val("ev-date")) return "The end date is before the start date.";
+    return ""; } },
+  team: { status: "tm-status", read: () => readTeamForm(), check(){
+    if(!val("tm-name")) return "Add the member’s name first.";
+    const sp = slugProblem(val("tm-slug") || slugify(val("tm-name")), "name"); if(sp) return sp;
+    if(!val("tm-role")) return "Add the member’s role.";
+    return ""; } }
+};
+function prepare(type){
+  const c = PUBLISH_CFG[type];
+  const problem = c.check();
+  if(problem){ showStatus(c.status, "error", "⚠ " + problem); return null; }
+  return withExtras(type, c.read());
+}
+
+// ---- "Where will this appear?" hint for the writing categories ----
+const WHERE = {
+  news: "Appears in the Literature room, The Library and “Fresh across the house”.",
+  campus: "Appears in the Literature room and The Library.",
+  academics: "Appears in the Philosophy room and The Library.",
+  opinion: "Appears on The Open Floor, in the Philosophy room, and in The Library.",
+  events: "Appears in Session Notes and The Library."
+};
+function updateWhere(){ document.getElementById("p-where").textContent = WHERE[document.getElementById("p-category").value] || ""; }
+document.getElementById("p-category").addEventListener("change", updateWhere);
+updateWhere();
+
+// ---- Urdu story-body editor ----
+const urBody = document.getElementById("p-body-ur-editor");
+function updateUrCounts(){
+  const words = (urBody.innerText || "").trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById("pu-counts").textContent = `${words} word${words === 1 ? "" : "s"}`;
+}
+document.getElementById("pu-heading").addEventListener("mousedown", (e) => e.preventDefault());
+document.getElementById("pu-heading").addEventListener("click", () => {
+  urBody.focus();
+  const cur = (document.queryCommandValue("formatBlock") || "").toLowerCase();
+  document.execCommand("formatBlock", false, cur === "h3" ? "p" : "h3");
+  updateUrCounts(); renderPreview();
+});
+initRichText(urBody, {
+  buttons: { bold: document.getElementById("pu-bold"), italic: document.getElementById("pu-italic"), link: document.getElementById("pu-link") },
+  onChange: () => { updateUrCounts(); }
+});
+urBody.addEventListener("input", updateUrCounts);
+
+// ---- Draft autosave (this browser only) ----
+const DRAFT_KEY = (t) => "ss_editor_draft_v2_" + t;
+const DRAFT_FORMS = { post: "post-form", video: "video-form", photo: "photo-form", event: "event-form", team: "team-form" };
+const DRAFT_RTE = { post: ["p-body-editor", "p-body-ur-editor"] };
+const DRAFT_TITLE = { post: "p-title", video: "v-title", photo: "ph-title", event: "ev-title", team: "tm-name" };
+const DRAFT_LABEL = { post: "Writing", video: "Video", photo: "Art piece", event: "Event", team: "Team member" };
+let draftTimer = null;
+function collectDraft(type){
+  const data = {};
+  document.getElementById(DRAFT_FORMS[type]).querySelectorAll("input, select, textarea").forEach(el => {
+    if(!el.id || el.type === "file" || el.type === "button") return;
+    data[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  (DRAFT_RTE[type] || []).forEach(id => { data["#" + id] = document.getElementById(id).innerHTML; });
+  return data;
+}
+function saveDraft(type){
+  if(!val(DRAFT_TITLE[type])) return;                      // nothing worth saving yet
+  try{ localStorage.setItem(DRAFT_KEY(type), JSON.stringify({ t: Date.now(), data: collectDraft(type) })); }catch(e){}
+}
+function clearDraft(type){ try{ localStorage.removeItem(DRAFT_KEY(type)); }catch(e){} showDraftBanner(); }
+function restoreDraft(type){
+  let rec; try{ rec = JSON.parse(localStorage.getItem(DRAFT_KEY(type)) || "null"); }catch(e){}
+  if(!rec) return;
+  setMode(type);
+  Object.entries(rec.data).forEach(([id, v]) => {
+    if(id[0] === "#"){ document.getElementById(id.slice(1)).innerHTML = v; return; }
+    const el = document.getElementById(id); if(!el) return;
+    if(el.type === "checkbox") el.checked = !!v; else el.value = v;
+    if(/-slug$/.test(id) && v) el.dataset.manual = "true";
+  });
+  document.getElementById(DRAFT_FORMS[type]).querySelectorAll("input, select, textarea").forEach(el => el.dispatchEvent(new Event("input", { bubbles: true })));
+  updatePbCounts(); updateUrCounts(); updateWhere(); renderPreview();
+  const blk = document.getElementById(UR_BLOCKS[type]);
+  blk.open = UR_FIELDS[type].some(([id]) => val(id)) || (type === "post" && !!(urBody.innerText || "").trim());
+  document.getElementById("draft-banner").style.display = "none";
+  showDraftBanner();
+}
+function discardDraft(type){ clearDraft(type); }
+function showDraftBanner(){
+  const bar = document.getElementById("draft-banner");
+  const items = Object.keys(DRAFT_FORMS).map(t => {
+    try{ const r = JSON.parse(localStorage.getItem(DRAFT_KEY(t)) || "null"); return r ? { t, r } : null; }catch(e){ return null; }
+  }).filter(Boolean);
+  if(!items.length){ bar.style.display = "none"; bar.innerHTML = ""; return; }
+  bar.style.display = "block";
+  bar.innerHTML = items.map(({ t, r }) => `
+    <div class="draft-banner-row">
+      <span>📝 Unsaved <strong>${DRAFT_LABEL[t]}</strong> draft — “${escapeHtml((r.data[DRAFT_TITLE[t]] || "").slice(0, 60))}” · ${new Date(r.t).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>
+      <span><button type="button" class="btn-secondary" onclick="restoreDraft('${t}')">Restore</button>
+      <button type="button" class="btn-secondary" onclick="discardDraft('${t}')">Discard</button></span>
+    </div>`).join("");
+}
+document.addEventListener("input", (e) => {
+  const form = e.target.closest && e.target.closest("form"); if(!form) return;
+  const type = Object.keys(DRAFT_FORMS).find(t => DRAFT_FORMS[t] === form.id); if(!type) return;
+  clearTimeout(draftTimer); draftTimer = setTimeout(() => saveDraft(type), 700);
+});
+showDraftBanner();
+
+// ---- Contributor submissions: choose category / date / slug / featured before approving ----
+const PEND_CATS = [["news","Prose & picture stories → Literature"],["campus","Poetry → Literature"],["academics","Reflection / essay → Philosophy"],["opinion","Reader reflection → The Open Floor"],["events","Session recap → Session Notes"]];
+function renderPending(){
+  const list = document.getElementById("pending-list");
+  if(!pendingItems.length){
+    list.innerHTML = `<div class="manage-empty">No submissions waiting for review.</div>`;
+    return;
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  list.innerHTML = pendingItems.map(sub => `
+    <div class="pending-review-item">
+      <div class="pending-review-head">
+        <div>
+          <h4>${escapeHtml(sub.title)}</h4>
+          <div class="submission-meta">By ${escapeHtml(sub.author.username)} (${escapeHtml(sub.author.email)}, ${escapeHtml(sub.author.whatsapp)}) · submitted as ${escapeHtml(CATEGORY_LABELS && CATEGORY_LABELS[sub.category] || sub.category)}</div>
+        </div>
+      </div>
+      <p style="font-family:var(--body); font-style:italic; margin:8px 0;">${escapeHtml(sub.deck)}</p>
+      <div class="pending-review-body">${blockPreviewHTML(sub)}</div>
+      <div class="pending-options">
+        <label>Publish under
+          <select id="pend-cat-${sub.id}">${PEND_CATS.map(([v, l]) => `<option value="${v}"${v === sub.category ? " selected" : ""}>${escapeHtml(l)}</option>`).join("")}</select></label>
+        <label>Publish date <input type="date" id="pend-date-${sub.id}" value="${today}"></label>
+        <label>URL slug <input type="text" id="pend-slug-${sub.id}" value="${escapeHtml(sub.slug || slugify(sub.title))}"></label>
+        <label class="pend-check"><input type="checkbox" id="pend-feat-${sub.id}"> Feature on the homepage</label>
+      </div>
+      <div class="pending-review-actions">
+        <button type="button" class="btn-approve" onclick="approveSubmission('${sub.id}')">✅ Approve &amp; Publish</button>
+        <button type="button" class="btn-reject" onclick="rejectSubmission('${sub.id}')">✕ Decline</button>
+      </div>
+    </div>`).join("");
+}
+
+async function approveSubmission(id){
+  const auth = requireAuth("pending-status");
+  if(!auth) return;
+  const slug = val("pend-slug-" + id);
+  if(!SLUG_RE.test(slug)){ showStatus("pending-status", "error", "⚠ The URL slug can only contain lowercase letters, numbers and single hyphens."); return; }
+  if(!confirm("Publish this article to the live site?")) return;
+  showStatus("pending-status", "working", "Publishing…");
+  try{
+    const res = await fetch("/api/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: auth.username, password: auth.password, id, action: "approve",
+        category: val("pend-cat-" + id), date: val("pend-date-" + id), slugOverride: slug,
+        featured: document.getElementById("pend-feat-" + id).checked
+      })
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "Couldn't publish this article.");
+    showStatus("pending-status", "success", "✅ Published. Your site will rebuild within about a minute.");
+    loadPending();
+  } catch(e){
+    showStatus("pending-status", "error", "⚠ " + e.message);
+  }
+}
+
   document.getElementById("p-date").valueAsDate = new Date();
   document.getElementById("v-date").valueAsDate = new Date();
   document.getElementById("ev-date").valueAsDate = new Date();
@@ -121,6 +407,12 @@
   }
 
   async function callPublishApi(payload){
+    const r = await callPublishApiRaw(payload);
+    if(r && r.data && r.data.ok) clearDraft(payload.type);
+    return r;
+  }
+
+  async function callPublishApiRaw(payload){
     const res = await fetch("/api/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -305,9 +597,11 @@
   // field. Paragraphs keep their sanitized inline formatting (bold/italic/
   // links); this is the same allowlist sanitizeInlineHTML() enforces on
   // write.html, so pasted content can't smuggle anything else in here either.
-  function extractStaffBody(){
-    const editorEl = document.getElementById("p-body-editor");
+  function extractStaffBody(){ return extractBody(document.getElementById("p-body-editor")); }
+
+  function extractBody(editorEl){
     const body = [];
+    if(!editorEl) return body;
     Array.from(editorEl.childNodes).forEach(node => {
       if(node.nodeType === Node.TEXT_NODE){
         const t = node.textContent.trim();
@@ -364,7 +658,10 @@
     const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim()).filter(Boolean);
     const featured = document.getElementById("p-featured").checked;
     const body = extractStaffBody();
-    return { slug, category, featured, title, deck, author, date, readTime, image, imageCaption, tags, body: body.length ? body : ["Your story body will appear here."] };
+    const out = { slug, category, featured, title, deck, author, date, readTime, image, imageCaption, tags, body: body.length ? body : ["Your story body will appear here."], ...readUrdu("post") };
+    const bodyUr = extractBody(document.getElementById("p-body-ur-editor"));
+    if(bodyUr.length) out.body_ur = bodyUr;
+    return out;
   }
 
   function renderPreview(){
@@ -432,9 +729,11 @@
     const deck = document.getElementById("v-deck").value || "Your video description will appear here.";
     const author = document.getElementById("v-author").value || "Soul & Script Media Team";
     const date = document.getElementById("v-date").value || new Date().toISOString().slice(0,10);
-    const youtubeId = document.getElementById("v-youtube").value || "dQw4w9WgXcQ";
-    const thumbnail = `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
-    return { slug, title, deck, author, date, youtubeId, thumbnail };
+    const youtubeId = parseYouTubeId(document.getElementById("v-youtube").value) || "dQw4w9WgXcQ";
+    const customThumb = (document.getElementById("v-thumb").value || "").trim();
+    const thumbnail = customThumb || `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+    const tags = document.getElementById("v-tags").value.split(",").map(t => t.trim()).filter(Boolean);
+    return { slug, title, deck, author, date, youtubeId, thumbnail, tags, ...readUrdu("video") };
   }
 
   function renderVideoPreview(){
@@ -456,7 +755,7 @@
     const photo = uploadFile
       ? (document.getElementById("tm-image-preview-img").src || "")
       : (document.getElementById("tm-photo").value || "");
-    return { slug, name, role, team, order, bio, photo };
+    return { slug, name, role, team, order, bio, photo, ...readUrdu("team") };
   }
 
   function renderTeamPreview(){
@@ -528,7 +827,7 @@
     const image = uploadFile
       ? (document.getElementById("ph-image-preview-img").src || "")
       : (document.getElementById("ph-image").value || "");
-    return { slug, title, caption, author, date, tags, image };
+    return { slug, title, caption, author, date, tags, image, ...readUrdu("photo") };
   }
 
   function readEventForm(){
@@ -550,6 +849,7 @@
     if(endDate) event.endDate = endDate;
     if(status) event.status = status;
     if(image) event.image = image;
+    Object.assign(event, readUrdu("event"));
     return event;
   }
 
@@ -593,7 +893,7 @@
       showStatus("p-status", "error", "Please add a headline first.");
       return;
     }
-    const post = readPostForm();
+    const post = prepare("post"); if(!post) return;
     if(!post.slug){
       showStatus("p-status", "error", "Please add a headline or slug first.");
       return;
@@ -654,7 +954,8 @@
       showStatus("v-status", "error", "Please add a video title first.");
       return;
     }
-    const v = readVideoForm();
+    const v = prepare("video"); if(!v) return;
+    if(!document.getElementById("v-thumb").value.trim()) v.thumbnail = await pickYouTubeThumb(v.youtubeId);
 
     const btn = document.getElementById("v-publish-btn");
     btn.disabled = true;
@@ -702,7 +1003,7 @@
       return;
     }
     const uploadFile = document.getElementById("ph-image-file").files[0];
-    const p = readPhotoForm();
+    const p = prepare("photo"); if(!p) return;
     if(!uploadFile && !p.image){
       showStatus("ph-status", "error", "Please add a photo — upload one or paste an image URL.");
       return;
@@ -768,7 +1069,7 @@
       return;
     }
     const uploadFile = document.getElementById("ev-image-file").files[0];
-    const ev = readEventForm();
+    const ev = prepare("event"); if(!ev) return;
     if(!ev.slug){
       showStatus("ev-status-msg", "error", "Please add a title or slug first.");
       return;
@@ -826,7 +1127,7 @@
       return;
     }
     const uploadFile = document.getElementById("tm-image-file").files[0];
-    const m = readTeamForm();
+    const m = prepare("team"); if(!m) return;
 
     const btn = document.getElementById("tm-publish-btn");
     btn.disabled = true;
@@ -934,6 +1235,7 @@
   function editTeamMember(slug){
     const m = findTeamMember(slug);
     if(!m) return;
+    afterEdit("team", m);
     setMode("team");
     document.getElementById("tm-name").value = m.name || "";
     document.getElementById("tm-slug").value = m.slug || "";
@@ -980,6 +1282,7 @@
   function editPost(slug){
     const post = findPost(slug);
     if(!post) return;
+    afterEdit("post", post);
     setMode("post");
     document.getElementById("p-category").value = post.category || "news";
     document.getElementById("p-title").value = post.title || "";
@@ -1006,6 +1309,7 @@
   function editVideo(slug){
     const v = findVideo(slug);
     if(!v) return;
+    afterEdit("video", v);
     setMode("video");
     document.getElementById("v-title").value = v.title || "";
     document.getElementById("v-slug").value = v.slug || "";
@@ -1022,6 +1326,7 @@
   function editPhoto(slug){
     const p = findPhoto(slug);
     if(!p) return;
+    afterEdit("photo", p);
     setMode("photo");
     document.getElementById("ph-title").value = p.title || "";
     document.getElementById("ph-slug").value = p.slug || "";
@@ -1042,6 +1347,7 @@
   function editEvent(slug){
     const ev = findEvent(slug);
     if(!ev) return;
+    afterEdit("event", ev);
     setMode("event");
     document.getElementById("ev-title").value = ev.title || "";
     document.getElementById("ev-slug").value = ev.slug || "";
@@ -1203,50 +1509,7 @@
     }
   }
 
-  function renderPending(){
-    const list = document.getElementById("pending-list");
-    if(!pendingItems.length){
-      list.innerHTML = `<div class="manage-empty">No submissions waiting for review.</div>`;
-      return;
-    }
-    list.innerHTML = pendingItems.map(sub => `
-      <div class="pending-review-item">
-        <div class="pending-review-head">
-          <div>
-            <h4>${escapeHtml(sub.title)}</h4>
-            <div class="submission-meta">By ${escapeHtml(sub.author.username)} (${escapeHtml(sub.author.email)}, ${escapeHtml(sub.author.whatsapp)}) · ${escapeHtml(CATEGORY_LABELS && CATEGORY_LABELS[sub.category] || sub.category)}</div>
-          </div>
-        </div>
-        <p style="font-family:var(--body); font-style:italic; margin:8px 0;">${escapeHtml(sub.deck)}</p>
-        <div class="pending-review-body">${blockPreviewHTML(sub)}</div>
-        <div class="pending-review-actions">
-          <button type="button" class="btn-approve" onclick="approveSubmission('${sub.id}')">✅ Approve &amp; Publish</button>
-          <button type="button" class="btn-reject" onclick="rejectSubmission('${sub.id}')">✕ Decline</button>
-        </div>
-      </div>`).join("");
-  }
-
-  async function approveSubmission(id){
-    const auth = requireAuth("pending-status");
-    if(!auth) return;
-    if(!confirm("Publish this article to the live site?")) return;
-    showStatus("pending-status", "working", "Publishing…");
-    try{
-      const res = await fetch("/api/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, id, action: "approve" })
-      });
-      const data = await res.json();
-      if(!data.ok) throw new Error(data.error || "Couldn't publish this article.");
-      showStatus("pending-status", "success", "✅ Published. Your site will rebuild within about a minute.");
-      loadPending();
-    } catch(e){
-      showStatus("pending-status", "error", "⚠ " + e.message);
-    }
-  }
-
-  async function rejectSubmission(id){
+      async function rejectSubmission(id){
     const auth = requireAuth("pending-status");
     if(!auth) return;
     const reviewNote = prompt("Optional note for the contributor (they'll see this):", "") || "";

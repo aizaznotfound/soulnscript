@@ -12,39 +12,24 @@
 <link rel="stylesheet" href="css/contributor.css">
 <link rel="stylesheet" href="css/write-tool.css">
 <link rel="stylesheet" href="css/theme.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Inter:wght@400;500;600&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/shell.css">
+<link rel="stylesheet" href="css/editor-staff.css">
 </head>
 <body>
 
-<div class="utility-bar">
-  <div class="wrap">
-    <span id="utility-date"></span>
-    <span><span class="divider">|</span>Staff Tool · Not visible to readers</span>
-  </div>
-</div>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="wrap bar">
+  <a class="brand" href="index.html" aria-label="Soul &amp; Script"><span class="quad" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">Soul <i>&amp;</i> Script</span><span class="staff-tag">Editorial Access</span></a>
+  <nav class="staff-links" aria-label="Staff"><a href="index.html">← Back to site</a><a href="poster.html">Poster Studio ↗</a><a href="contribute.html">Reader form ↗</a></nav>
+</div></header>
+<main id="main" class="wrap" style="padding-top:26px;">
 
-<header class="masthead">
-  <div class="wrap">
-    <div class="kicker">Team Only</div>
-    <h1><a href="index.html">Soul <span class="amp">&amp;</span> Script</a></h1>
-    <div class="tagline">Editorial Access</div>
-  </div>
-  <div class="wrap"><div class="pulse-rule-mount"></div></div>
-</header>
-
-<nav class="nav">
-  <div class="wrap">
-    <ul>
-      <li><a href="index.html">← Back to Site</a></li>
-      <li><a href="poster.html">Poster Studio ↗</a></li>
-    </ul>
-  </div>
-</nav>
-
-<main class="wrap" style="padding-top:26px;">
-
-  <div class="page-header" style="text-align:left; border-bottom:3px solid var(--rule-strong); padding-bottom:20px;">
-    <h1 style="font-size:2.2rem;">Publish New Content</h1>
-    <p style="max-width:none;">Log in, fill in the form, check the live preview, then hit <strong>Publish</strong>. It goes straight to the site — no file uploads, no GitHub tokens to manage.</p>
+  <div class="page-header" style="text-align:left; border-bottom:3px solid var(--line-2); padding-bottom:20px;">
+    <h1 style="font-size:2.4rem;">Editorial Access</h1>
+    <p style="max-width:none;">Publish anything the site shows — writing, films, art, events and team members — in English and Urdu. Log in, fill in the form, check the live preview, then hit <strong>Publish</strong>. Edit or remove existing pieces in <em>Manage Existing Content</em> at the bottom.</p>
   </div>
 
   <!-- ============ Login panel ============ -->
@@ -88,10 +73,31 @@
     </div>
   </div>
 
+  <details class="guide-panel">
+    <summary>🧭 Where does each thing appear on the site?</summary>
+    <table class="guide-table">
+      <thead><tr><th>Tab</th><th>Choice</th><th>Appears in</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="5"><strong>Writing</strong></td><td>Prose</td><td>Literature room · The Library · “Fresh across the house”</td></tr>
+        <tr><td>Poetry</td><td>Literature room · The Library</td></tr>
+        <tr><td>Reflection</td><td>Philosophy room · The Library</td></tr>
+        <tr><td>Reader Reflection</td><td>The Open Floor + Philosophy room · The Library</td></tr>
+        <tr><td>Session Recap</td><td>Session Notes · The Library</td></tr>
+        <tr><td><strong>Video</strong></td><td>—</td><td>Cinema room (and the Cinema door on the homepage)</td></tr>
+        <tr><td><strong>Art piece</strong></td><td>—</td><td>Art room · The Wall (with zoom viewer)</td></tr>
+        <tr><td><strong>Event</strong></td><td>—</td><td>Events page — “Active” or “Past” automatically from the dates</td></tr>
+        <tr><td><strong>Team member</strong></td><td>—</td><td>Team page, inside the group you pick</td></tr>
+      </tbody>
+    </table>
+    <p class="helper-text" style="margin:10px 0 0;">Every piece also shows up in site search, and the author’s name builds their card on <em>Voices</em>. Tags on writing feed the <em>Themes</em> page. The <strong>Urdu version</strong> box on each form is optional — fill it so readers who switch to اردو see Urdu text; leave it blank and they’ll see the English.</p>
+  </details>
+
+  <div id="draft-banner" class="draft-banner" style="display:none;"></div>
+
   <div class="editor-tabs">
-    <button type="button" class="active" data-mode="post" onclick="setMode('post')">Writing</button>
-    <button type="button" data-mode="video" onclick="setMode('video')">Video</button>
-    <button type="button" data-mode="photo" onclick="setMode('photo')">Gallery Piece</button>
+    <button type="button" class="active" data-mode="post" onclick="setMode('post')">Writing <span class="tab-room">Literature · Philosophy</span></button>
+    <button type="button" data-mode="video" onclick="setMode('video')">Video <span class="tab-room">Cinema</span></button>
+    <button type="button" data-mode="photo" onclick="setMode('photo')">Art Piece <span class="tab-room">Art · Wall</span></button>
     <button type="button" data-mode="event" onclick="setMode('event')">Event</button>
     <button type="button" data-mode="team" onclick="setMode('team')">Team Member</button>
   </div>
@@ -103,12 +109,13 @@
         <div class="form-field">
           <label for="p-category">Category</label>
           <select id="p-category">
-            <option value="news">Prose &amp; Picture Stories</option>
-            <option value="campus">Poetry</option>
-            <option value="academics">Philosophy &amp; Reflections</option>
-            <option value="events">Session Recap</option>
-            <option value="opinion">Reader Reflection</option>
+            <option value="news">Prose &amp; picture stories → Literature</option>
+            <option value="campus">Poetry → Literature</option>
+            <option value="academics">Reflection / essay → Philosophy</option>
+            <option value="opinion">Reader reflection → The Open Floor</option>
+            <option value="events">Session recap → Session Notes</option>
           </select>
+          <p class="helper-text where-note" id="p-where"></p>
         </div>
         <div class="form-field">
           <label for="p-title">Headline</label>
@@ -157,7 +164,7 @@
           <input type="text" id="p-tags" placeholder="e.g. Poetry, Open Mic, Sketch">
         </div>
         <div class="form-field">
-          <label><input type="checkbox" id="p-featured" style="width:auto; display:inline-block; margin-right:8px;"> Feature this on the homepage lead story rotation</label>
+          <label><input type="checkbox" id="p-featured" style="width:auto; display:inline-block; margin-right:8px;"> Feature this as the lead story on the homepage (Literature section)</label>
         </div>
         <div class="form-field">
           <label for="p-body-editor">Story Body</label>
@@ -180,6 +187,22 @@
           </div>
           <p class="helper-text">Editing an existing article? Its old paragraphs load right into this box, formatting and all.</p>
         </div>
+        <details class="ur-block" id="p-ur-block"><summary>🌐 Urdu version <small>(optional — shown when readers switch to اردو)</small></summary>
+          <p class="helper-text">Leave a field blank and Urdu readers see the English text for it.</p>
+          <div class="form-field"><label for="p-title-ur">Headline (Urdu)</label><input type="text" id="p-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="p-deck-ur">Subheading / Deck (Urdu)</label><textarea id="p-deck-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="p-author-ur">Author name (Urdu)</label><input type="text" id="p-author-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="p-readtime-ur">Read time (Urdu)</label><input type="text" id="p-readtime-ur" class="ur-input" dir="rtl" lang="ur" placeholder="مثلاً ۴ منٹ"></div><div class="form-field"><label for="p-caption-ur">Image caption (Urdu)</label><input type="text" id="p-caption-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="p-body-ur-editor">Story body (Urdu)</label>
+            <div class="rte-field">
+              <div class="rte-toolbar">
+                <button type="button" id="pu-bold" title="Bold (Ctrl+B)"><b>B</b></button>
+                <button type="button" id="pu-italic" title="Italic (Ctrl+I)"><i>I</i></button>
+                <button type="button" id="pu-link" title="Add link (Ctrl+K)">🔗</button>
+                <span class="rte-sep"></span>
+                <button type="button" id="pu-heading" title="Turn this line into a heading">H</button>
+                <span class="rte-counts" id="pu-counts">0 words</span>
+              </div>
+              <div class="rte-editor ur-body" id="p-body-ur-editor" contenteditable="true" dir="rtl" lang="ur" data-placeholder="اردو متن یہاں لکھیں — انگریزی متن کے متوازی پیراگراف۔"></div>
+            </div>
+            <p class="helper-text">Write the Urdu text paragraph by paragraph. If you leave this empty, Urdu readers see the English body.</p></div>
+        </details>
         <div class="gh-actions">
           <button type="button" class="btn" id="p-publish-btn" onclick="publishPost()">🚀 Publish to Site</button>
           <button type="button" class="btn-secondary" onclick="downloadPost()">⬇ Download File Instead</button>
@@ -222,10 +245,22 @@
           <input type="date" id="v-date">
         </div>
         <div class="form-field">
-          <label for="v-youtube">YouTube Video ID</label>
-          <input type="text" id="v-youtube" required placeholder="the part after watch?v= in the YouTube URL">
+          <label for="v-youtube">YouTube link or video ID</label>
+          <input type="text" id="v-youtube" required placeholder="Paste the YouTube link, e.g. https://youtu.be/abc123XYZ_0 — or just the ID">
         </div>
-        <p class="helper-text">Thumbnail is generated automatically from the YouTube video ID.</p>
+        <div class="form-field">
+          <label for="v-tags">Tags (comma separated)</label>
+          <input type="text" id="v-tags" placeholder="e.g. Short Film, Session Recording">
+        </div>
+        <div class="form-field">
+          <label for="v-thumb">Custom thumbnail URL (optional)</label>
+          <input type="text" id="v-thumb" placeholder="Leave blank to use the YouTube thumbnail">
+        </div>
+        <p class="helper-text">The thumbnail comes from YouTube automatically (HD if the video has one, standard quality otherwise).</p>
+        <details class="ur-block" id="v-ur-block"><summary>🌐 Urdu version <small>(optional — shown when readers switch to اردو)</small></summary>
+          <p class="helper-text">Leave a field blank and Urdu readers see the English text for it.</p>
+          <div class="form-field"><label for="v-title-ur">Title (Urdu)</label><input type="text" id="v-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="v-deck-ur">Description (Urdu)</label><textarea id="v-deck-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="v-author-ur">Credit (Urdu)</label><input type="text" id="v-author-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div>
+        </details>
         <div class="gh-actions">
           <button type="button" class="btn" id="v-publish-btn" onclick="publishVideo()">🚀 Publish to Site</button>
           <button type="button" class="btn-secondary" onclick="downloadVideo()">⬇ Download File Instead</button>
@@ -285,6 +320,10 @@
           <input type="text" id="ph-tags" placeholder="e.g. Campus, Aerial, Convocation">
         </div>
         <p class="helper-text">Photo posts are image-only — no article body. Great for a standalone shot that doesn't need a full story around it.</p>
+        <details class="ur-block" id="ph-ur-block"><summary>🌐 Urdu version <small>(optional — shown when readers switch to اردو)</small></summary>
+          <p class="helper-text">Leave a field blank and Urdu readers see the English text for it.</p>
+          <div class="form-field"><label for="ph-title-ur">Title (Urdu)</label><input type="text" id="ph-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="ph-caption-ur">Caption (Urdu)</label><textarea id="ph-caption-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="ph-author-ur">Artist / credit (Urdu)</label><input type="text" id="ph-author-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div>
+        </details>
         <div class="gh-actions">
           <button type="button" class="btn" id="ph-publish-btn" onclick="publishPhoto()">🚀 Publish to Site</button>
           <button type="button" class="btn-secondary" onclick="downloadPhoto()">⬇ Download File Instead</button>
@@ -364,6 +403,10 @@
           </div>
         </div>
         <p class="helper-text">Events show under <strong>Active Events</strong> automatically while today falls within the start/end dates, then move to <strong>Past Events</strong> on their own — no need to come back and edit anything when one ends. Use the Status dropdown only to override that (e.g. an open-ended call for submissions with no fixed end date).</p>
+        <details class="ur-block" id="ev-ur-block"><summary>🌐 Urdu version <small>(optional — shown when readers switch to اردو)</small></summary>
+          <p class="helper-text">Leave a field blank and Urdu readers see the English text for it.</p>
+          <div class="form-field"><label for="ev-title-ur">Title (Urdu)</label><input type="text" id="ev-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="ev-description-ur">Description (Urdu)</label><textarea id="ev-description-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="ev-location-ur">Location (Urdu)</label><input type="text" id="ev-location-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div>
+        </details>
         <div class="gh-actions">
           <button type="button" class="btn" id="ev-publish-btn" onclick="publishEvent()">🚀 Publish to Site</button>
           <button type="button" class="btn-secondary" onclick="downloadEvent()">⬇ Download File Instead</button>
@@ -430,6 +473,10 @@
             <input type="text" id="tm-photo" placeholder="https://...">
           </div>
         </div>
+        <details class="ur-block" id="tm-ur-block"><summary>🌐 Urdu version <small>(optional — shown when readers switch to اردو)</small></summary>
+          <p class="helper-text">Leave a field blank and Urdu readers see the English text for it.</p>
+          <div class="form-field"><label for="tm-name-ur">Name (Urdu)</label><input type="text" id="tm-name-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="tm-role-ur">Role (Urdu)</label><input type="text" id="tm-role-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="tm-bio-ur">Short bio (Urdu)</label><textarea id="tm-bio-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div>
+        </details>
         <div class="gh-actions">
           <button type="button" class="btn" id="tm-publish-btn" onclick="publishTeamMember()">🚀 Publish to Site</button>
           <button type="button" class="btn-secondary" onclick="downloadTeamMember()">⬇ Download File Instead</button>
@@ -470,7 +517,7 @@
     <strong>Prefer to do it manually instead?</strong>
     <ol style="margin:10px 0 0; padding-left:20px; font-family:var(--body);">
       <li style="margin-bottom:6px;">Click <strong>"⬇ Download File Instead"</strong> — it saves one small file, e.g. <code>your-title.json</code>.</li>
-      <li style="margin-bottom:6px;">On <a href="https://github.com" target="_blank" rel="noopener">github.com</a>, open the matching content folder — <code>content/posts</code>, <code>content/videos</code>, <code>content/photos</code>, or <code>content/team</code> — → <strong>Add file → Upload files</strong> → drop in the file → <strong>Commit changes</strong>.</li>
+      <li style="margin-bottom:6px;">On <a href="https://github.com" target="_blank" rel="noopener">github.com</a>, open the matching content folder — <code>content/posts</code>, <code>content/videos</code>, <code>content/photos</code>, <code>content/events</code>, or <code>content/team</code> — → <strong>Add file → Upload files</strong> → drop in the file → <strong>Commit changes</strong>.</li>
       <li>Cloudflare Pages redeploys automatically — check your live site in about a minute.</li>
     </ol>
   </div>

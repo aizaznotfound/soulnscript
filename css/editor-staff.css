@@ -1,0 +1,48 @@
+/* =========================================================
+   SOUL & SCRIPT — editor-staff.css
+   Editorial Access page: staff header, posting guide, Urdu
+   blocks, draft banner, approval options. Loaded after
+   shell.css on editor.html only.
+   ========================================================= */
+body{ background-color:var(--paper); }
+.site-header .bar{ min-height:64px; }
+.staff-tag{ font:600 11px/1 var(--f-ui); letter-spacing:.12em; text-transform:uppercase; background:var(--ink); color:var(--paper); padding:6px 11px; border-radius:999px; margin-inline-start:8px; }
+.staff-links{ display:flex; gap:22px; align-items:center; font:500 14px var(--f-ui); color:var(--ink-2); }
+.staff-links a:hover{ color:var(--art); }
+@media (max-width:640px){ .staff-links{ gap:14px; font-size:13px; } .staff-tag{ display:none; } }
+
+/* posting guide */
+.guide-panel{ background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 20px; margin-bottom:22px; }
+.guide-panel summary{ cursor:pointer; font:600 15px var(--f-ui); }
+.guide-table{ width:100%; border-collapse:collapse; margin-top:14px; font:400 14.5px/1.45 var(--f-ui); }
+.guide-table th{ text-align:start; font:600 11px var(--f-ui); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); padding:8px 10px; border-bottom:2px solid var(--line-2); }
+.guide-table td{ padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+.guide-table td[rowspan]{ border-inline-end:1px solid var(--line); }
+
+/* tabs: show where each tab publishes to */
+.editor-tabs button{ display:inline-flex; flex-direction:column; align-items:flex-start; gap:3px; line-height:1.2; }
+.tab-room{ font:500 10.5px var(--f-ui); letter-spacing:.06em; text-transform:uppercase; opacity:.7; }
+.where-note{ margin-top:6px; color:var(--phil); }
+
+/* Urdu version blocks */
+.ur-block{ border:1px solid var(--line-2); border-radius:var(--r); background:var(--card); padding:14px 18px; margin:22px 0; }
+.ur-block summary{ cursor:pointer; font:600 15px var(--f-ui); }
+.ur-block summary small{ font-weight:400; color:var(--ink-3); }
+.ur-block[open] summary{ margin-bottom:12px; }
+.ur-input,.ur-body{ direction:rtl; text-align:right; font-family:'Noto Nastaliq Urdu',serif; line-height:2.1; }
+.ur-input{ font-size:18px; }
+.ur-body{ min-height:200px; font-size:19px; }
+.ur-body:empty:before{ content:attr(data-placeholder); color:var(--ink-3); }
+
+/* draft banner */
+.draft-banner{ background:#FFF6DD; border:1px solid #E5CF8E; border-radius:var(--r); padding:12px 16px; margin-bottom:18px; font:400 14.5px var(--f-ui); }
+.draft-banner-row{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; padding:6px 0; }
+.draft-banner-row + .draft-banner-row{ border-top:1px solid #EBDCA8; }
+.draft-banner .btn-secondary{ padding:7px 14px; font-size:13px; }
+
+/* approval options on contributor submissions */
+.pending-options{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px 18px; background:var(--paper-2); border-radius:var(--r); padding:14px 16px; margin:14px 0 6px; }
+.pending-options label{ font:600 12px var(--f-ui); letter-spacing:.03em; color:var(--ink-2); margin:0; }
+.pending-options select,.pending-options input[type=text],.pending-options input[type=date]{ margin-top:6px; padding:9px 11px; font-size:14px; }
+.pending-options .pend-check{ display:flex; align-items:center; gap:8px; align-self:end; padding-bottom:8px; }
+.pending-options .pend-check input{ width:auto; margin:0; }

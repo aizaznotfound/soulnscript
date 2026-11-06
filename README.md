@@ -264,3 +264,14 @@ Site-wide search (header icon or the `/` key) lives in `js/search.js`. The heade
 - `js/toc.js` builds the sticky contents list on any page with 3+ headings in its `.article-body` (currently About).
 - `favicon.svg`, theme-colour and basic Open Graph tags are in every page head. For rich WhatsApp/Twitter previews add an absolute `og:image` URL once the domain is final.
 - Print styles hide the header, footer and share bar so articles print cleanly.
+
+## Editorial Access (`editor.html`)
+
+Covers every kind of posting the site shows: **Writing** (5 categories → Literature / Philosophy / Open Floor / Session Notes), **Video** (Cinema), **Art piece** (Art + The Wall), **Event**, **Team member**, plus review of contributor submissions and edit/delete of existing content.
+
+- Each form has an optional **Urdu version** box (`title_ur`, `deck_ur`, `body_ur`, …). Blank = readers see English.
+- Re-publishing an edited piece keeps any fields the form doesn't model (only the fields it does model can be cleared).
+- Publishing is validated first (headline, English slug, deck, author, body; valid YouTube link; image for art; dates for events).
+- YouTube field accepts a normal link; the thumbnail falls back to standard quality when the video has no HD one.
+- Drafts autosave in this browser (restore banner after a reload) and clear after a successful publish.
+- Contributor submissions can be re-categorised, dated, re-slugged and featured when approving.
