@@ -356,16 +356,35 @@ async function approveSubmission(id){
     return res;
   }
 
+  // Show the login screen OR the workspace — never both. While logged out the
+  // whole workspace is hidden AND inert (can't be focused or clicked).
+  function renderGate(){
+    const authed = session.loggedIn;
+    document.getElementById("login-screen").hidden = authed;
+    document.getElementById("login-checking").hidden = true;
+    document.getElementById("login-form-wrap").hidden = authed;
+    const ws = document.getElementById("workspace");
+    ws.hidden = !authed;
+    ws.inert = !authed;
+    document.body.classList.toggle("is-authed", authed);
+    document.getElementById("session-user").textContent = authed && session.username ? `Signed in as ${session.username}` : "";
+    if(!authed){
+      const pw = document.getElementById("login-password");
+      const user = document.getElementById("login-username");
+      (user.value ? pw : user).focus({ preventScroll: true });
+    }
+  }
+
   function applySession(info){
     session = info && info.loggedIn ? { loggedIn: true, username: info.username || "", expiresAt: info.expiresAt || 0 } : { loggedIn: false, username: "", expiresAt: 0 };
     setLoginStatusPill(session.loggedIn);
+    renderGate();
     if(session.loggedIn){ lastActive = Date.now(); startIdleWatch(); }
     else { stopIdleWatch(); }
   }
   function sessionEnded(message){
     applySession(null);
     showStatus("login-status", "error", "🔒 " + message);
-    document.getElementById("login-panel-body").style.display = "block";
     clearSensitiveLists();
   }
   function clearSensitiveLists(){
@@ -422,21 +441,17 @@ async function approveSubmission(id){
     document.getElementById("login-password").value = "";
     applySession(null);
     clearSensitiveLists();
-    if(typeof message === "string" && message){ showStatus("login-status", "error", "🔒 " + message); document.getElementById("login-panel-body").style.display = "block"; }
-    else hideStatus("login-status");
+    if(typeof message === "string" && message){ showStatus("login-status", "error", "🔒 " + message); }
+    else { hideStatus("login-status"); setTimeout(() => location.reload(), 60); }   // explicit logout: wipe everything on screen
   }
 
-  document.getElementById("login-panel-toggle").addEventListener("click", () => {
-    const body = document.getElementById("login-panel-body");
-    body.style.display = body.style.display === "none" ? "block" : "none";
-  });
   ["login-username", "login-password"].forEach(id => document.getElementById(id).addEventListener("keydown", (e) => { if(e.key === "Enter"){ e.preventDefault(); doLogin(); } }));
 
   function requireAuth(statusElId){
     if(!session.loggedIn){
-      showStatus(statusElId, "error", "⚠ Please log in first — open the <strong>Staff Login</strong> panel above.");
-      document.getElementById("login-panel-body").style.display = "block";
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      showStatus(statusElId, "error", "⚠ Please log in first.");
+      renderGate();
+      window.scrollTo({ top: 0 });
       return null;
     }
     return session;

@@ -51,3 +51,20 @@ body{ background-color:var(--paper); }
 .audit-bad td{ color:#8A1F1F; font-weight:600; background:#FBEDEA; }
 .audit-warn td{ background:#FFF6DD; }
 .audit-ok td:nth-child(2){ color:var(--phil); font-weight:600; }
+
+/* ===== Login gate: login screen first, workspace only after login ===== */
+[hidden]{ display:none !important; }
+.staff-only{ display:none; }
+body.is-authed .staff-only{ display:inline; }
+.login-screen{ min-height:62vh; display:grid; place-items:center; padding:7vh 0 4vh; }
+.login-card{ width:100%; max-width:460px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:38px 36px 30px; box-shadow:0 18px 40px -24px rgba(27,26,23,.35); }
+.login-eyebrow{ color:var(--art); margin-bottom:10px; }
+.login-card h1{ font:700 2.1rem/1.1 var(--f-display); letter-spacing:-.025em; margin:0 0 8px; }
+.login-lede{ color:var(--ink-2); font:400 16px/1.5 var(--f-body); margin:0 0 24px; }
+.login-checking{ color:var(--ink-3); font:500 14px var(--f-ui); padding:12px 0; }
+.login-submit{ width:100%; justify-content:center; margin-top:6px; padding:14px 20px; }
+.login-note{ margin:18px 0 0; font-size:13px; line-height:1.55; }
+.login-error{ color:#8A1F1F; font:600 14px var(--f-ui); }
+.session-bar{ display:flex; align-items:center; justify-content:flex-end; gap:14px; flex-wrap:wrap; padding:10px 0 18px; font:500 14px var(--f-ui); color:var(--ink-2); }
+.session-user{ margin-inline-end:auto; }
+@media (max-width:560px){ .login-card{ padding:28px 22px 24px; } }

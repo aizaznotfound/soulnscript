@@ -25,39 +25,47 @@
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="wrap bar">
   <a class="brand" href="index.html" aria-label="Soul &amp; Script"><span class="quad" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">Soul <i>&amp;</i> Script</span><span class="staff-tag">Editorial Access</span></a>
-  <nav class="staff-links" aria-label="Staff"><a href="index.html">← Back to site</a><a href="poster.html">Poster Studio ↗</a><a href="contribute.html">Reader form ↗</a></nav>
+  <nav class="staff-links" aria-label="Staff"><a href="index.html">← Back to site</a><a class="staff-only" href="poster.html">Poster Studio ↗</a><a class="staff-only" href="contribute.html">Reader form ↗</a></nav>
 </div></header>
 <main id="main" class="wrap" style="padding-top:26px;">
 
-  <div class="page-header" style="text-align:left; border-bottom:3px solid var(--line-2); padding-bottom:20px;">
-    <h1 style="font-size:2.4rem;">Editorial Access</h1>
-    <p style="max-width:none;">Publish anything the site shows — writing, films, art, events and team members — in English and Urdu. Log in, fill in the form, check the live preview, then hit <strong>Publish</strong>. Edit or remove existing pieces in <em>Manage Existing Content</em> at the bottom.</p>
-  </div>
+  <!-- ============ LOGIN SCREEN — the only thing visible until you are logged in ============ -->
+  <section id="login-screen" class="login-screen" aria-labelledby="login-title">
+    <div class="login-card">
+      <p class="eyebrow login-eyebrow">Staff only</p>
+      <h1 id="login-title">Editorial Access</h1>
+      <p class="login-lede">Log in to publish and manage content for Soul &amp; Script.</p>
 
-  <!-- ============ Login panel ============ -->
-  <div class="gh-panel" id="login-panel">
-    <div class="gh-panel-head" id="login-panel-toggle">
-      <h3>🔐 Staff Login</h3>
-      <span class="gh-status-pill disconnected" id="login-status-pill">Not logged in</span>
-    </div>
-    <div class="gh-panel-body" id="login-panel-body">
-      <div class="gh-row">
+      <div id="login-checking" class="login-checking" role="status">Checking your session…</div>
+      <noscript><p class="login-error">JavaScript is required to use Editorial Access.</p></noscript>
+
+      <div id="login-form-wrap" hidden>
         <div class="form-field">
           <label for="login-username">Username</label>
-          <input type="text" id="login-username" autocomplete="username" placeholder="Username">
+          <input type="text" id="login-username" autocomplete="username" placeholder="Username" autocapitalize="none" spellcheck="false">
         </div>
         <div class="form-field">
           <label for="login-password">Password</label>
           <input type="password" id="login-password" autocomplete="current-password" placeholder="Password">
         </div>
+        <button type="button" class="btn login-submit" data-action="doLogin">Log in</button>
+        <div id="login-status" class="publish-status" role="alert"></div>
+        <p class="helper-text login-note">🔒 Your password is checked once and never kept in this browser. You stay logged in for up to 4 hours and are logged out automatically after 30 minutes of inactivity. Five wrong attempts lock this connection out for 15 minutes.</p>
       </div>
-      <div class="gh-actions">
-        <button type="button" class="btn" data-action="doLogin">Log In</button>
-        <button type="button" class="btn-secondary" data-action="doLogout">Log Out</button>
-      </div>
-      <p class="helper-text" style="margin:12px 0 0;">🔒 Your password is checked once and never kept in this browser. You stay logged in for up to 4 hours, and are logged out automatically after 30 minutes of inactivity. Five wrong attempts lock this connection out for 15 minutes. Always log out on a shared computer.</p>
-      <div id="login-status" class="publish-status"></div>
     </div>
+  </section>
+
+  <!-- ============ WORKSPACE — everything else; hidden and inert until logged in ============ -->
+  <div id="workspace" hidden inert>
+    <div class="session-bar">
+      <span class="gh-status-pill disconnected" id="login-status-pill">Not logged in</span>
+      <span id="session-user" class="session-user"></span>
+      <button type="button" class="btn-secondary" data-action="doLogout">Log out</button>
+    </div>
+
+  <div class="page-header" style="text-align:left; border-bottom:3px solid var(--line-2); padding-bottom:20px;">
+    <h1 style="font-size:2.4rem;">Editorial Access</h1>
+    <p style="max-width:none;">Publish anything the site shows — writing, films, art, events and team members — in English and Urdu. Log in, fill in the form, check the live preview, then hit <strong>Publish</strong>. Edit or remove existing pieces in <em>Manage Existing Content</em> at the bottom.</p>
   </div>
 
   <!-- ============ Security log ============ -->
@@ -534,7 +542,7 @@
   </div>
 
   <p class="helper-text" style="text-align:center; margin:24px 0 60px;">Editing an already-published article? Just publish again with the same headline/slug — it will overwrite the existing one after a confirmation. You can also edit the file directly inside <code>content/posts</code> on GitHub if you prefer.</p>
-
+  </div>
 </main>
 
   <script src="js/content.js"></script>
