@@ -66,7 +66,7 @@
         return `<li><div class="when">${mon}<b>${d.getDate()}</b>${d.getFullYear()}</div>
           <div><h3><a href="article.html?slug=${p.slug}">${escapeHtml(ssField(p, "title"))}</a></h3>
           <p>${escapeHtml(ssField(p, "deck"))}</p>
-          ${p.image ? `<a href="article.html?slug=${p.slug}"><img src="${p.image}" alt="" loading="lazy"></a>` : ""}
+          ${p.image ? `<a href="article.html?slug=${p.slug}"><img src="${escapeHtml(p.image)}" alt="" loading="lazy"></a>` : ""}
           <div class="meta" style="margin-top:12px">${escapeHtml(ssField(p, "author"))}</div></div></li>`;
       }).join("")}</ul>`;
     };
@@ -107,7 +107,7 @@
       shown = sorter(base.filter(p => !query || hay(p).includes(query))); setCount(shown.length);
       mount.className = "wall";
       mount.innerHTML = shown.length ? shown.map((p, i) => `
-        <button class="tile" type="button" data-i="${i}"><div class="plate-frame"><img src="${p.image}" alt="${escapeHtml(ssField(p, "title"))}" loading="lazy"></div>
+        <button class="tile" type="button" data-i="${i}"><div class="plate-frame"><img src="${escapeHtml(p.image)}" alt="${escapeHtml(ssField(p, "title"))}" loading="lazy"></div>
         <span class="cap">${escapeHtml(ssField(p, "title"))}</span></button>`).join("") : empty(query ? ssUi("ui.noSearchResults") : ssUi("ui.noPhotos"));
     };
     mount.addEventListener("click", (e) => {

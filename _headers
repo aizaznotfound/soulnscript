@@ -1,0 +1,29 @@
+# Cloudflare Pages response headers (applies to static pages, not /api functions —
+# those set their own). Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+# ---- Every page ----
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# ---- Editorial Access: strict policy. No inline scripts can run, nothing can
+# ---- connect anywhere except this site, it can't be framed, search engines skip it.
+/editor.html
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+/editor
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+
+# ---- Other staff tool: keep it out of search engines and un-cached ----
+/poster.html
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+/poster
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store

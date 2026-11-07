@@ -50,7 +50,7 @@
     $("home-lit").innerHTML = `
     <div class="lit-grid">
       <article class="lit-lead">
-        ${lead.image ? `<a href="article.html?slug=${lead.slug}"><img src="${lead.image}" alt="${escapeHtml(ssField(lead, "title"))}"></a>` : ""}
+        ${lead.image ? `<a href="article.html?slug=${lead.slug}"><img src="${escapeHtml(lead.image)}" alt="${escapeHtml(ssField(lead, "title"))}"></a>` : ""}
         <span class="tag-pill">${escapeHtml(ssCategory(lead.category))}</span>
         <h3><a href="article.html?slug=${lead.slug}">${escapeHtml(ssField(lead, "title"))}</a></h3>
         <p class="deck">${escapeHtml(ssField(lead, "deck"))}</p>

@@ -18,7 +18,7 @@ function cardHTML(post){
   const title = escapeHtml(ssField(post, "title"));
   const deck = escapeHtml(ssField(post, "deck"));
   const author = escapeHtml(ssField(post, "author"));
-  const thumb = post.image ? `<a href="article.html?slug=${post.slug}"><img src="${post.image}" alt="${title}" loading="lazy"></a>` : "";
+  const thumb = post.image ? `<a href="article.html?slug=${post.slug}"><img src="${escapeHtml(post.image)}" alt="${title}" loading="lazy"></a>` : "";
   return `
   <article class="card${post.image ? "" : " no-image"}">
     ${thumb}
@@ -48,7 +48,7 @@ function heroHTML(post){
   const author = escapeHtml(ssField(post, "author"));
   const media = post.image ? `
   <div class="hero-media">
-    <img src="${post.image}" alt="${title}">
+    <img src="${escapeHtml(post.image)}" alt="${title}">
     ${post.imageCaption ? `<figcaption>${escapeHtml(ssField(post, "imageCaption"))}</figcaption>` : ""}
   </div>` : "";
   return `
@@ -69,7 +69,7 @@ function videoCardHTML(video){
   <article class="card video-card">
     <a href="article.html?video=${video.slug}">
       <div class="thumb">
-        <img src="${video.thumbnail}" alt="${title}" loading="lazy">
+        <img src="${escapeHtml(video.thumbnail)}" alt="${title}" loading="lazy">
         <div class="play"><span>${escapeHtml(ssUi("ui.play"))}</span></div>
       </div>
     </a>
@@ -84,7 +84,7 @@ function photoCardHTML(photo){
   const title = escapeHtml(ssField(photo, "title"));
   return `
   <a class="photo-tile" href="article.html?photo=${photo.slug}">
-    <img src="${photo.image}" alt="${title}" loading="lazy">
+    <img src="${escapeHtml(photo.image)}" alt="${title}" loading="lazy">
     <div class="pt-body">
       <h4>${title}</h4>
       <div class="meta">${formatDate(photo.date)}</div>
@@ -102,7 +102,7 @@ function eventCardHTML(event, active){
   const location = escapeHtml(ssField(event, "location"));
   const when = [formatDate(event.date), event.time ? escapeHtml(event.time) : ""].filter(Boolean).join(" · ");
   const whereLine = [when, location].filter(Boolean).join(" — ");
-  const thumb = event.image ? `<div class="thumb"><img src="${event.image}" alt="${title}" loading="lazy"></div>` : "";
+  const thumb = event.image ? `<div class="thumb"><img src="${escapeHtml(event.image)}" alt="${title}" loading="lazy"></div>` : "";
   const cta = event.link
     ? `<a class="event-cta" href="${event.link}" target="_blank" rel="noopener">${escapeHtml(active ? ssUi("ui.rsvp") : ssUi("ui.learnMore"))} →</a>`
     : "";

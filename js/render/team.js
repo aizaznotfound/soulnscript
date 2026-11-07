@@ -13,7 +13,7 @@ function teamMemberCardHTML(member, index){
   const role = escapeHtml(ssField(member, "role"));
   const bio = escapeHtml(ssField(member, "bio"));
   const initials = (ssField(member, "name") || "?").trim().split(/\s+/).map(w => w[0]).slice(0,2).join("").toUpperCase();
-  const photo = member.photo ? `<img src="${member.photo}" alt="${name}" loading="lazy">` : `<span class="team-avatar-initials">${initials}</span>`;
+  const photo = member.photo ? `<img src="${escapeHtml(member.photo)}" alt="${name}" loading="lazy">` : `<span class="team-avatar-initials">${initials}</span>`;
   const delay = Math.min(index, 8) * 45;
   return `<div class="team-card" style="transition-delay:${delay}ms;"><div class="team-avatar">${photo}</div><h4>${name}</h4>${role ? `<div class="team-role">${role}</div>` : ""}${bio ? `<p class="team-bio">${bio}</p>` : ""}</div>`;
 }

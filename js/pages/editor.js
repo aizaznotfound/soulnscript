@@ -6,7 +6,8 @@
    ========================================================= */
 
   let downloadLog = [];
-  const AUTH_KEY = "gkmc_editor_auth_v1";
+  // Older versions stored the admin password in this browser. Erase it on sight.
+  try{ localStorage.removeItem("gkmc_editor_auth_v1"); }catch(e){}
 
 
 /* =========================================================================
@@ -224,8 +225,8 @@ function showDraftBanner(){
   bar.innerHTML = items.map(({ t, r }) => `
     <div class="draft-banner-row">
       <span>📝 Unsaved <strong>${DRAFT_LABEL[t]}</strong> draft — “${escapeHtml((r.data[DRAFT_TITLE[t]] || "").slice(0, 60))}” · ${new Date(r.t).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>
-      <span><button type="button" class="btn-secondary" onclick="restoreDraft('${t}')">Restore</button>
-      <button type="button" class="btn-secondary" onclick="discardDraft('${t}')">Discard</button></span>
+      <span><button type="button" class="btn-secondary" data-action="restoreDraft" data-arg="${t}">Restore</button>
+      <button type="button" class="btn-secondary" data-action="discardDraft" data-arg="${t}">Discard</button></span>
     </div>`).join("");
 }
 document.addEventListener("input", (e) => {
@@ -262,8 +263,8 @@ function renderPending(){
         <label class="pend-check"><input type="checkbox" id="pend-feat-${sub.id}"> Feature on the homepage</label>
       </div>
       <div class="pending-review-actions">
-        <button type="button" class="btn-approve" onclick="approveSubmission('${sub.id}')">✅ Approve &amp; Publish</button>
-        <button type="button" class="btn-reject" onclick="rejectSubmission('${sub.id}')">✕ Decline</button>
+        <button type="button" class="btn-approve" data-action="approveSubmission" data-arg="${escapeHtml(sub.id)}">✅ Approve &amp; Publish</button>
+        <button type="button" class="btn-reject" data-action="rejectSubmission" data-arg="${escapeHtml(sub.id)}">✕ Decline</button>
       </div>
     </div>`).join("");
 }
@@ -276,11 +277,11 @@ async function approveSubmission(id){
   if(!confirm("Publish this article to the live site?")) return;
   showStatus("pending-status", "working", "Publishing…");
   try{
-    const res = await fetch("/api/review", {
+    const res = await adminFetch("/api/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: auth.username, password: auth.password, id, action: "approve",
+        id, action: "approve",
         category: val("pend-cat-" + id), date: val("pend-date-" + id), slugOverride: slug,
         featured: document.getElementById("pend-feat-" + id).checked
       })
@@ -307,30 +308,27 @@ async function approveSubmission(id){
   }
 
   /* ============ Login handling ============ */
-  function getAuth(){
-    try{ return JSON.parse(localStorage.getItem(AUTH_KEY) || "null"); }
-    catch(e){ return null; }
-  }
+  /* ============ Staff session (no password is ever stored) ============ */
+  // Login sets an HttpOnly cookie that scripts can't read. This object only
+  // remembers *whether* we're logged in, for the UI.
+  let session = { loggedIn: false, username: "", expiresAt: 0 };
+  const IDLE_LIMIT_MS = 30 * 60 * 1000;
+  let lastActive = Date.now();
+  let idleTimer = null;
+
+  function getAuth(){ return session.loggedIn ? session : null; }
+
   function setLoginStatusPill(loggedIn){
     const pill = document.getElementById("login-status-pill");
     if(loggedIn){
-      pill.textContent = "Logged in";
+      const until = session.expiresAt ? new Date(session.expiresAt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+      pill.textContent = until ? `Logged in · until ${until}` : "Logged in";
       pill.classList.remove("disconnected");
       pill.classList.add("connected");
     } else {
       pill.textContent = "Not logged in";
       pill.classList.remove("connected");
       pill.classList.add("disconnected");
-    }
-  }
-  function loadAuthIntoForm(){
-    const auth = getAuth();
-    if(auth && auth.username){
-      document.getElementById("login-username").value = auth.username;
-      document.getElementById("login-password").value = auth.password;
-      setLoginStatusPill(true);
-    } else {
-      setLoginStatusPill(false);
     }
   }
   function showStatus(elId, type, html){
@@ -341,6 +339,51 @@ async function approveSubmission(id){
   function hideStatus(elId){
     document.getElementById(elId).className = "publish-status";
   }
+
+  // Same-origin only, cookie attached automatically, CSRF header on every call.
+  async function adminFetch(url, init){
+    const opts = init || {};
+    const res = await fetch(url, {
+      ...opts,
+      credentials: "same-origin",
+      headers: { ...(opts.headers || {}), "Content-Type": "application/json", "X-Requested-With": "SoulScriptEditor" }
+    });
+    if(res.status === 401){
+      let code = "";
+      try{ code = (await res.clone().json()).code; }catch(e){}
+      if(code === "auth") sessionEnded("Your session ended — please log in again.");
+    }
+    return res;
+  }
+
+  function applySession(info){
+    session = info && info.loggedIn ? { loggedIn: true, username: info.username || "", expiresAt: info.expiresAt || 0 } : { loggedIn: false, username: "", expiresAt: 0 };
+    setLoginStatusPill(session.loggedIn);
+    if(session.loggedIn){ lastActive = Date.now(); startIdleWatch(); }
+    else { stopIdleWatch(); }
+  }
+  function sessionEnded(message){
+    applySession(null);
+    showStatus("login-status", "error", "🔒 " + message);
+    document.getElementById("login-panel-body").style.display = "block";
+    clearSensitiveLists();
+  }
+  function clearSensitiveLists(){
+    pendingItems = [];
+    const list = document.getElementById("pending-list"); if(list) list.innerHTML = "";
+    const al = document.getElementById("audit-list"); if(al) al.innerHTML = "";
+  }
+
+  function startIdleWatch(){
+    stopIdleWatch();
+    idleTimer = setInterval(() => {
+      if(!session.loggedIn) return;
+      if(Date.now() - lastActive > IDLE_LIMIT_MS){ doLogout("You were logged out after 30 minutes of inactivity."); return; }
+      if(session.expiresAt && Date.now() / 1000 > session.expiresAt){ sessionEnded("Your 4-hour session ended — please log in again."); }
+    }, 15000);
+  }
+  function stopIdleWatch(){ if(idleTimer){ clearInterval(idleTimer); idleTimer = null; } }
+  ["pointerdown", "keydown", "input", "scroll"].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true, capture: true }));
 
   async function doLogin(){
     const username = document.getElementById("login-username").value.trim();
@@ -353,47 +396,60 @@ async function approveSubmission(id){
     try{
       const res = await fetch("/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-Requested-With": "SoulScriptEditor" },
         body: JSON.stringify({ username, password })
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      document.getElementById("login-password").value = "";           // the password never lingers in the page
       if(data.ok){
-        localStorage.setItem(AUTH_KEY, JSON.stringify({ username, password }));
-        setLoginStatusPill(true);
-        showStatus("login-status", "success", "✅ Logged in. You can publish now.");
+        applySession({ loggedIn: true, username: data.username, expiresAt: data.expiresAt });
+        const warn = data.warning ? `<br><strong>⚠ ${escapeHtml(data.warning)}</strong>` : "";
+        showStatus("login-status", "success", "✅ Logged in. You can publish now." + warn);
+        loadPending();
       } else {
-        setLoginStatusPill(false);
-        showStatus("login-status", "error", data.error || "Incorrect username or password.");
+        applySession(null);
+        showStatus("login-status", "error", escapeHtml(data.error || "Incorrect username or password."));
       }
     } catch(e){
       showStatus("login-status", "error", "Couldn't reach the server. Check your internet connection and try again.");
     }
   }
 
-  function doLogout(){
-    localStorage.removeItem(AUTH_KEY);
+  async function doLogout(message){
+    try{ await adminFetch("/api/logout", { method: "POST", body: "{}" }); }catch(e){}
     document.getElementById("login-username").value = "";
     document.getElementById("login-password").value = "";
-    setLoginStatusPill(false);
-    hideStatus("login-status");
+    applySession(null);
+    clearSensitiveLists();
+    if(typeof message === "string" && message){ showStatus("login-status", "error", "🔒 " + message); document.getElementById("login-panel-body").style.display = "block"; }
+    else hideStatus("login-status");
   }
 
   document.getElementById("login-panel-toggle").addEventListener("click", () => {
     const body = document.getElementById("login-panel-body");
     body.style.display = body.style.display === "none" ? "block" : "none";
   });
-
-  loadAuthIntoForm();
+  ["login-username", "login-password"].forEach(id => document.getElementById(id).addEventListener("keydown", (e) => { if(e.key === "Enter"){ e.preventDefault(); doLogin(); } }));
 
   function requireAuth(statusElId){
-    const auth = getAuth();
-    if(!auth || !auth.username || !auth.password){
+    if(!session.loggedIn){
       showStatus(statusElId, "error", "⚠ Please log in first — open the <strong>Staff Login</strong> panel above.");
       document.getElementById("login-panel-body").style.display = "block";
       window.scrollTo({ top: 0, behavior: "smooth" });
       return null;
     }
-    return auth;
+    return session;
+  }
+
+  // On page load: are we already logged in (cookie still valid)? Nothing secret is read back.
+  async function bootSession(){
+    try{
+      const res = await fetch("/api/session", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-Requested-With": "SoulScriptEditor" }, body: "{}" });
+      const data = await res.json();
+      if(data.ok && data.loggedIn){ applySession(data); loadPending(); return; }
+    }catch(e){}
+    applySession(null);
   }
 
   /* ============ File helpers ============ */
@@ -413,7 +469,7 @@ async function approveSubmission(id){
   }
 
   async function callPublishApiRaw(payload){
-    const res = await fetch("/api/publish", {
+    const res = await adminFetch("/api/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -586,7 +642,7 @@ async function approveSubmission(id){
       <h1 style="font-size:1.5rem; margin:10px 0 6px;">${escapeHtml(title)}</h1>
       ${caption ? `<p class="deck" style="font-size:.95rem;">${escapeHtml(caption)}</p>` : ""}
       <div class="byline" style="margin-bottom:14px;">${escapeHtml(author)} · ${formatDate(date)}</div>
-      ${imgSrc ? `<img src="${imgSrc}" style="width:100%; border:1px solid var(--rule); border-radius:var(--radius-md);" alt="">` : `<div class="empty-state">No photo added yet.</div>`}
+      ${imgSrc ? `<img src="${escapeHtml(imgSrc)}" style="width:100%; border:1px solid var(--rule); border-radius:var(--radius-md);" alt="">` : `<div class="empty-state">No photo added yet.</div>`}
     `;
   }
 
@@ -915,7 +971,6 @@ async function approveSubmission(id){
       }
 
       let { status, data } = await callPublishApi({
-        username: auth.username, password: auth.password,
         type: "post", data: post, image
       });
 
@@ -924,7 +979,6 @@ async function approveSubmission(id){
         if(!proceed){ btn.disabled = false; hideStatus("p-status"); return; }
         showStatus("p-status", "working", "Overwriting…");
         ({ status, data } = await callPublishApi({
-          username: auth.username, password: auth.password,
           type: "post", data: post, image, confirmOverwrite: true
         }));
       }
@@ -963,7 +1017,6 @@ async function approveSubmission(id){
 
     try{
       let { status, data } = await callPublishApi({
-        username: auth.username, password: auth.password,
         type: "video", data: v
       });
 
@@ -972,7 +1025,6 @@ async function approveSubmission(id){
         if(!proceed){ btn.disabled = false; hideStatus("v-status"); return; }
         showStatus("v-status", "working", "Overwriting…");
         ({ status, data } = await callPublishApi({
-          username: auth.username, password: auth.password,
           type: "video", data: v, confirmOverwrite: true
         }));
       }
@@ -1025,7 +1077,6 @@ async function approveSubmission(id){
       }
 
       let { status, data } = await callPublishApi({
-        username: auth.username, password: auth.password,
         type: "photo", data: p, image
       });
 
@@ -1034,7 +1085,6 @@ async function approveSubmission(id){
         if(!proceed){ btn.disabled = false; hideStatus("ph-status"); return; }
         showStatus("ph-status", "working", "Overwriting…");
         ({ status, data } = await callPublishApi({
-          username: auth.username, password: auth.password,
           type: "photo", data: p, image, confirmOverwrite: true
         }));
       }
@@ -1087,7 +1137,6 @@ async function approveSubmission(id){
       }
 
       let { status, data } = await callPublishApi({
-        username: auth.username, password: auth.password,
         type: "event", data: ev, image
       });
 
@@ -1096,7 +1145,6 @@ async function approveSubmission(id){
         if(!proceed){ btn.disabled = false; hideStatus("ev-status-msg"); return; }
         showStatus("ev-status-msg", "working", "Overwriting…");
         ({ status, data } = await callPublishApi({
-          username: auth.username, password: auth.password,
           type: "event", data: ev, image, confirmOverwrite: true
         }));
       }
@@ -1141,7 +1189,6 @@ async function approveSubmission(id){
       }
 
       let { status, data } = await callPublishApi({
-        username: auth.username, password: auth.password,
         type: "team", data: m, image
       });
 
@@ -1150,7 +1197,6 @@ async function approveSubmission(id){
         if(!proceed){ btn.disabled = false; hideStatus("tm-status"); return; }
         showStatus("tm-status", "working", "Overwriting…");
         ({ status, data } = await callPublishApi({
-          username: auth.username, password: auth.password,
           type: "team", data: m, image, confirmOverwrite: true
         }));
       }
@@ -1220,8 +1266,8 @@ async function approveSubmission(id){
           <span class="manage-item-meta">${it._kind === "team" ? escapeHtml(it.role || TEAM_LABELS[it.team] || "") : (META[it._kind] || (CATEGORY_LABELS && CATEGORY_LABELS[it.category] || it.category || "")) + " · " + formatDate(it.date)}</span>
         </div>
         <div class="manage-item-actions">
-          <button type="button" class="edit-btn" onclick="${EDIT_FN[it._kind]}('${it.slug}')">Edit</button>
-          <button type="button" class="delete-btn" onclick="${DELETE_FN[it._kind]}('${it.slug}')">Delete</button>
+          <button type="button" class="edit-btn" data-action="${EDIT_FN[it._kind]}" data-arg="${escapeHtml(it.slug)}">Edit</button>
+          <button type="button" class="delete-btn" data-action="${DELETE_FN[it._kind]}" data-arg="${escapeHtml(it.slug)}">Delete</button>
         </div>
       </div>`).join("");
   }
@@ -1261,10 +1307,10 @@ async function approveSubmission(id){
     if(!auth) return;
     showStatus("manage-status", "working", `Removing "${escapeHtml(m.name)}"…`);
     try{
-      const res = await fetch("/api/delete", {
+      const res = await adminFetch("/api/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, type: "team", slug })
+        body: JSON.stringify({ type: "team", slug })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Delete failed.");
@@ -1376,10 +1422,10 @@ async function approveSubmission(id){
     if(!auth) return;
     showStatus("manage-status", "working", `Deleting "${escapeHtml(post.title)}"…`);
     try{
-      const res = await fetch("/api/delete", {
+      const res = await adminFetch("/api/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, type: "post", slug })
+        body: JSON.stringify({ type: "post", slug })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Delete failed.");
@@ -1402,10 +1448,10 @@ async function approveSubmission(id){
     if(!auth) return;
     showStatus("manage-status", "working", `Deleting "${escapeHtml(v.title)}"…`);
     try{
-      const res = await fetch("/api/delete", {
+      const res = await adminFetch("/api/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, type: "video", slug })
+        body: JSON.stringify({ type: "video", slug })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Delete failed.");
@@ -1428,10 +1474,10 @@ async function approveSubmission(id){
     if(!auth) return;
     showStatus("manage-status", "working", `Deleting "${escapeHtml(p.title)}"…`);
     try{
-      const res = await fetch("/api/delete", {
+      const res = await adminFetch("/api/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, type: "photo", slug })
+        body: JSON.stringify({ type: "photo", slug })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Delete failed.");
@@ -1454,10 +1500,10 @@ async function approveSubmission(id){
     if(!auth) return;
     showStatus("manage-status", "working", `Deleting "${escapeHtml(ev.title)}"…`);
     try{
-      const res = await fetch("/api/delete", {
+      const res = await adminFetch("/api/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, type: "event", slug })
+        body: JSON.stringify({ type: "event", slug })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Delete failed.");
@@ -1480,7 +1526,11 @@ async function approveSubmission(id){
   function blockPreviewHTML(sub){
     return (sub.blocks || []).map(b => {
       if(b.type === "heading") return `<h4 style="margin:0 0 8px;">${escapeHtml(b.text)}</h4>`;
-      if(b.type === "image") return `<img src="data:${mimeFromFilename(b.filename)};base64,${b.base64}" alt="">${b.caption ? `<p style="font-size:.8em;opacity:.7;">${escapeHtml(b.caption)}</p>` : ""}`;
+      if(b.type === "image"){
+        // base64 comes from a stranger: only a pure base64 string is allowed into the attribute.
+        if(typeof b.base64 !== "string" || !/^[A-Za-z0-9+/]+={0,2}$/.test(b.base64)) return `<p class="manage-empty">⚠ An image in this submission was blocked (invalid data).</p>`;
+      }
+      if(b.type === "image") return `<img src="data:${escapeHtml(mimeFromFilename(b.filename))};base64,${b.base64}" alt="">${b.caption ? `<p style="font-size:.8em;opacity:.7;">${escapeHtml(b.caption)}</p>` : ""}`;
       if(typeof b.html === "string" && b.html) return `<p>${sanitizeInlineHTML(b.html)}</p>`;
       return `<p>${escapeHtml(b.text)}</p>`;
     }).join("");
@@ -1491,10 +1541,10 @@ async function approveSubmission(id){
     if(!auth) return;
     showStatus("pending-status", "working", "Loading submissions…");
     try{
-      const res = await fetch("/api/pending", {
+      const res = await adminFetch("/api/pending", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, status: "pending" })
+        body: JSON.stringify({ status: "pending" })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Couldn't load submissions.");
@@ -1515,10 +1565,10 @@ async function approveSubmission(id){
     const reviewNote = prompt("Optional note for the contributor (they'll see this):", "") || "";
     showStatus("pending-status", "working", "Declining…");
     try{
-      const res = await fetch("/api/review", {
+      const res = await adminFetch("/api/review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: auth.username, password: auth.password, id, action: "reject", reviewNote })
+        body: JSON.stringify({ id, action: "reject", reviewNote })
       });
       const data = await res.json();
       if(!data.ok) throw new Error(data.error || "Couldn't decline this submission.");
@@ -1529,4 +1579,60 @@ async function approveSubmission(id){
     }
   }
 
-  loadPending();
+  bootSession();
+
+
+/* =========================================================================
+   Click routing (the page runs under a strict Content-Security-Policy, so
+   there are no inline onclick="" handlers — buttons carry data-action).
+   Only the names listed here can ever be triggered.
+   ========================================================================= */
+const ACTIONS = {
+  setMode, setImageMode, setPhotoImageMode, setTeamImageMode, setEventImageMode,
+  publishPost, publishVideo, publishPhoto, publishEvent, publishTeamMember,
+  downloadPost, downloadVideo, downloadPhoto, downloadEvent, downloadTeamMember,
+  doLogin, doLogout: () => doLogout(), loadPending, loadAudit,
+  restoreDraft, discardDraft, approveSubmission, rejectSubmission,
+  editPost, editVideo, editPhoto, editEvent, editTeamMember,
+  confirmDeletePost, confirmDeleteVideo, confirmDeletePhoto, confirmDeleteEvent, confirmDeleteTeamMember
+};
+document.addEventListener("click", (e) => {
+  const el = e.target.closest("[data-action]");
+  if(!el) return;
+  const fn = Object.prototype.hasOwnProperty.call(ACTIONS, el.dataset.action) ? ACTIONS[el.dataset.action] : null;
+  if(!fn) return;
+  e.preventDefault();
+  fn(el.dataset.arg);
+});
+document.getElementById("manage-search").addEventListener("input", () => renderManageList());
+
+/* ---------------- Security log ---------------- */
+const AUDIT_LABELS = {
+  login_ok: ["Logged in", "ok"], login_fail: ["Failed login attempt", "bad"], login_locked: ["Login blocked — too many attempts", "bad"],
+  logout: ["Logged out", ""], publish: ["Published", ""], publish_blocked: ["Blocked unsafe content", "bad"],
+  delete: ["Deleted", "warn"], approve: ["Approved a submission", ""], reject: ["Declined a submission", ""]
+};
+async function loadAudit(){
+  if(!requireAuth("audit-status")) return;
+  showStatus("audit-status", "working", "Loading…");
+  try{
+    const res = await adminFetch("/api/audit", { method: "POST", body: "{}" });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "Couldn't load the log.");
+    hideStatus("audit-status");
+    const list = document.getElementById("audit-list");
+    if(!data.available){
+      list.innerHTML = `<p class="helper-text">The security log needs a Cloudflare KV namespace. Bind one named <code>ADMIN_STATE</code> (or reuse <code>SUBMISSIONS</code>) in Settings → Functions → KV namespace bindings. Events are also written to the Cloudflare function logs.</p>`;
+      return;
+    }
+    if(!data.items.length){ list.innerHTML = `<p class="helper-text">Nothing recorded yet.</p>`; return; }
+    list.innerHTML = `<table class="guide-table"><thead><tr><th>When</th><th>What</th><th>Details</th><th>From</th></tr></thead><tbody>${data.items.map(it => {
+      const [label, tone] = AUDIT_LABELS[it.evt] || [it.evt, ""];
+      const detail = [it.type, it.slug || it.id, it.why].filter(Boolean).join(" · ");
+      return `<tr class="audit-${tone}"><td>${escapeHtml(new Date(it.t).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }))}</td><td>${escapeHtml(label)}</td><td>${escapeHtml(detail)}</td><td>${escapeHtml(it.ip || "")}</td></tr>`;
+    }).join("")}</tbody></table>`;
+  }catch(e){
+    showStatus("audit-status", "error", "⚠ " + escapeHtml(e.message));
+  }
+}
+document.getElementById("audit-panel").addEventListener("toggle", (e) => { if(e.target.open && session.loggedIn) loadAudit(); });

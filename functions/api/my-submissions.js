@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: "Your session has expired — please log in again." }, 401);
   }
 
-  const list = await env.SUBMISSIONS.list();
+  const list = await env.SUBMISSIONS.list({ prefix: "sub_" });
   const items = [];
   for (const key of list.keys) {
     const raw = await env.SUBMISSIONS.get(key.name);

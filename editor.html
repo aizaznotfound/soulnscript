@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Editorial Access — Soul &amp; Script</title>
 <meta name="description" content="Publish writing, films, gallery pieces, events, and manage the Soul &amp; Script team — no code required.">
@@ -50,12 +52,21 @@
         </div>
       </div>
       <div class="gh-actions">
-        <button type="button" class="btn" onclick="doLogin()">Log In</button>
-        <button type="button" class="btn-secondary" onclick="doLogout()">Log Out</button>
+        <button type="button" class="btn" data-action="doLogin">Log In</button>
+        <button type="button" class="btn-secondary" data-action="doLogout">Log Out</button>
       </div>
+      <p class="helper-text" style="margin:12px 0 0;">🔒 Your password is checked once and never kept in this browser. You stay logged in for up to 4 hours, and are logged out automatically after 30 minutes of inactivity. Five wrong attempts lock this connection out for 15 minutes. Always log out on a shared computer.</p>
       <div id="login-status" class="publish-status"></div>
     </div>
   </div>
+
+  <!-- ============ Security log ============ -->
+  <details class="guide-panel" id="audit-panel">
+    <summary>🛡 Security log <small style="font-weight:400;color:var(--ink-3);">— recent logins, failed attempts, publishes and deletes</small></summary>
+    <div class="gh-actions" style="margin-top:12px;"><button type="button" class="btn-secondary" data-action="loadAudit">Refresh</button></div>
+    <div id="audit-list" style="margin-top:12px;"></div>
+    <div id="audit-status" class="publish-status"></div>
+  </details>
 
   <!-- ============ Contributor submissions awaiting review ============ -->
   <div class="gh-panel" id="pending-panel">
@@ -66,7 +77,7 @@
     <div class="gh-panel-body" id="pending-panel-body">
       <p class="helper-text" style="margin-top:-2px;">Articles submitted by readers through <code>write.html</code> land here. Review each one, then approve (publishes it live) or decline (the contributor sees your note).</p>
       <div class="gh-actions">
-        <button type="button" class="btn-secondary" onclick="loadPending()">Refresh</button>
+        <button type="button" class="btn-secondary" data-action="loadPending">Refresh</button>
       </div>
       <div id="pending-list" style="margin-top:14px;"></div>
       <div id="pending-status" class="publish-status"></div>
@@ -95,11 +106,11 @@
   <div id="draft-banner" class="draft-banner" style="display:none;"></div>
 
   <div class="editor-tabs">
-    <button type="button" class="active" data-mode="post" onclick="setMode('post')">Writing <span class="tab-room">Literature · Philosophy</span></button>
-    <button type="button" data-mode="video" onclick="setMode('video')">Video <span class="tab-room">Cinema</span></button>
-    <button type="button" data-mode="photo" onclick="setMode('photo')">Art Piece <span class="tab-room">Art · Wall</span></button>
-    <button type="button" data-mode="event" onclick="setMode('event')">Event</button>
-    <button type="button" data-mode="team" onclick="setMode('team')">Team Member</button>
+    <button type="button" class="active" data-mode="post" data-action="setMode" data-arg="post">Writing <span class="tab-room">Literature · Philosophy</span></button>
+    <button type="button" data-mode="video" data-action="setMode" data-arg="video">Video <span class="tab-room">Cinema</span></button>
+    <button type="button" data-mode="photo" data-action="setMode" data-arg="photo">Art Piece <span class="tab-room">Art · Wall</span></button>
+    <button type="button" data-mode="event" data-action="setMode" data-arg="event">Event</button>
+    <button type="button" data-mode="team" data-action="setMode" data-arg="team">Team Member</button>
   </div>
 
   <div class="editor-shell" id="post-shell">
@@ -144,8 +155,8 @@
         <div class="form-field">
           <label>Image</label>
           <div class="image-input-toggle">
-            <button type="button" class="active" data-imgmode="upload" onclick="setImageMode('upload')">Upload from computer</button>
-            <button type="button" data-imgmode="url" onclick="setImageMode('url')">Paste image URL</button>
+            <button type="button" class="active" data-imgmode="upload" data-action="setImageMode" data-arg="upload">Upload from computer</button>
+            <button type="button" data-imgmode="url" data-action="setImageMode" data-arg="url">Paste image URL</button>
           </div>
           <div id="p-image-upload-wrap">
             <input type="file" id="p-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
@@ -204,8 +215,8 @@
             <p class="helper-text">Write the Urdu text paragraph by paragraph. If you leave this empty, Urdu readers see the English body.</p></div>
         </details>
         <div class="gh-actions">
-          <button type="button" class="btn" id="p-publish-btn" onclick="publishPost()">🚀 Publish to Site</button>
-          <button type="button" class="btn-secondary" onclick="downloadPost()">⬇ Download File Instead</button>
+          <button type="button" class="btn" id="p-publish-btn" data-action="publishPost">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" data-action="downloadPost">⬇ Download File Instead</button>
         </div>
         <div id="p-warning" class="editor-warning" style="display:none;"></div>
         <div id="p-status" class="publish-status"></div>
@@ -262,8 +273,8 @@
           <div class="form-field"><label for="v-title-ur">Title (Urdu)</label><input type="text" id="v-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="v-deck-ur">Description (Urdu)</label><textarea id="v-deck-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="v-author-ur">Credit (Urdu)</label><input type="text" id="v-author-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div>
         </details>
         <div class="gh-actions">
-          <button type="button" class="btn" id="v-publish-btn" onclick="publishVideo()">🚀 Publish to Site</button>
-          <button type="button" class="btn-secondary" onclick="downloadVideo()">⬇ Download File Instead</button>
+          <button type="button" class="btn" id="v-publish-btn" data-action="publishVideo">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" data-action="downloadVideo">⬇ Download File Instead</button>
         </div>
         <div id="v-warning" class="editor-warning" style="display:none;"></div>
         <div id="v-status" class="publish-status"></div>
@@ -304,8 +315,8 @@
         <div class="form-field">
           <label>Photo</label>
           <div class="image-input-toggle">
-            <button type="button" class="active" data-imgmode="upload" onclick="setPhotoImageMode('upload')">Upload from computer</button>
-            <button type="button" data-imgmode="url" onclick="setPhotoImageMode('url')">Paste image URL</button>
+            <button type="button" class="active" data-imgmode="upload" data-action="setPhotoImageMode" data-arg="upload">Upload from computer</button>
+            <button type="button" data-imgmode="url" data-action="setPhotoImageMode" data-arg="url">Paste image URL</button>
           </div>
           <div id="ph-image-upload-wrap">
             <input type="file" id="ph-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
@@ -325,8 +336,8 @@
           <div class="form-field"><label for="ph-title-ur">Title (Urdu)</label><input type="text" id="ph-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="ph-caption-ur">Caption (Urdu)</label><textarea id="ph-caption-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="ph-author-ur">Artist / credit (Urdu)</label><input type="text" id="ph-author-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div>
         </details>
         <div class="gh-actions">
-          <button type="button" class="btn" id="ph-publish-btn" onclick="publishPhoto()">🚀 Publish to Site</button>
-          <button type="button" class="btn-secondary" onclick="downloadPhoto()">⬇ Download File Instead</button>
+          <button type="button" class="btn" id="ph-publish-btn" data-action="publishPhoto">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" data-action="downloadPhoto">⬇ Download File Instead</button>
         </div>
         <div id="ph-warning" class="editor-warning" style="display:none;"></div>
         <div id="ph-status" class="publish-status"></div>
@@ -391,8 +402,8 @@
         <div class="form-field">
           <label>Poster / Photo (optional)</label>
           <div class="image-input-toggle">
-            <button type="button" class="active" data-imgmode="upload" onclick="setEventImageMode('upload')">Upload from computer</button>
-            <button type="button" data-imgmode="url" onclick="setEventImageMode('url')">Paste image URL</button>
+            <button type="button" class="active" data-imgmode="upload" data-action="setEventImageMode" data-arg="upload">Upload from computer</button>
+            <button type="button" data-imgmode="url" data-action="setEventImageMode" data-arg="url">Paste image URL</button>
           </div>
           <div id="ev-image-upload-wrap">
             <input type="file" id="ev-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
@@ -408,8 +419,8 @@
           <div class="form-field"><label for="ev-title-ur">Title (Urdu)</label><input type="text" id="ev-title-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="ev-description-ur">Description (Urdu)</label><textarea id="ev-description-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div><div class="form-field"><label for="ev-location-ur">Location (Urdu)</label><input type="text" id="ev-location-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div>
         </details>
         <div class="gh-actions">
-          <button type="button" class="btn" id="ev-publish-btn" onclick="publishEvent()">🚀 Publish to Site</button>
-          <button type="button" class="btn-secondary" onclick="downloadEvent()">⬇ Download File Instead</button>
+          <button type="button" class="btn" id="ev-publish-btn" data-action="publishEvent">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" data-action="downloadEvent">⬇ Download File Instead</button>
         </div>
         <div id="ev-warning" class="editor-warning" style="display:none;"></div>
         <div id="ev-status-msg" class="publish-status"></div>
@@ -462,8 +473,8 @@
         <div class="form-field">
           <label>Profile Photo (optional — leave blank to show initials)</label>
           <div class="image-input-toggle">
-            <button type="button" class="active" data-imgmode="upload" onclick="setTeamImageMode('upload')">Upload from computer</button>
-            <button type="button" data-imgmode="url" onclick="setTeamImageMode('url')">Paste image URL</button>
+            <button type="button" class="active" data-imgmode="upload" data-action="setTeamImageMode" data-arg="upload">Upload from computer</button>
+            <button type="button" data-imgmode="url" data-action="setTeamImageMode" data-arg="url">Paste image URL</button>
           </div>
           <div id="tm-image-upload-wrap">
             <input type="file" id="tm-image-file" accept="image/png,image/jpeg,image/webp,image/gif">
@@ -478,8 +489,8 @@
           <div class="form-field"><label for="tm-name-ur">Name (Urdu)</label><input type="text" id="tm-name-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="tm-role-ur">Role (Urdu)</label><input type="text" id="tm-role-ur" class="ur-input" dir="rtl" lang="ur" placeholder=""></div><div class="form-field"><label for="tm-bio-ur">Short bio (Urdu)</label><textarea id="tm-bio-ur" class="ur-input" dir="rtl" lang="ur" style="min-height:76px;" placeholder=""></textarea></div>
         </details>
         <div class="gh-actions">
-          <button type="button" class="btn" id="tm-publish-btn" onclick="publishTeamMember()">🚀 Publish to Site</button>
-          <button type="button" class="btn-secondary" onclick="downloadTeamMember()">⬇ Download File Instead</button>
+          <button type="button" class="btn" id="tm-publish-btn" data-action="publishTeamMember">🚀 Publish to Site</button>
+          <button type="button" class="btn-secondary" data-action="downloadTeamMember">⬇ Download File Instead</button>
         </div>
         <div id="tm-warning" class="editor-warning" style="display:none;"></div>
         <div id="tm-status" class="publish-status"></div>
@@ -501,7 +512,7 @@
     </div>
     <div id="manage-panel-body" style="margin-top:16px;">
       <div class="manage-search">
-        <input type="text" id="manage-search" placeholder="Search by title…" oninput="renderManageList()">
+        <input type="text" id="manage-search" placeholder="Search by title…">
       </div>
       <div class="manage-list" id="manage-list"></div>
       <div id="manage-status" class="publish-status"></div>

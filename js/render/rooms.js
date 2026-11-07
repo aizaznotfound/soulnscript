@@ -38,7 +38,7 @@ function plateHTML(photo){
   const title = escapeHtml(ssField(photo, "title"));
   return `
   <a class="plate" href="article.html?photo=${photo.slug}">
-    <div class="plate-frame"><img src="${photo.image}" alt="${title}" loading="lazy"></div>
+    <div class="plate-frame"><img src="${escapeHtml(photo.image)}" alt="${title}" loading="lazy"></div>
     <div class="plaque"><b>${title}</b>${escapeHtml(ssField(photo, "author"))} · ${formatDate(photo.date)}</div>
   </a>`;
 }
@@ -83,7 +83,7 @@ function screenHTML(video){
   const title = escapeHtml(ssField(video, "title"));
   return `
   <a class="screen" href="article.html?video=${video.slug}">
-    <img src="${video.thumbnail}" alt="">
+    <img src="${escapeHtml(video.thumbnail)}" alt="">
     <div class="in"><h3>${title}</h3><p>${escapeHtml(ssField(video, "deck"))}</p><span class="btn sm">${escapeHtml(ssUi("ui.play"))}</span></div>
   </a>`;
 }

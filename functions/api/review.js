@@ -3,18 +3,18 @@
 // published article (same GitHub write path as publish.js). action:"reject"
 // just marks it rejected, with an optional note the contributor can see.
 
-import { json } from "../_lib/auth.js";
+import { requireAdmin, jsonResponse as json, audit } from "../_lib/admin.js";
+import { validateImageUpload, assertSafeContent } from "../_lib/validate.js";
 import { ghGetSha, ghPutFile, utf8ToBase64 } from "../_lib/github.js";
 import { escapeHtml, sanitizeInlineHtml, sanitizeCategory, isValidSlug } from "../_lib/sanitize.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
 
+  const gate = await requireAdmin(context);
+  if (gate instanceof Response) return gate;
   if (!env.SUBMISSIONS) {
     return json({ ok: false, error: "Server isn't configured — the SUBMISSIONS KV namespace isn't bound." }, 500);
-  }
-  if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD) {
-    return json({ ok: false, error: "Server isn't configured — ADMIN_USERNAME / ADMIN_PASSWORD are missing." }, 500);
   }
 
   let body;
@@ -24,12 +24,9 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: "Bad request body." }, 400);
   }
 
-  if (body.username !== env.ADMIN_USERNAME || body.password !== env.ADMIN_PASSWORD) {
-    return json({ ok: false, error: "Incorrect username or password." }, 401);
-  }
-
   const { id, action } = body;
-  if (!id) return json({ ok: false, error: "Missing submission id." }, 400);
+  // Only real submissions — never session, rate-limit or audit keys in a shared KV.
+  if (typeof id !== "string" || !/^sub_[A-Za-z0-9_]+$/.test(id)) return json({ ok: false, error: "Missing or invalid submission id." }, 400);
   if (action !== "approve" && action !== "reject") {
     return json({ ok: false, error: "Unknown action." }, 400);
   }
@@ -43,6 +40,7 @@ export async function onRequestPost(context) {
     sub.reviewNote = body.reviewNote || "";
     sub.reviewedAt = new Date().toISOString();
     await env.SUBMISSIONS.put(id, JSON.stringify(sub));
+    await audit(env, request, "reject", { id });
     return json({ ok: true, status: "rejected" });
   }
 
@@ -66,8 +64,10 @@ export async function onRequestPost(context) {
     // ---- Lead image ----
     let leadImagePath = "";
     if (sub.leadImage && sub.leadImage.base64 && sub.leadImage.filename) {
-      const ext = (sub.leadImage.filename.split(".").pop() || "jpg").toLowerCase();
-      leadImagePath = `images/${slug}.${ext}`;
+      // The type comes from the file's real bytes, never from its filename.
+      const v = validateImageUpload(sub.leadImage);
+      if (!v.ok) return json({ ok: false, error: `The lead image isn't usable: ${v.error} Decline this submission or ask the writer to re-upload.` }, 400);
+      leadImagePath = `images/${slug}.${v.ext}`;
       await ghPutFile(env, leadImagePath, sub.leadImage.base64, `Add lead image for ${sub.title}`, await ghGetSha(env, leadImagePath));
     }
 
@@ -86,8 +86,9 @@ export async function onRequestPost(context) {
         body_.push(`<h3>${escapeHtml(block.text)}</h3>`);
       } else if (block.type === "image" && block.base64 && block.filename) {
         imgCount++;
-        const ext = (block.filename.split(".").pop() || "jpg").toLowerCase();
-        const path = `images/${slug}-${imgCount}.${ext}`;
+        const v = validateImageUpload(block);
+        if (!v.ok) return json({ ok: false, error: `An inline image isn't usable: ${v.error} Decline this submission or ask the writer to re-upload.` }, 400);
+        const path = `images/${slug}-${imgCount}.${v.ext}`;
         await ghPutFile(env, path, block.base64, `Add inline image for ${sub.title}`, await ghGetSha(env, path));
         const cap = block.caption ? `<figcaption>${escapeHtml(block.caption)}</figcaption>` : "";
         body_.push(`<figure><img src="${path}" alt="${escapeHtml(block.caption || sub.title)}">${cap}</figure>`);
@@ -114,6 +115,8 @@ export async function onRequestPost(context) {
       body: body_
     };
 
+    try { assertSafeContent(data); } catch (e) { return json({ ok: false, error: e.message }, 400); }
+
     const contentB64 = utf8ToBase64(JSON.stringify(data, null, 2));
     await ghPutFile(env, `content/posts/${slug}.json`, contentB64, `Publish (contributor): ${sub.title}`, existingSha);
 
@@ -122,6 +125,7 @@ export async function onRequestPost(context) {
     sub.publishedSlug = slug;
     await env.SUBMISSIONS.put(id, JSON.stringify(sub));
 
+    await audit(env, request, "approve", { id, slug });
     return json({ ok: true, status: "approved", slug });
   } catch (e) {
     return json({ ok: false, error: e.message || "Something went wrong while publishing." }, 500);

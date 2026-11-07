@@ -7,6 +7,7 @@
 // KV namespace bindings) and a SESSION_SECRET environment variable.
 
 import { hashPassword, isValidUsername, isValidEmail, json } from "../_lib/auth.js";
+import { rateLimitCheck, rateLimitHit, clientIp } from "../_lib/admin.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -20,6 +21,12 @@ export async function onRequestPost(context) {
     body = await request.json();
   } catch (e) {
     return json({ ok: false, error: "Bad request body." }, 400);
+  }
+
+  // Stop bulk sign-ups: at most 8 new accounts per hour per IP.
+  const ip = clientIp(request);
+  if ((await rateLimitCheck(env, "register", ip, 8, 3600)).blocked) {
+    return json({ ok: false, error: "Too many sign-ups from your connection. Please try again later." }, 429);
   }
 
   const username = (body.username || "").trim();
@@ -58,6 +65,7 @@ export async function onRequestPost(context) {
       createdAt: new Date().toISOString()
     };
     await env.CONTRIBUTORS.put(key, JSON.stringify(record));
+    await rateLimitHit(env, "register", ip, 3600);
 
     return json({ ok: true, username });
   } catch (e) {

@@ -275,3 +275,30 @@ Covers every kind of posting the site shows: **Writing** (5 categories → Liter
 - YouTube field accepts a normal link; the thumbnail falls back to standard quality when the video has no HD one.
 - Drafts autosave in this browser (restore banner after a reload) and clear after a successful publish.
 - Contributor submissions can be re-categorised, dated, re-slugged and featured when approving.
+
+## Security of Editorial Access (`editor.html`)
+
+**How login works now.** `/api/login` checks the admin username/password once and starts a session in an **HttpOnly, Secure, SameSite=Strict** cookie (4 hours). The password is never stored in, or readable by, the browser — older versions kept it in `localStorage` and sent it with every request; that stored copy is erased automatically the first time the new editor page loads. Every admin request (`publish`, `delete`, `pending`, `review`, `audit`) needs that cookie **and** passes CSRF checks (custom header, `Origin`, `Sec-Fetch-Site`, JSON content-type). Sessions end after 30 minutes idle (in the page) or 4 hours (on the server), and instantly when you press *Log Out* (with KV bound).
+
+**Environment variables** (Cloudflare Pages → Settings → Environment variables)
+
+| Name | Notes |
+|---|---|
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Use a long passphrase (16+ characters). The login warns if it's under 12. |
+| `SESSION_SECRET` | **Now required for the editor too.** 32+ random characters. |
+| `GH_TOKEN`, `GH_OWNER`, `GH_REPO`, `GH_BRANCH` | As before. Use a fine-grained token limited to this repo's *Contents*. |
+
+**Strongly recommended: a KV binding named `ADMIN_STATE`** (Settings → Functions → KV namespace bindings). Without it, the lockout only lasts as long as one server instance and logout can't revoke a session. If you'd rather not create a new one, the existing `SUBMISSIONS` namespace is used automatically. With KV you also get the **Security log** panel (logins, failed attempts, publishes, deletes, approvals — IPs are partly masked).
+
+**What is protected**
+- 5 wrong passwords from one connection → 15-minute lockout (contributor login: 8 attempts; sign-ups and submissions are rate-limited too). Passwords are compared in constant time.
+- Changing `ADMIN_PASSWORD` (or the username) ends every session at once.
+- Uploaded images are checked by their real bytes (JPG/PNG/GIF/WebP only, ≤ 6 MB); the file extension comes from the bytes, never the filename. SVG/HTML are refused.
+- Content is scanned on the server before it reaches GitHub (no `<script>`, `<iframe>`, `javascript:`, inline `on…=` handlers; image/link URLs must be https or our own `images/…`).
+- Contributor submissions are rebuilt from an allow-list when they arrive, and re-checked on approval. Delete only removes images that belong to the deleted item, and slugs are validated.
+- `_headers`: the editor page runs under a strict **Content-Security-Policy** (scripts from this site only, no inline handlers — buttons use `data-action`), can't be framed, isn't indexed, isn't cached. Every page gets `nosniff`, a referrer policy, frame protection and a permissions policy.
+- Articles are cleaned again in the browser when displayed, so stored text can't run code even if it got past the server.
+
+**Optional extra layer:** put `/editor*` and the admin API paths (`/api/login`, `session`, `logout`, `publish`, `delete`, `pending`, `review`, `audit`) behind Cloudflare Access (Zero Trust, free for small teams) so only your email addresses can even reach the login. Keep the contributor paths (`register`, `contributor-login`, `submit`, `my-submissions`) public.
+
+**Known limits:** no two-factor login (use Cloudflare Access for that); contributor sessions are still kept in the contributor's own browser; the public pages don't yet run under a CSP (the contributor pages use a few inline handlers).

@@ -46,3 +46,8 @@ body{ background-color:var(--paper); }
 .pending-options select,.pending-options input[type=text],.pending-options input[type=date]{ margin-top:6px; padding:9px 11px; font-size:14px; }
 .pending-options .pend-check{ display:flex; align-items:center; gap:8px; align-self:end; padding-bottom:8px; }
 .pending-options .pend-check input{ width:auto; margin:0; }
+
+/* security log rows */
+.audit-bad td{ color:#8A1F1F; font-weight:600; background:#FBEDEA; }
+.audit-warn td{ background:#FFF6DD; }
+.audit-ok td:nth-child(2){ color:var(--phil); font-weight:600; }

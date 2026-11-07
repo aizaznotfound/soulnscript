@@ -4,11 +4,15 @@
 // added to the body) — not just the cover photo. Uses the same server-side
 // GH_TOKEN as publish.js — never exposed to the browser.
 
-import { json } from "../_lib/auth.js";
+import { requireAdmin, jsonResponse as json, audit } from "../_lib/admin.js";
+import { isValidSlug } from "../_lib/sanitize.js";
 import { ghGetFile, ghDeleteFile } from "../_lib/github.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+
+  const gate = await requireAdmin(context);
+  if (gate instanceof Response) return gate;
 
   let body;
   try {
@@ -17,22 +21,16 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: "Bad request body." }, 400);
   }
 
-  const { username, password, type, slug } = body || {};
+  const { type, slug } = body || {};
 
-  if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD) {
-    return json({ ok: false, error: "Server isn't configured — ADMIN_USERNAME / ADMIN_PASSWORD are missing." }, 500);
-  }
-  if (username !== env.ADMIN_USERNAME || password !== env.ADMIN_PASSWORD) {
-    return json({ ok: false, error: "Incorrect username or password." }, 401);
-  }
   if (!env.GH_TOKEN || !env.GH_OWNER || !env.GH_REPO || !env.GH_BRANCH) {
     return json({ ok: false, error: "Server isn't configured — GH_TOKEN / GH_OWNER / GH_REPO / GH_BRANCH are missing." }, 500);
   }
   if (type !== "post" && type !== "video" && type !== "photo" && type !== "team" && type !== "event") {
     return json({ ok: false, error: "Unknown content type." }, 400);
   }
-  if (!slug) {
-    return json({ ok: false, error: "Missing slug." }, 400);
+  if (!isValidSlug(slug)) {
+    return json({ ok: false, error: "Invalid slug." }, 400);
   }
 
   const folder = type === "post" ? "content/posts" : type === "video" ? "content/videos" : type === "photo" ? "content/photos" : type === "event" ? "content/events" : "content/team";
@@ -56,7 +54,7 @@ export async function onRequestPost(context) {
     const imagesFailed = [];
     try {
       const rawText = b64ToUtf8(file.content);
-      const localImagePaths = findLocalImagePaths(rawText);
+      const localImagePaths = findLocalImagePaths(rawText, slug);
       for (const imgPath of localImagePaths) {
         try {
           const imgFile = await ghGetFile(env, imgPath);
@@ -75,6 +73,7 @@ export async function onRequestPost(context) {
 
     await ghDeleteFile(env, jsonPath, file.sha, `Delete ${type}: ${slug}`);
 
+    await audit(env, request, "delete", { type, slug, imagesRemoved });
     return json({ ok: true, imagesRemoved, imagesFailed });
   } catch (e) {
     return json({ ok: false, error: e.message || "Something went wrong while deleting." }, 500);
@@ -85,9 +84,13 @@ export async function onRequestPost(context) {
 // "images/my-slug-2.png" wherever they appear in the JSON text — whether
 // in the top-level `image` field or embedded inside a body HTML string
 // like <img src="images/my-slug-1.jpg">. Returns unique paths only.
-function findLocalImagePaths(rawText) {
+// Only images that belong to THIS item (images/<slug>.ext or <slug>-N.ext) are
+// removed, so text inside a post can never trick a delete into removing
+// somebody else's image.
+function findLocalImagePaths(rawText, slug) {
   const matches = rawText.match(/images\/[A-Za-z0-9._-]+\.(?:jpe?g|png|gif|webp)/gi) || [];
-  return [...new Set(matches)];
+  const own = new RegExp(`^images/${slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:-\\d+)?\\.(?:jpe?g|png|gif|webp)$`, "i");
+  return [...new Set(matches)].filter((p) => own.test(p));
 }
 
 function b64ToUtf8(b64) {

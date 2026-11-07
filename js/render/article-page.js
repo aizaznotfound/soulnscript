@@ -33,7 +33,7 @@ function renderArticleDetail(){
     document.title = title + " — Soul & Script";
     head.dataset.room = "art";
     head.innerHTML = crumbHTML("art", ssUi("ui.photo")) + `<span class="tag-pill">${escapeHtml(ssUi("ui.photo"))}</span><h1>${escapeHtml(title)}</h1>${caption ? `<p class="deck">${escapeHtml(caption)}</p>` : ""}<div class="byline">${escapeHtml(ssField(photo, "author"))} · ${formatDate(photo.date)}</div>`;
-    body.innerHTML = `<figure style="margin:0 0 24px;"><img src="${photo.image}" alt="${escapeHtml(title)}" style="width:100%; border-radius:var(--radius-lg);  display:block;"></figure><div class="share-bar-mount"></div><div class="article-tags">${articleTagsHTML(ssListField(photo, "tags"))}</div>`;
+    body.innerHTML = `<figure style="margin:0 0 24px;"><img src="${escapeHtml(photo.image)}" alt="${escapeHtml(title)}" style="width:100%; border-radius:var(--radius-lg);  display:block;"></figure><div class="share-bar-mount"></div><div class="article-tags">${articleTagsHTML(ssListField(photo, "tags"))}</div>`;
     wireShareBar(body.querySelector(".share-bar-mount"), title);
     renderPrevNext("photo", photo);
     return;
@@ -49,15 +49,15 @@ function renderArticleDetail(){
   head.innerHTML = crumbHTML(roomOfCategory(post.category), ssCategory(post.category)) + `<span class="tag-pill ${post.category === 'opinion' ? 'opinion' : ''}">${escapeHtml(ssCategory(post.category))}</span><h1>${escapeHtml(title)}</h1><p class="deck">${escapeHtml(deck)}</p><div class="byline-block"><div class="avatar">${escapeHtml((author || "?").charAt(0))}</div><div><div class="byline" style="margin:0;"><a href="voices.html#${voiceSlug(authorName(author))}">${escapeHtml(author)}</a></div><div class="byline" style="margin:0;opacity:.7;">${formatDate(post.date)} · ${escapeHtml(ssField(post, "readTime"))}</div></div></div>`;
 
   const imageCaption = ssField(post, "imageCaption");
-  const figure = post.image ? `<figure><img src="${post.image}" alt="${escapeHtml(title)}">${imageCaption ? `<figcaption>${escapeHtml(imageCaption)}</figcaption>` : ""}</figure>` : "";
+  const figure = post.image ? `<figure><img src="${escapeHtml(post.image)}" alt="${escapeHtml(title)}">${imageCaption ? `<figcaption>${escapeHtml(imageCaption)}</figcaption>` : ""}</figure>` : "";
   const rawBlockRe = /^\s*<(h[1-6]|figure|blockquote|ul|ol|div|table)[\s>]/i;
   let dropCapUsed = false;
   const paragraphs = ssListField(post, "body").map((paragraph) => {
     const isRawBlock = typeof paragraph === "string" && rawBlockRe.test(paragraph);
-    if(isRawBlock) return paragraph;
+    if(isRawBlock) return sanitizeBlockHTML(paragraph);
     const cls = !dropCapUsed ? ' class="drop-cap"' : '';
     dropCapUsed = true;
-    return `<p${cls}>${paragraph}</p>`;
+    return `<p${cls}>${sanitizeInlineHTML(paragraph)}</p>`;
   }).join("");
 
   body.innerHTML = `${figure}${paragraphs}<div class="share-bar-mount"></div><div class="article-tags">${articleTagsHTML(ssListField(post, "tags"))}</div>`;
